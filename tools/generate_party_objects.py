@@ -155,12 +155,19 @@ def generate(root):
     custom_spells=ability_groups[1]
     spell_by_id={e["id"]:e for e in custom_spells}
     spell_template=spell_by_id.get("A11D") or custom_spells[0]
-    # Warcraft Channel: Ncl1=target kind, Ncl2=options,
-    # Ncl3=follow-through, Ncl4=art duration, Ncl5=disable other abilities,
-    # Ncl6=base order. The four DIFFERENT order IDs are essential.
-    orders=("thunderclap","roar","fanofknives","berserk")
+    # Channel (ANcl) REAL field layout:
+    # Ncl1 = follow-through time (REAL), Ncl2 = target type (INT),
+    # Ncl3 = options mask (INT; bit 1 means Visible),
+    # Ncl4 = art duration (REAL), Ncl5 = disable other skills (BOOL),
+    # Ncl6 = base order ID (STRING). Never write target type into Ncl1.
     target_types={"instant":0,"unit":1,"point":2}
+    orders={
+        "unit":("chainlightning","acidbomb","cripple","curse"),
+        "point":("blink","blizzard","carrionswarm","earthquake"),
+        "instant":("avatar","berserk","phaseshift","roar"),
+    }
     for hero in heroes:
+        used_orders=set()
         for k,skill in enumerate(hero["skills"]):
             ident=skill["id"]
             obj=spell_by_id.get(ident)
@@ -169,8 +176,12 @@ def generate(root):
                 obj=clone(template,ident)
                 custom_spells.append(obj)
                 spell_by_id[ident]=obj
-            for rank in range(1,6):
-                tooltip=f"{skill['name']} |cffc0c0c0[ур. {rank}]|r"
+            options=orders[skill["target"]]
+            chosen=next((order for order in options if order not in used_orders),None)
+            if not chosen: raise ValueError(f"Not enough free base orders: {hero['name']}")
+            used_orders.add(chosen)
+            for level in range(1,6):
+                tooltip=f"{skill['name']} |cffc0c0c0[ур. {level}]|r"
                 body=f"{skill['description']} |n|nСтоимость: {skill['mana']} маны | Перезарядка: {skill['cooldown']} сек."
                 for code,value,typ in (
                     ("anam",skill["name"],3),
@@ -178,16 +189,16 @@ def generate(root):
                     ("aart",skill["icon"],3),("ahky",skill["key"],3),
                     ("amcs",int(skill["mana"]),0),
                     ("acdn",float(skill["cooldown"]),1),
-                    ("Ncl1",target_types[skill["target"]],0),
-                    ("Ncl2",0,0),("Ncl3",0.0,1),("Ncl4",0.0,1),
-                    ("Ncl5",0,0),("Ncl6",orders[k],3),
+                    ("Ncl1",0.0,1),("Ncl2",target_types[skill["target"]],0),
+                    ("Ncl3",1,0),("Ncl4",0.0,1),
+                    ("Ncl5",0,0),("Ncl6",chosen,3),
                 ):
-                    field(obj,code,value,rank,typ=typ)
+                    field(obj,code,value,level,typ=typ)
                 field(obj,"alev",5,typ=0)
                 field(obj,"abpx",k,typ=0)
                 field(obj,"abpy",2,typ=0)
-                field(obj,"aran",800 if skill["target"]!="instant" else 0,rank,typ=1)
-                field(obj,"atar","air,ground,enemy,friend,self",rank,typ=3)
+                field(obj,"aran",800 if skill["target"]!="instant" else 0,level,typ=1)
+                field(obj,"atar","air,ground,enemy,friend,self",level,typ=3)
     encode(root/"war3map.w3a",av,ability_groups,True)
     return len(custom),len(custom_spells)
 
