@@ -124,3 +124,65 @@ for kind=1,12 do
   end
 end
 print("48 role abilities executed successfully in mocked Lua runtime")
+
+-- Character-specific regression checks: passive W, armor rollback, parry -> R, Valor.
+do
+  units={}
+  pending={}
+  local blade=unit(0,0,0)
+  local target=unit(5,150,0,false)
+  Arena.heroUnits={[0]=blade}
+  Arena.heroKind={[0]=2}
+  Arena.resources={[0]={valor=0,combo=0}}
+  Arena.roleState={}
+  Arena.bleeds={}
+  Arena.bleedArmor={}
+  Arena.statuses={}
+  Arena.cooldowns={}
+  Arena.clock=100
+  now=100
+  local armor=BlzGetUnitArmor(target)
+  Arena.applyBleed(blade,target,2,8)
+  assert(Arena.bleedCount(target)==2,"bleed should start at 2 stacks")
+  assert(BlzGetUnitArmor(target)==armor-2,"two stacks must remove two armor")
+  Arena.applyBleed(blade,target,1,8)
+  assert(Arena.bleedCount(target)==3 and BlzGetUnitArmor(target)==armor-3)
+  Arena.removeBleed(target)
+  assert(Arena.bleedCount(target)==0 and BlzGetUnitArmor(target)==armor,"bleed cleanup must restore armor")
+  assert(Arena.castHero(blade,Arena.spells[2][2])==false,"passive W must not be castable")
+  assert(Arena.cooldowns[GetHandleId(blade)..":"..Arena.spells[2][2]]==nil)
+  local attacker=blade
+  function GetEventDamageSource() return attacker end
+  function BlzGetEventIsAttack() return true end
+  Arena.modifyIncoming(target,25)
+  assert(Arena.bleedCount(target)==1,"ordinary attack must proc passive bleed W")
+  Arena.removeBleed(target)
+  local dance=Arena.spells[2][4]
+  Arena.cooldowns[GetHandleId(blade)..":"..dance]=Arena.clock+46
+  attacker=target
+  Arena.role(0).parry=Arena.clock+4
+  Arena.modifyIncoming(blade,20)
+  advance(now+.08)
+  local remains=Arena.cooldowns[GetHandleId(blade)..":"..dance]-Arena.clock
+  assert(remains<40 and remains>35,"parry should refund 8 seconds of dance, got "..tostring(remains))
+end
+do
+  units={}
+  pending={}
+  local paladin=unit(0,0,0)
+  paladin.str=38
+  local target=unit(5,250,0,false)
+  Arena.heroUnits={[0]=paladin}
+  Arena.heroKind={[0]=1}
+  Arena.resources={[0]={valor=0}}
+  Arena.roleState={}
+  Arena.statuses={}
+  local old=target.hp
+  Arena.spellDamage(paladin,target,50,"physical")
+  local baseline=old-target.hp
+  Arena.resources[0].valor=100
+  old=target.hp
+  Arena.spellDamage(paladin,target,50,"physical")
+  assert((old-target.hp)>baseline*1.29,"100 Valor must boost physical skill damage +30%")
+end
+print("BLEED / ARMOR / PASSIVE / PARRY / VALOR regression checks passed")
