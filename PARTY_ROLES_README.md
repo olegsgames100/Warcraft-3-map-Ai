@@ -62,6 +62,6 @@ python3 tools/build_pure_lua.py --source . --output dist/Hero_Arena_Party_Roles_
 
 ## Limitations
 
-The first CI run detected a syntax error in `25_role_spells.lua`; a fix was committed afterward. **Do not assume CI is green unless the latest workflow run confirms it.** Warcraft III Reforged runtime, hero creation, native Object Editor custom records, sound paths, visuals, combat balance and multiplayer performance **must still be tested inside the game**. This is an experimental overhaul branch, not an in-game-tested release. Existing map terrain, wave, item and shop systems are inherited from V2.
+The validated GitHub Actions run [#38070097828](https://github.com/olegsgames100/Warcraft-3-map-Ai/actions/runs/38070097828) **succeeded**: Lua syntax, all 12 object-based hero definitions, all 48 custom abilities and HM3W/MPQ packaging checks passed. Warcraft III Reforged runtime, hero creation, native Object Editor custom records, sound paths, visuals, combat balance and multiplayer performance **must still be tested inside the game**. This is an experimental overhaul branch, not an in-game-tested release. Existing map terrain, wave, item and shop systems are inherited from V2.
 
 Recommended smoke test: select both skeletons in a two-player game; confirm their models and QWER hotkeys, rank 1–5 cooldowns, mark/consume/empowered arrow/paired ult. Then run tank+healer and mage+buffer groups through waves 1–10 before extended balancing.
