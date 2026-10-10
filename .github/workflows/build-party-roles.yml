@@ -58,7 +58,7 @@ jobs:
               unit=units[hero["id"]]
               fields={m["field"]:m for m in unit["mods"]}
               assert fields["ua1c"]["type"]==1
-              assert .5<=fields["ua1c"]["val"]<=3.0
+              assert 2.35<=fields["ua1c"]["val"]<=3.35
               assert fields["uaen"]["val"]==1
               if hero["kind"]>=11:
                   assert fields["ua1w"]["type"]==3
