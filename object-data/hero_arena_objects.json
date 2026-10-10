@@ -19,8 +19,8 @@
       "skills": [
         "A101",
         "A102",
-        "AHds",
-        "AHre"
+        "A10D",
+        "A10E"
       ]
     },
     {
@@ -41,8 +41,8 @@
       "skills": [
         "A103",
         "A104",
-        "AOcr",
-        "AOmi"
+        "A10F",
+        "A10G"
       ]
     },
     {
@@ -63,8 +63,8 @@
       "skills": [
         "A105",
         "A106",
-        "AHfs",
-        "AHmt"
+        "A10H",
+        "A10I"
       ]
     },
     {
@@ -85,8 +85,8 @@
       "skills": [
         "A107",
         "A108",
-        "AUcs",
-        "AUan"
+        "A10J",
+        "A10K"
       ]
     },
     {
@@ -107,8 +107,8 @@
       "skills": [
         "A109",
         "A10A",
-        "AEev",
-        "AEme"
+        "A10L",
+        "A10M"
       ]
     },
     {
@@ -129,8 +129,8 @@
       "skills": [
         "A10B",
         "A10C",
-        "AEer",
-        "AEst"
+        "A10N",
+        "A10O"
       ]
     }
   ],
@@ -206,6 +206,90 @@
       "base": "AHbz",
       "name": "Дождь созвездий",
       "desc": "Вызывает магический звёздный дождь, восстанавливая силы союзников."
+    },
+    {
+      "id": "A10D",
+      "base": "AHds",
+      "name": "Свет нерушимости",
+      "desc": "Священный барьер, защищающий Рейнара от всего урона.",
+      "ultimate": false
+    },
+    {
+      "id": "A10E",
+      "base": "AHre",
+      "name": "Последний рассвет",
+      "desc": "Возвращает павших союзников к жизни.",
+      "ultimate": true
+    },
+    {
+      "id": "A10F",
+      "base": "AOcr",
+      "name": "Ветер клинков",
+      "desc": "Удары клинка могут наносить критический урон.",
+      "ultimate": false
+    },
+    {
+      "id": "A10G",
+      "base": "AOmi",
+      "name": "Зеркала пустыни",
+      "desc": "Создаёт обманчивые копии Зархана.",
+      "ultimate": false
+    },
+    {
+      "id": "A10H",
+      "base": "AHfs",
+      "name": "Пылающий циклон",
+      "desc": "Призывает смерч огня и обжигает врагов.",
+      "ultimate": false
+    },
+    {
+      "id": "A10I",
+      "base": "AHmt",
+      "name": "Грозовой переход",
+      "desc": "Перемещает союзников в выбранную точку.",
+      "ultimate": true
+    },
+    {
+      "id": "A10J",
+      "base": "AUcs",
+      "name": "Коса воронов",
+      "desc": "Выпускает волну тёмной энергии по врагам.",
+      "ultimate": false
+    },
+    {
+      "id": "A10K",
+      "base": "AUan",
+      "name": "Пепельный легион",
+      "desc": "Поднимает павших воинов для сражения.",
+      "ultimate": true
+    },
+    {
+      "id": "A10L",
+      "base": "AEev",
+      "name": "Поступь призрака",
+      "desc": "Позволяет избегать вражеских ударов.",
+      "ultimate": false
+    },
+    {
+      "id": "A10M",
+      "base": "AEme",
+      "name": "Облик разлома",
+      "desc": "Превращает охотника в могущественное создание.",
+      "ultimate": true
+    },
+    {
+      "id": "A10N",
+      "base": "AEer",
+      "name": "Лунные оковы",
+      "desc": "Спутывает цель и наносит периодический урон.",
+      "ultimate": false
+    },
+    {
+      "id": "A10O",
+      "base": "AEst",
+      "name": "Звёздный час",
+      "desc": "Вызывает мощный ливень звёзд.",
+      "ultimate": true
     }
   ],
   "aura": [
@@ -361,12 +445,13 @@
       "id": "nS01",
       "base": "ngme",
       "name": "Кузница осколков",
-      "model": "Buildings\\Neutral\\GoblinMerchant\\GoblinMerchant.mdl",
+      "model": "Inherited Goblin Merchant 1.26a model (no custom path override)",
       "sale": [
         "I001",
         "I002",
         "I003",
         "ratf",
+        "ratc",
         "ofir"
       ]
     },
@@ -374,38 +459,41 @@
       "id": "nS02",
       "base": "ngme",
       "name": "Оплот Каменного Стража",
-      "model": "Buildings\\Neutral\\Marketplace\\Marketplace.mdl",
+      "model": "Inherited Goblin Merchant 1.26a model (no custom path override)",
       "sale": [
         "I004",
         "I005",
         "I006",
         "rde2",
-        "ciri"
+        "rde3",
+        "brac"
       ]
     },
     {
       "id": "nS03",
       "base": "ngme",
       "name": "Алхимик Перекрёстка",
-      "model": "Buildings\\Neutral\\GoblinLaboratory\\GoblinLaboratory.mdl",
+      "model": "Inherited Goblin Merchant 1.26a model (no custom path override)",
       "sale": [
         "I007",
         "I008",
         "I009",
         "phea",
-        "pman"
+        "pman",
+        "shrs"
       ]
     },
     {
       "id": "nS04",
       "base": "ngme",
       "name": "Хранилище запретных реликвий",
-      "model": "Buildings\\Neutral\\Tavern\\Tavern.mdl",
+      "model": "Inherited Goblin Merchant 1.26a model (no custom path override)",
       "sale": [
         "I00A",
         "I00B",
         "I00C",
         "ckng",
+        "modt",
         "rwiz"
       ]
     }
