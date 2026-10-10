@@ -1,5 +1,5 @@
 {
-  "version": 7,
+  "version": 8,
   "title": "Hero Arena Party Roles - 12 heroes, 48 spells",
   "scaling": {
     "physical": {
@@ -52,7 +52,7 @@
           "id": "A101",
           "key": "Q",
           "name": "Клеймо Доблести",
-          "description": "Физический удар по конусу, провоцирует врагов. Каждый поражённый враг пополняет Доблесть; блокировка урона также усиливает Доблесть и Решимость.",
+          "description": "Удар с провокацией накапливает Доблесть (+10 за применение и +7 за врага). Доблесть повышает физический урон паладина до +30% и снижает получаемый урон до 10%.",
           "mana": 22,
           "cooldown": 6,
           "type": "physical",
@@ -66,7 +66,7 @@
           "id": "A102",
           "key": "W",
           "name": "Клятвенный Бастион",
-          "description": "В указанной точке создаёт хорошо заметный защитный купол на 11 секунд. Союзники внутри получают щиты от Силы паладина; часть получаемого урона переносится на Арбитра. Купол и его границы видны всё время.",
+          "description": "Защитный купол на 11 сек. Видимая граница постоянно обновляется. Щиты и сопротивление урону союзников внутри купола усиливаются текущей Доблестью (0–100).",
           "mana": 38,
           "cooldown": 20,
           "type": "physical",
@@ -80,7 +80,7 @@
           "id": "A10D",
           "key": "E",
           "name": "Перехват Стража",
-          "description": "Можно применить только на другого союзного героя. Арбитр перемещается к нему, даёт зависящий от Силы щит и принимает часть дальнейшего урона союзника.",
+          "description": "Рывок ТОЛЬКО к другому союзному герою. Даёт щит от Силы, перехватывает урон, накапливает Доблесть (+12).",
           "mana": 30,
           "cooldown": 14,
           "type": "physical",
@@ -94,7 +94,7 @@
           "id": "A10E",
           "key": "R",
           "name": "Несокрушимая Клятва",
-          "description": "Даёт союзникам поблизости защиту от падения здоровья ниже 10% на 10 секунд. Каждый затронутый герой получает ровно один заряд автоматического воскрешения на 35 секунд. Сила усиливает щиты; Доблесть усиливает защиту.",
+          "description": "Расходует всю Доблесть, превращая её в мощный щит от Силы. На 10 сек союзникам в радиусе нельзя опуститься ниже 10% HP; каждый получает 1 заряд воскрешения на 35 сек.",
           "mana": 85,
           "cooldown": 72,
           "type": "physical",
@@ -130,7 +130,7 @@
           "id": "A103",
           "key": "Q",
           "name": "Режущий шаг",
-          "description": "Рывок в выбранную точку режет всех на пути и накладывает кровотечение.",
+          "description": "Режущий рывок в точку; наносит физический урон конусом, накладывает 2 метки кровотечения и накапливает Комбо.",
           "mana": 22,
           "cooldown": 6,
           "type": "physical",
@@ -142,34 +142,46 @@
         {
           "id": "A104",
           "key": "W",
-          "name": "Три раны",
-          "description": "Три рубящих удара по цели накапливают раны; три раны взрываются.",
-          "mana": 32,
-          "cooldown": 12,
-          "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNCriticalStrike.blp",
-          "target": "unit",
-          "manaGrowth": 5,
-          "range": 850
+          "name": "Кровавое мастерство",
+          "description": "ПАССИВНО: каждая обычная атака накладывает 1 метку кровотечения на 8 секунд (макс. 6). Каждая метка снижает броню врага на 1, наносит периодический физический урон. Q накладывает 2 метки, R поглощает все метки ради взрывного урона. Рост ранга увеличивает урон кровотечения.",
+          "mana": 0,
+          "cooldown": 0,
+          "type": "passive",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNPoisonSting.blp",
+          "target": "passive",
+          "manaGrowth": 0,
+          "range": 0,
+          "school": "physical",
+          "maxStacks": 6,
+          "armorPerStack": 1,
+          "dotBase": 12,
+          "dotPerRank": 5
         },
         {
           "id": "A10F",
           "key": "E",
           "name": "Стойка миража",
-          "description": "Парирует следующую атаку: уклонение, ответный удар и восстановление рывка.",
+          "description": "Парирует следующую атаку в течение 5 сек. Успешное парирование снижает урон, отвечает контрударом и сокращает перезарядку R «Танец барханов» на 8/10/12/14/16 сек.",
           "mana": 38,
           "cooldown": 16,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNMirrorImage.blp",
           "target": "instant",
           "manaGrowth": 4,
-          "range": 0
+          "range": 0,
+          "parryDanceRefund": [
+            8,
+            10,
+            12,
+            14,
+            16
+          ]
         },
         {
           "id": "A10G",
           "key": "R",
           "name": "Танец барханов",
-          "description": "Телепортируется между кровоточащими врагами, расходуя комбо для смертельного финала.",
+          "description": "Танец барханов: прыжок к врагу и двойной физический удар. Поглощает все метки кровотечения, взрывает их и расходует Комбо.",
           "mana": 105,
           "cooldown": 46,
           "type": "physical",
@@ -925,7 +937,7 @@
       ]
     }
   ],
-  "rework": "Arbiter STR guardian: visible valor, persistent bastion, ally-only E, 10% HP floor + one resurrection charge. Restored native attack cooldowns. Rank-dependent mana and range.",
+  "rework": "Zarhan passive W + bleeding stacks, -1 armor per stack, visible status, timed E->R refund; Arbiter only Valor with real damage/defense/dome/ult modifiers",
   "fixNotes": "Bone heroes both inherit from tested stock hero Udea. Explicit normal vs missile weapon types, correct attack cooldown, base damage and projectile art are generated.",
   "balanceNote": "Native attacks use stock unit base attack intervals, without custom attack cooldown overrides. QWER mana escalates with rank."
 }
