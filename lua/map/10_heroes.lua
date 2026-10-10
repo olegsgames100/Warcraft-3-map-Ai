@@ -61,6 +61,7 @@ function A.assignStats(pid)
    local id=A.raw(ability)
    if GetUnitAbilityLevel(hero,id)==0 then UnitAddAbility(hero,id) end
    if GetUnitAbilityLevel(hero,id)>0 then SetUnitAbilityLevel(hero,id,rank) end
+   if kind==2 and ability=="A104" and BlzUnitDisableAbility then BlzUnitDisableAbility(hero,id,true,false) end
  end
  local points=GetHeroSkillPoints(hero)
  if points>0 then UnitModifySkillPoints(hero,-points) end
