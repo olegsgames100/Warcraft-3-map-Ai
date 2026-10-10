@@ -190,40 +190,16 @@ function Arena_PrepareShop takes unit shop, integer r, integer g, integer b retu
 endfunction
 
 function Arena_CreateShops takes nothing returns nothing
-    // Stock Goblin Merchants always exist in Warcraft III 1.26a, even without custom w3u.
-    set udg_ShopWeapon = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'ngme', -760.0, -380.0, 270.0)
-    set udg_ShopArmor = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'ngme', 760.0, -380.0, 270.0)
-    set udg_ShopMagic = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'ngme', -760.0, 380.0, 270.0)
-    set udg_ShopRelic = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'ngme', 760.0, 380.0, 270.0)
+    // Four distinct Warcraft III object types with independent built-in item inventories.
+    set udg_ShopWeapon = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'nS01', -760.0, -380.0, 270.0)
+    set udg_ShopArmor = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'nS02', 760.0, -380.0, 270.0)
+    set udg_ShopMagic = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'nS03', -760.0, 380.0, 270.0)
+    set udg_ShopRelic = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'nS04', 760.0, 380.0, 270.0)
     call Arena_PrepareShop(udg_ShopWeapon, 255, 130, 110)
     call Arena_PrepareShop(udg_ShopArmor, 130, 185, 255)
     call Arena_PrepareShop(udg_ShopMagic, 120, 255, 160)
     call Arena_PrepareShop(udg_ShopRelic, 255, 215, 125)
-    // Each shop has distinct stock. Vanilla items remain available if custom w3t is absent.
-    call Arena_Stock(udg_ShopWeapon, 'ratf', 6)
-    call Arena_Stock(udg_ShopWeapon, 'ratc', 6)
-    call Arena_Stock(udg_ShopWeapon, 'ofir', 6)
-    call Arena_Stock(udg_ShopWeapon, 'I001', 6)
-    call Arena_Stock(udg_ShopWeapon, 'I002', 6)
-    call Arena_Stock(udg_ShopWeapon, 'I003', 6)
-    call Arena_Stock(udg_ShopArmor, 'rde2', 6)
-    call Arena_Stock(udg_ShopArmor, 'rde3', 6)
-    call Arena_Stock(udg_ShopArmor, 'brac', 6)
-    call Arena_Stock(udg_ShopArmor, 'I004', 6)
-    call Arena_Stock(udg_ShopArmor, 'I005', 6)
-    call Arena_Stock(udg_ShopArmor, 'I006', 6)
-    call Arena_Stock(udg_ShopMagic, 'phea', 20)
-    call Arena_Stock(udg_ShopMagic, 'pman', 20)
-    call Arena_Stock(udg_ShopMagic, 'shrs', 8)
-    call Arena_Stock(udg_ShopMagic, 'I007', 12)
-    call Arena_Stock(udg_ShopMagic, 'I008', 12)
-    call Arena_Stock(udg_ShopMagic, 'I009', 6)
-    call Arena_Stock(udg_ShopRelic, 'ckng', 3)
-    call Arena_Stock(udg_ShopRelic, 'modt', 3)
-    call Arena_Stock(udg_ShopRelic, 'rwiz', 4)
-    call Arena_Stock(udg_ShopRelic, 'I00A', 3)
-    call Arena_Stock(udg_ShopRelic, 'I00B', 3)
-    call Arena_Stock(udg_ShopRelic, 'I00C', 3)
+    // No AddItemToStock calls: Object Editor 'Items Sold' now owns the inventory.
     call Arena_ShopLabel(-760.0, -380.0, "КУЗНИЦА ОСКОЛКОВ", 255, 160, 135)
     call Arena_ShopLabel(760.0, -380.0, "ОПЛОТ СТРАЖА", 150, 190, 255)
     call Arena_ShopLabel(-760.0, 380.0, "АЛХИМИЧЕСКАЯ ЛАВКА", 150, 255, 170)
@@ -232,18 +208,19 @@ endfunction
 
 //===========================================================================
 function Arena_HeroType takes integer kind returns integer
+    // Custom heroes have individual learnable skill lists in war3map.w3u.
     if kind == 1 then
-        return 'Hpal'
+        return 'H001'
     elseif kind == 2 then
-        return 'Obla'
+        return 'O001'
     elseif kind == 3 then
-        return 'Hamg'
+        return 'H002'
     elseif kind == 4 then
-        return 'Udea'
+        return 'U001'
     elseif kind == 5 then
-        return 'Edem'
+        return 'E001'
     endif
-    return 'Emoo'
+    return 'E002'
 endfunction
 
 function Arena_HeroTitle takes integer kind returns string
@@ -277,26 +254,8 @@ function Arena_HeroEpithet takes integer kind returns string
 endfunction
 
 function Arena_GiveSkills takes unit u, integer kind returns nothing
-    // Stock abilities only; extra abilities still differ for all six archetypes.
-    if kind == 1 then
-        call UnitAddAbility(u, 'ACtb')
-        call UnitAddAbility(u, 'ACfb')
-    elseif kind == 2 then
-        call UnitAddAbility(u, 'ACba')
-        call UnitAddAbility(u, 'ACtb')
-    elseif kind == 3 then
-        call UnitAddAbility(u, 'ACfb')
-        call UnitAddAbility(u, 'ACfl')
-    elseif kind == 4 then
-        call UnitAddAbility(u, 'ACrd')
-        call UnitAddAbility(u, 'ACfb')
-    elseif kind == 5 then
-        call UnitAddAbility(u, 'ACim')
-        call UnitAddAbility(u, 'ACtb')
-    else
-        call UnitAddAbility(u, 'Alsh')
-        call UnitAddAbility(u, 'ACfl')
-    endif
+    // Hero skills are learned only through the Warcraft III level-up menu.
+    // Never pre-add or pre-level these custom hero abilities here.
 endfunction
 
 function Arena_ClearAuras takes nothing returns nothing
@@ -358,7 +317,6 @@ function Arena_SpawnHero takes integer pid, integer kind returns nothing
     local real x = -144.0
     local real y = -144.0
     local unit hero
-    local texttag tag
     if pid == 1 then
         set x = 144.0
     elseif pid == 2 then
@@ -401,19 +359,11 @@ function Arena_SpawnHero takes integer pid, integer kind returns nothing
     call UnitAddItemById(hero, 'phea')
     call UnitAddItemById(hero, 'pman')
     call UnitAddItemById(hero, 'ciri')
-    set tag = CreateTextTag()
-    call SetTextTagText(tag, Arena_HeroTitle(kind) + " - " + Arena_HeroEpithet(kind), 0.019)
-    call SetTextTagPosUnit(tag, hero, -65.0)
-    call SetTextTagColor(tag, 255, 218, 145, 255)
-    call SetTextTagPermanent(tag, true)
-    call SetTextTagVisibility(tag, true)
-    set udg_HeroSubtitle[pid] = tag
     set udg_Heroes[pid] = hero
     set udg_HeroKind[pid] = kind
     call Arena_GiveAuras(hero)
     call SelectUnitForPlayerSingle(hero, Player(pid))
     call PanCameraToTimedForPlayer(Player(pid), x, y, 0.00)
-    set tag = null
     set hero = null
 endfunction
 
@@ -603,19 +553,7 @@ function Trig_HeroSpell_Actions takes nothing returns nothing
 endfunction
 
 function Arena_UpdateHeroLabels takes nothing returns nothing
-    local integer pid = 0
-    loop
-        exitwhen pid >= 4
-        if udg_Heroes[pid] != null and udg_HeroSubtitle[pid] != null then
-            if GetWidgetLife(udg_Heroes[pid]) > 0.405 then
-                call SetTextTagPosUnit(udg_HeroSubtitle[pid], udg_Heroes[pid], -70.0)
-                call SetTextTagVisibility(udg_HeroSubtitle[pid], true)
-            else
-                call SetTextTagVisibility(udg_HeroSubtitle[pid], false)
-            endif
-        endif
-        set pid = pid + 1
-    endloop
+    // No follower-name texttags above playable heroes.
 endfunction
 
 function Arena_CreateEnemy takes integer unitId, real x, real y returns nothing
@@ -625,19 +563,21 @@ function Arena_CreateEnemy takes integer unitId, real x, real y returns nothing
     endif
     set udg_EnemiesAlive = udg_EnemiesAlive + 1
     call SetUnitAcquireRange(u, 4000.0)
+    call SetUnitCreepGuard(u, false)
+    call UnitWakeUp(u)
     call IssuePointOrder(u, "attack", 0.0, 0.0)
     set u = null
 endfunction
 
 function Arena_SpawnRing takes integer unitId, integer count, real dist returns nothing
     local integer i = 0
-    local integer scaled = (count * (udg_HumanCount + 2) + 5) / 8
+    local integer scaled = (count * (udg_HumanCount + 2) + 3) / 4
     local real ang
     if scaled < 2 then
         set scaled = 2
     endif
     loop
-        exitwhen i >= scaled or udg_EnemiesAlive >= 65
+        exitwhen i >= scaled or udg_EnemiesAlive >= 85
         set ang = (3.14159 * 2.0) * I2R(i) / I2R(scaled)
         call Arena_CreateEnemy(unitId, dist * Cos(ang) + GetRandomReal(-70.0, 70.0), dist * Sin(ang) + GetRandomReal(-70.0, 70.0))
         set i = i + 1
@@ -954,7 +894,8 @@ function Trig_Wave_Actions takes nothing returns nothing
         call TimerDialogSetTitle(udg_WaveTD, "Каз'Рул")
         call Arena_Msg("|cffff8844Последняя минута перед боссом!|r")
     endif
-    call TimerStart(udg_WaveTimer, 75.00, false, function Arena_DoNothing)
+    // Maximum wait if enemies stay alive; clearing every wave creep skips it.
+    call TimerStart(udg_WaveTimer, 95.00, false, function Arena_DoNothing)
 endfunction
 
 //===========================================================================
@@ -1000,6 +941,14 @@ function Trig_Revive3 takes nothing returns nothing
     call Arena_ReviveHero(3)
 endfunction
 
+function Arena_CheckWaveClear takes nothing returns nothing
+    // Only ordinary waves count. Boss-stage summons cannot start another wave.
+    if udg_WavesStarted and udg_Wave >= 1 and udg_Wave <= 10 and udg_EnemiesAlive == 0 and udg_Boss == null and not udg_GameOver then
+        call Arena_Msg("|cff66ff99Волна " + I2S(udg_Wave) + " очищена! Следующая через 7 секунд.|r")
+        call TimerStart(udg_WaveTimer, 7.00, false, function Arena_DoNothing)
+    endif
+endfunction
+
 function Trig_Death_Actions takes nothing returns nothing
     local unit u = GetDyingUnit()
     local unit killer = GetKillingUnit()
@@ -1011,6 +960,9 @@ function Trig_Death_Actions takes nothing returns nothing
         endif
         set udg_TotalKills = udg_TotalKills + 1
         call Arena_DropLoot(u)
+        if udg_EnemiesAlive == 0 then
+            call Arena_CheckWaveClear()
+        endif
         if killer != null then
             set pid = GetPlayerId(GetOwningPlayer(killer))
             if pid >= 0 and pid < 4 and Arena_IsHuman(pid) then
@@ -1133,7 +1085,6 @@ function Trig_Aura_Actions takes nothing returns nothing
     local real mana
     local real addHp
     local real addMp
-    call Arena_UpdateHeroLabels()
     set i = 0
     loop
         exitwhen i >= 4
@@ -1182,7 +1133,7 @@ endfunction
 function Arena_CreateQuests takes nothing returns nothing
     set udg_QuestMain = CreateQuest()
     call QuestSetTitle(udg_QuestMain, "Арена героев")
-    call QuestSetDescription(udg_QuestMain, "Выберите героя. Волны каждую минуту. После 10 волны босс. Магазины у центра. Меньше игроков - сильнее реген и ауры. На 4 игроках бонусов нет.")
+    call QuestSetDescription(udg_QuestMain, "Выберите героя. Зачистка волны ускоряет следующую (7 сек). После 10 волны босс. Четыре разных магазина у центра. Вечный день.")
     call QuestSetIconPath(udg_QuestMain, "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp")
     call QuestSetRequired(udg_QuestMain, true)
     call QuestSetDiscovered(udg_QuestMain, true)
@@ -1297,6 +1248,8 @@ function Trig_Arena_Actions takes nothing returns nothing
     call FogEnableOff()
     call FogMaskEnableOff()
     call SetTimeOfDay(12.00)
+    call SetTimeOfDayScale(0.00)
+    call SuspendTimeOfDay(true)
     call SetCameraPosition(0.0, 0.0)
     set udg_HumanCount = Arena_CountHumans()
     if udg_HumanCount < 1 then
