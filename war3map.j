@@ -302,7 +302,8 @@ function Arena_GiveAuras takes unit hero returns nothing
             call UnitAddAbility(carrier, 'A203')
             call UnitAddAbility(carrier, 'A204')
         endif
-        call ShowUnit(carrier, false)
+        // Transparency preserves aura updates; ShowUnit(false) may suppress them.
+        call SetUnitVertexColor(carrier, 255, 255, 255, 0)
     endif
     set carrier = null
 endfunction
