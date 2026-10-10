@@ -23,6 +23,8 @@ function GetUnitY(u)return u.y end
 function GetUnitFacing(u)return 0 end
 function GetUnitMoveSpeed(u)return 300 end
 function SetUnitMoveSpeed(u,speed)u.speed=speed end
+function BlzGetUnitArmor(u)return u.armor or 5 end
+function BlzSetUnitArmor(u,v)u.armor=v end
 function SetUnitPosition(u,x,y)u.x=x;u.y=y end
 function GetRandomReal(a,b)return (a+b)*.5 end
 function GetSpellTargetX()return 320 end
@@ -90,6 +92,7 @@ dofile("lua/map/10_heroes.lua")
 dofile("lua/map/15_combat.lua")
 dofile("lua/map/16_role_mechanics.lua")
 dofile("lua/map/17_arbiter.lua")
+dofile("lua/map/18_blood_valor.lua")
 dofile("lua/map/21_spell_meta.lua")
 dofile("lua/map/22_spell_events.lua")
 dofile("lua/map/27_rebuilt_spells.lua")
