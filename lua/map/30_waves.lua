@@ -207,7 +207,40 @@ function A.forceNextWave()
     A.clearEnemies()
     A.scheduleNext(.4)
 end
+function A.forceEnemyAggression()
+    if A.phase~="waves" and A.phase~="boss" then return end
+    local function nearestHero(enemy)
+        local best,dist=nil,1e12
+        for pid=0,3 do
+            local h=A.heroUnits[pid]
+            if A.alive(h) then
+                local dx,dy=GetUnitX(h)-GetUnitX(enemy),GetUnitY(h)-GetUnitY(enemy)
+                local d=dx*dx+dy*dy
+                if d<dist then best,dist=h,d end
+            end
+        end
+        return best
+    end
+    for _,entry in pairs(A.waveUnits) do
+        local u=entry.unit
+        if A.alive(u) then
+            SetUnitCreepGuard(u,false)
+            SetUnitAcquireRange(u,5000)
+            local target=nearestHero(u)
+            if target then IssueTargetOrder(u,"attack",target)
+            else IssuePointOrder(u,"attack",0,0) end
+        end
+    end
+    if A.alive(A.boss) then
+        local target=nearestHero(A.boss)
+        if target then IssueTargetOrder(A.boss,"attack",target) end
+    end
+end
 function A.tickWaves()
+    if not A.nextAggroAt or A.clock>=A.nextAggroAt then
+        A.nextAggroAt=A.clock+2.0
+        A.forceEnemyAggression()
+    end
     if A.phase=="waves" and A.nextAt and A.clock>=A.nextAt then
        A.nextWave()
     elseif A.phase=="boss" then
