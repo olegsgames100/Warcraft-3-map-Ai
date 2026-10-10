@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "title": "Hero Arena Party Roles - 12 heroes, 48 spells",
   "scaling": {
     "physical": {
@@ -38,62 +38,73 @@
       "roleId": "tank",
       "attack": "melee",
       "stats": {
-        "str": 32,
-        "agi": 13,
-        "int": 18,
-        "strGain": 3.9,
+        "str": 27,
+        "agi": 11,
+        "int": 16,
+        "strGain": 3.05,
         "agiGain": 1.4,
-        "intGain": 2,
-        "hp": 430,
-        "mana": 170
+        "intGain": 1.5,
+        "hp": 245,
+        "mana": 85
       },
       "skills": [
         {
           "id": "A101",
           "key": "Q",
-          "name": "Световой вызов",
-          "description": "Конусный удар провоцирует врагов и копит Доблесть от защищённых союзников.",
-          "mana": 28,
-          "cooldown": 7,
+          "name": "Клеймо Доблести",
+          "description": "Физический удар по конусу, провоцирует врагов. Каждый поражённый враг пополняет Доблесть; блокировка урона также усиливает Доблесть и Решимость.",
+          "mana": 22,
+          "cooldown": 6,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
-          "target": "instant"
+          "target": "instant",
+          "manaGrowth": 4,
+          "range": 0,
+          "school": "physical"
         },
         {
           "id": "A102",
           "key": "W",
-          "name": "Клятвенный бастион",
-          "description": "Создаёт защитную печать в точке: герои внутри получают щиты и часть урона перенаправляют паладину.",
-          "mana": 44,
-          "cooldown": 18,
-          "type": "magic",
+          "name": "Клятвенный Бастион",
+          "description": "В указанной точке создаёт хорошо заметный защитный купол на 11 секунд. Союзники внутри получают щиты от Силы паладина; часть получаемого урона переносится на Арбитра. Купол и его границы видны всё время.",
+          "mana": 38,
+          "cooldown": 20,
+          "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNDivineShield.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 7,
+          "range": 800,
+          "school": "physical"
         },
         {
           "id": "A10D",
           "key": "E",
-          "name": "Перехват клятвы",
-          "description": "Прыжок к выбранному союзнику, щит, провокация и ответный удар по нападающим.",
-          "mana": 36,
-          "cooldown": 13,
+          "name": "Перехват Стража",
+          "description": "Можно применить только на другого союзного героя. Арбитр перемещается к нему, даёт зависящий от Силы щит и принимает часть дальнейшего урона союзника.",
+          "mana": 30,
+          "cooldown": 14,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNDefend.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 6,
+          "range": 825,
+          "school": "physical"
         },
         {
           "id": "A10E",
           "key": "R",
-          "name": "Последний рассвет",
-          "description": "Массовое спасение, воскрешение и взрыв накопленной Доблести; усиливает командный бастион.",
-          "mana": 115,
-          "cooldown": 60,
-          "type": "magic",
+          "name": "Несокрушимая Клятва",
+          "description": "Даёт союзникам поблизости защиту от падения здоровья ниже 10% на 10 секунд. Каждый затронутый герой получает ровно один заряд автоматического воскрешения на 35 секунд. Сила усиливает щиты; Доблесть усиливает защиту.",
+          "mana": 85,
+          "cooldown": 72,
+          "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNResurrection.blp",
-          "target": "instant"
+          "target": "instant",
+          "manaGrowth": 12,
+          "range": 0,
+          "school": "physical"
         }
-      ],
-      "attackCooldown": 3
+      ]
     },
     {
       "kind": 2,
@@ -124,7 +135,9 @@
           "cooldown": 6,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNWindWalk.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 3,
+          "range": 925
         },
         {
           "id": "A104",
@@ -135,7 +148,9 @@
           "cooldown": 12,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNCriticalStrike.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 5,
+          "range": 850
         },
         {
           "id": "A10F",
@@ -146,7 +161,9 @@
           "cooldown": 16,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNMirrorImage.blp",
-          "target": "instant"
+          "target": "instant",
+          "manaGrowth": 4,
+          "range": 0
         },
         {
           "id": "A10G",
@@ -157,10 +174,11 @@
           "cooldown": 46,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNBladestorm.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 9,
+          "range": 850
         }
-      ],
-      "attackCooldown": 2.45
+      ]
     },
     {
       "kind": 3,
@@ -191,7 +209,9 @@
           "cooldown": 7,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNChainLightning.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 3,
+          "range": 850
         },
         {
           "id": "A106",
@@ -202,7 +222,9 @@
           "cooldown": 15,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNLightningShield.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 5,
+          "range": 925
         },
         {
           "id": "A10H",
@@ -213,7 +235,9 @@
           "cooldown": 17,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNBrilliance.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 4,
+          "range": 850
         },
         {
           "id": "A10I",
@@ -224,10 +248,11 @@
           "cooldown": 50,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 9,
+          "range": 925
         }
-      ],
-      "attackCooldown": 3.25
+      ]
     },
     {
       "kind": 4,
@@ -258,7 +283,9 @@
           "cooldown": 8,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathCoil.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 3,
+          "range": 850
         },
         {
           "id": "A108",
@@ -269,7 +296,9 @@
           "cooldown": 19,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 5,
+          "range": 850
         },
         {
           "id": "A10J",
@@ -280,7 +309,9 @@
           "cooldown": 13,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathPact.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 4,
+          "range": 850
         },
         {
           "id": "A10K",
@@ -291,10 +322,11 @@
           "cooldown": 52,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 9,
+          "range": 925
         }
-      ],
-      "attackCooldown": 3.05
+      ]
     },
     {
       "kind": 5,
@@ -325,7 +357,9 @@
           "cooldown": 6,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 3,
+          "range": 925
         },
         {
           "id": "A10A",
@@ -336,7 +370,9 @@
           "cooldown": 12,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 5,
+          "range": 850
         },
         {
           "id": "A10L",
@@ -347,7 +383,9 @@
           "cooldown": 16,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNImmolation.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 4,
+          "range": 925
         },
         {
           "id": "A10M",
@@ -358,10 +396,11 @@
           "cooldown": 49,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNMetamorphosis.blp",
-          "target": "instant"
+          "target": "instant",
+          "manaGrowth": 9,
+          "range": 0
         }
-      ],
-      "attackCooldown": 2.7
+      ]
     },
     {
       "kind": 6,
@@ -392,7 +431,9 @@
           "cooldown": 5,
           "type": "heal",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNHeal.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 3,
+          "range": 850
         },
         {
           "id": "A10C",
@@ -403,7 +444,9 @@
           "cooldown": 17,
           "type": "heal",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNTranquility.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 5,
+          "range": 925
         },
         {
           "id": "A10N",
@@ -414,7 +457,9 @@
           "cooldown": 16,
           "type": "heal",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNDivineShield.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 4,
+          "range": 850
         },
         {
           "id": "A10O",
@@ -425,10 +470,11 @@
           "cooldown": 60,
           "type": "heal",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNResurrection.blp",
-          "target": "instant"
+          "target": "instant",
+          "manaGrowth": 9,
+          "range": 0
         }
-      ],
-      "attackCooldown": 3.2
+      ]
     },
     {
       "kind": 7,
@@ -459,7 +505,9 @@
           "cooldown": 12,
           "type": "buff",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNHealingSpray.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 3,
+          "range": 850
         },
         {
           "id": "A112",
@@ -470,7 +518,9 @@
           "cooldown": 15,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 5,
+          "range": 925
         },
         {
           "id": "A113",
@@ -481,7 +531,9 @@
           "cooldown": 18,
           "type": "buff",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNTransmute.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 4,
+          "range": 850
         },
         {
           "id": "A114",
@@ -492,10 +544,11 @@
           "cooldown": 54,
           "type": "buff",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNChemicalRage.blp",
-          "target": "instant"
+          "target": "instant",
+          "manaGrowth": 9,
+          "range": 0
         }
-      ],
-      "attackCooldown": 3.1
+      ]
     },
     {
       "kind": 8,
@@ -526,7 +579,9 @@
           "cooldown": 7,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 3,
+          "range": 850
         },
         {
           "id": "A116",
@@ -537,7 +592,9 @@
           "cooldown": 17,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 5,
+          "range": 925
         },
         {
           "id": "A117",
@@ -548,7 +605,9 @@
           "cooldown": 22,
           "type": "buff",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNAvatar.blp",
-          "target": "instant"
+          "target": "instant",
+          "manaGrowth": 4,
+          "range": 0
         },
         {
           "id": "A118",
@@ -559,10 +618,11 @@
           "cooldown": 55,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNAvatar.blp",
-          "target": "instant"
+          "target": "instant",
+          "manaGrowth": 9,
+          "range": 0
         }
-      ],
-      "attackCooldown": 3
+      ]
     },
     {
       "kind": 9,
@@ -593,7 +653,9 @@
           "cooldown": 6,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 3,
+          "range": 850
         },
         {
           "id": "A11A",
@@ -604,7 +666,9 @@
           "cooldown": 11,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 5,
+          "range": 850
         },
         {
           "id": "A11B",
@@ -615,7 +679,9 @@
           "cooldown": 18,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNFanOfKnives.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 4,
+          "range": 925
         },
         {
           "id": "A11C",
@@ -626,10 +692,11 @@
           "cooldown": 42,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 9,
+          "range": 850
         }
-      ],
-      "attackCooldown": 2.4
+      ]
     },
     {
       "kind": 10,
@@ -660,7 +727,9 @@
           "cooldown": 7,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostNova.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 3,
+          "range": 925
         },
         {
           "id": "A11E",
@@ -671,7 +740,9 @@
           "cooldown": 17,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostArmor.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 5,
+          "range": 850
         },
         {
           "id": "A11F",
@@ -682,7 +753,9 @@
           "cooldown": 18,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNBlizzard.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 4,
+          "range": 925
         },
         {
           "id": "A11G",
@@ -693,10 +766,11 @@
           "cooldown": 53,
           "type": "magic",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNFreezingBreath.blp",
-          "target": "instant"
+          "target": "instant",
+          "manaGrowth": 9,
+          "range": 0
         }
-      ],
-      "attackCooldown": 3.3
+      ]
     },
     {
       "kind": 11,
@@ -729,7 +803,9 @@
           "cooldown": 6,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNBlackArrow.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 3,
+          "range": 925
         },
         {
           "id": "A122",
@@ -740,7 +816,9 @@
           "cooldown": 15,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNClusterRockets.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 5,
+          "range": 925
         },
         {
           "id": "A123",
@@ -751,7 +829,9 @@
           "cooldown": 18,
           "type": "buff",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNTrueshot.blp",
-          "target": "instant"
+          "target": "instant",
+          "manaGrowth": 4,
+          "range": 0
         },
         {
           "id": "A124",
@@ -762,10 +842,11 @@
           "cooldown": 49,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNStarfall.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 9,
+          "range": 850
         }
-      ],
-      "attackCooldown": 2.8
+      ]
     },
     {
       "kind": 12,
@@ -798,7 +879,9 @@
           "cooldown": 7,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNCriticalStrike.blp",
-          "target": "instant"
+          "target": "instant",
+          "manaGrowth": 3,
+          "range": 0
         },
         {
           "id": "A126",
@@ -809,7 +892,9 @@
           "cooldown": 18,
           "type": "buff",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNDefend.blp",
-          "target": "unit"
+          "target": "unit",
+          "manaGrowth": 5,
+          "range": 850
         },
         {
           "id": "A127",
@@ -820,7 +905,9 @@
           "cooldown": 13,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNCharge.blp",
-          "target": "point"
+          "target": "point",
+          "manaGrowth": 4,
+          "range": 925
         },
         {
           "id": "A128",
@@ -831,13 +918,14 @@
           "cooldown": 52,
           "type": "physical",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
-          "target": "instant"
+          "target": "instant",
+          "manaGrowth": 9,
+          "range": 0
         }
-      ],
-      "attackCooldown": 3
+      ]
     }
   ],
-  "rework": "v3: distinct roles, native Channel point/unit/instant targeting, 48 bespoke Lua mechanics, attack restoration",
+  "rework": "Arbiter STR guardian: visible valor, persistent bastion, ally-only E, 10% HP floor + one resurrection charge. Restored native attack cooldowns. Rank-dependent mana and range.",
   "fixNotes": "Bone heroes both inherit from tested stock hero Udea. Explicit normal vs missile weapon types, correct attack cooldown, base damage and projectile art are generated.",
-  "balanceNote": "Native attack cooldown 2.40–3.30 sec before Warcraft agility; ability damage retains STR/INT scaling."
+  "balanceNote": "Native attacks use stock unit base attack intervals, without custom attack cooldown overrides. QWER mana escalates with rank."
 }
