@@ -4,6 +4,9 @@ local function unit(pid,x,y,hero) local v={pid=pid,x=x,y=y,hp=4000,mana=5000,lev
 function Player(i)return i end
 function FourCC(s)return s end
 function GetPlayerId(i)return i end
+PLAYER_STATE_RESOURCE_GOLD="gold"
+function GetPlayerState(p,stat)return 500 end
+function SetPlayerState(p,stat,amount)assert(amount>=0)end
 function GetOwningPlayer(u)return u.pid end
 function GetHandleId(u)return type(u)=="table" and tostring(u) or tostring(u) end
 function GetUnitTypeId(u)return u and u.alive and 1 or 0 end
