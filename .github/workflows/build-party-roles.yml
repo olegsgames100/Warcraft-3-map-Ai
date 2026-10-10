@@ -22,6 +22,8 @@ jobs:
           sudo apt-get install -y lua5.4
       - name: Validate 8 Lua modules
         run: luac5.4 -p lua/map/*.lua
+      - name: Execute all 48 skills with mocked Warcraft natives
+        run: lua5.4 tests/spell_runtime_smoke.lua
       - name: Regenerate Object Editor hero and ability files
         run: python3 tools/generate_party_objects.py
       - name: Assert 12 heroes and 48 spells
