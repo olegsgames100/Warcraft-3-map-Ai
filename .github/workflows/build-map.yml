@@ -1,0 +1,38 @@
+name: Build Warcraft III 1.26a map
+
+on:
+  push:
+    branches:
+      - feature/hero-arena-expanded
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-map:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out map sources
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Pack MPQ map archive
+        run: python tools/build_map.py --source . --output dist/Hero_Arena_126a.w3x
+      - name: Verify archive signature
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path("dist/Hero_Arena_126a.w3x")
+          data = p.read_bytes()
+          assert data[:4] == b"HM3W"
+          assert data[512:516] == b"MPQ\x1a"
+          print(f"Archive structure OK: {p} ({len(data):,} bytes)")
+          PY
+      - name: Upload playable-map candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hero_Arena_126a
+          path: dist/Hero_Arena_126a.w3x
