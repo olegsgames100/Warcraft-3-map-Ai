@@ -26,6 +26,13 @@ globals
     unit            array   udg_Heroes
     boolean         array   udg_Picked
     integer         array   udg_PendingPick
+    // Deterministic level growth. Object Editor's passive growth is disabled.
+    real            array   udg_GrowthStr
+    real            array   udg_GrowthAgi
+    real            array   udg_GrowthInt
+    integer         array   udg_AppliedGrowthStr
+    integer         array   udg_AppliedGrowthAgi
+    integer         array   udg_AppliedGrowthInt
     integer         array   udg_HeroKind
     integer         array   udg_ReviveWait
 
@@ -60,6 +67,7 @@ globals
 
     unit            array   udg_AuraCarrier
     texttag         array   udg_HeroSubtitle
+    trigger                 gg_trg_HeroLevel = null
     trigger                 gg_trg_Cheat = null
     trigger                 gg_trg_HeroSpell = null
     trigger                 gg_trg_ItemPickup = null
@@ -549,6 +557,60 @@ function Arena_NormalizeHeroStats takes unit hero returns nothing
     endif
 endfunction
 
+function Arena_SyncHeroGrowth takes integer pid returns nothing
+    local unit hero
+    local integer level
+    local integer desiredStr
+    local integer desiredAgi
+    local integer desiredInt
+    local integer diff
+    if pid < 0 or pid > 3 then
+        return
+    endif
+    set hero = udg_Heroes[pid]
+    if hero == null or not IsUnitType(hero, UNIT_TYPE_HERO) then
+        return
+    endif
+    set level = GetHeroLevel(hero)
+    if level < 1 then
+        set level = 1
+    endif
+    if level > 20 then
+        set level = 20
+    endif
+    // Retain fractions instead of rounding +3.6 to +4 at each level.
+    // An absolute cumulative target makes -maxlvl and skipped levels deterministic.
+    set desiredStr = R2I(I2R(level - 1) * udg_GrowthStr[pid] + 0.5)
+    set desiredAgi = R2I(I2R(level - 1) * udg_GrowthAgi[pid] + 0.5)
+    set desiredInt = R2I(I2R(level - 1) * udg_GrowthInt[pid] + 0.5)
+    set diff = desiredStr - udg_AppliedGrowthStr[pid]
+    if diff != 0 then
+        call SetHeroStr(hero, GetHeroStr(hero, false) + diff, true)
+        set udg_AppliedGrowthStr[pid] = desiredStr
+    endif
+    set diff = desiredAgi - udg_AppliedGrowthAgi[pid]
+    if diff != 0 then
+        call SetHeroAgi(hero, GetHeroAgi(hero, false) + diff, true)
+        set udg_AppliedGrowthAgi[pid] = desiredAgi
+    endif
+    set diff = desiredInt - udg_AppliedGrowthInt[pid]
+    if diff != 0 then
+        call SetHeroInt(hero, GetHeroInt(hero, false) + diff, true)
+        set udg_AppliedGrowthInt[pid] = desiredInt
+    endif
+    set hero = null
+endfunction
+
+function Trig_HeroLevel_Actions takes nothing returns nothing
+    local unit hero = GetTriggerUnit()
+    local integer pid = GetPlayerId(GetOwningPlayer(hero))
+    if pid >= 0 and pid < 4 and hero == udg_Heroes[pid] then
+        call Arena_SyncHeroGrowth(pid)
+        call Arena_UpdateCustomRanks()
+    endif
+    set hero = null
+endfunction
+
 function Arena_SpawnHero takes integer pid, integer kind returns boolean
     local real x = -144.0
     local real y = -144.0
@@ -610,9 +672,54 @@ function Arena_SpawnHero takes integer pid, integer kind returns boolean
         call SetHeroInt(hero, 30, true)
     endif
     call Arena_NormalizeHeroStats(hero)
-    call Arena_GiveSkills(hero, kind)
+    if kind == 1 then
+        set udg_GrowthStr[pid] = 3.60
+        set udg_GrowthAgi[pid] = 1.60
+        set udg_GrowthInt[pid] = 2.20
+    elseif kind == 2 then
+        set udg_GrowthStr[pid] = 2.00
+        set udg_GrowthAgi[pid] = 3.70
+        set udg_GrowthInt[pid] = 1.60
+    elseif kind == 3 then
+        set udg_GrowthStr[pid] = 1.80
+        set udg_GrowthAgi[pid] = 1.70
+        set udg_GrowthInt[pid] = 3.80
+    elseif kind == 4 then
+        set udg_GrowthStr[pid] = 3.30
+        set udg_GrowthAgi[pid] = 1.70
+        set udg_GrowthInt[pid] = 2.80
+    elseif kind == 5 then
+        set udg_GrowthStr[pid] = 2.20
+        set udg_GrowthAgi[pid] = 3.40
+        set udg_GrowthInt[pid] = 2.00
+    elseif kind == 6 then
+        set udg_GrowthStr[pid] = 2.00
+        set udg_GrowthAgi[pid] = 3.10
+        set udg_GrowthInt[pid] = 3.00
+    elseif kind == 7 then
+        set udg_GrowthStr[pid] = 2.10
+        set udg_GrowthAgi[pid] = 2.20
+        set udg_GrowthInt[pid] = 3.10
+    elseif kind == 8 then
+        set udg_GrowthStr[pid] = 2.10
+        set udg_GrowthAgi[pid] = 2.20
+        set udg_GrowthInt[pid] = 3.10
+    elseif kind == 9 then
+        set udg_GrowthStr[pid] = 2.10
+        set udg_GrowthAgi[pid] = 2.20
+        set udg_GrowthInt[pid] = 3.10
+    elseif kind == 10 then
+        set udg_GrowthStr[pid] = 2.10
+        set udg_GrowthAgi[pid] = 2.20
+        set udg_GrowthInt[pid] = 3.10
+    endif
+    set udg_AppliedGrowthStr[pid] = 0
+    set udg_AppliedGrowthAgi[pid] = 0
+    set udg_AppliedGrowthInt[pid] = 0
     set udg_Heroes[pid] = hero
     set udg_HeroKind[pid] = kind
+    call Arena_SyncHeroGrowth(pid)
+    call Arena_GiveSkills(hero, kind)
     // Reforged custom hero class with four native Object Editor spells.
     // QWER abilities are embedded in war3map.w3u and implemented by JASS.
     call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 7.0, "[Выбор 2/3] Герой создан. Выдаём снаряжение...")
@@ -1662,7 +1769,14 @@ function Trig_TestChat_Actions takes nothing returns nothing
     elseif cmd == "-maxlvl" then
         if pid >= 0 and pid < 4 and udg_Heroes[pid] != null then
             call SetHeroLevel(udg_Heroes[pid], 20, true)
+            call Arena_SyncHeroGrowth(pid)
+            call Arena_UpdateCustomRanks()
             call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 8.0, "Герой повышен до 20 уровня. Очки умений доступны для распределения.")
+        endif
+    elseif cmd == "-stats" then
+        if pid >= 0 and pid < 4 and udg_Heroes[pid] != null then
+            call Arena_SyncHeroGrowth(pid)
+            call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 14.0, "|cff66ccffУровень " + I2S(GetHeroLevel(udg_Heroes[pid])) + " | Сила " + I2S(GetHeroStr(udg_Heroes[pid], false)) + " | Ловкость " + I2S(GetHeroAgi(udg_Heroes[pid], false)) + " | Разум " + I2S(GetHeroInt(udg_Heroes[pid], false)) + "|r")
         endif
     elseif cmd == "-revive" then
         if udg_Heroes[pid] != null and GetWidgetLife(udg_Heroes[pid]) <= 0.405 then
@@ -1942,6 +2056,13 @@ function Trig_Aura_Actions takes nothing returns nothing
     local real mana
     local real addHp
     local real addMp
+    // Catch instant level jumps and missed level events, even with 4 players.
+    set i = 0
+    loop
+        exitwhen i >= 4
+        call Arena_SyncHeroGrowth(i)
+        set i = i + 1
+    endloop
     // Update custom QWER ranks for every player, including four-player matches.
     call Arena_UpdateCustomRanks()
     // Aura carriers remain at (0,0), inside the central monument.
@@ -2182,6 +2303,9 @@ function Trig_Arena_Actions takes nothing returns nothing
     call TriggerRegisterAnyUnitEventBJ(gg_trg_ItemUse, EVENT_PLAYER_UNIT_USE_ITEM)
     call TriggerAddAction(gg_trg_ItemUse, function Trig_ItemUse_Actions)
 
+    set gg_trg_HeroLevel = CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(gg_trg_HeroLevel, EVENT_PLAYER_HERO_LEVEL)
+    call TriggerAddAction(gg_trg_HeroLevel, function Trig_HeroLevel_Actions)
     set gg_trg_Cheat = CreateTrigger()
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-kill", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-next", true)
@@ -2189,6 +2313,10 @@ function Trig_Arena_Actions takes nothing returns nothing
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(1), "-maxlvl", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(2), "-maxlvl", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(3), "-maxlvl", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-stats", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(1), "-stats", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(2), "-stats", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(3), "-stats", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-revive", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(1), "-revive", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(2), "-revive", true)
