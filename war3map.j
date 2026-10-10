@@ -260,6 +260,29 @@ function Arena_HeroTitle takes integer k returns string
     return "Иссара Морозная"
 endfunction
 
+function Arena_HeroProfession takes integer kind returns string
+    if kind == 1 then
+        return "Паладин-защитник"
+    elseif kind == 2 then
+        return "Мастер клинка"
+    elseif kind == 3 then
+        return "Боевой архимаг"
+    elseif kind == 4 then
+        return "Рыцарь смерти"
+    elseif kind == 5 then
+        return "Охотник на демонов"
+    elseif kind == 6 then
+        return "Лунная жрица"
+    elseif kind == 7 then
+        return "Алхимик-боевик"
+    elseif kind == 8 then
+        return "Горный король"
+    elseif kind == 9 then
+        return "Сумрачная охотница"
+    endif
+    return "Ледяной лич"
+endfunction
+
 function Arena_HeroEpithet takes integer k returns string
     if k == 1 then
         return "Хранитель рассвета"
@@ -306,16 +329,18 @@ function Arena_GiveAuras takes unit hero returns nothing
     if pid < 0 or pid > 3 or udg_HumanCount >= 4 then
         return
     endif
-    // Diagnostic compatibility mode: only stock 1.26a unit/ability IDs.
-    // The aura carrier remains invisible at the centre and never follows heroes.
-    set carrier = CreateUnit(Player(pid), 'hfoo', 0.0, 0.0, 0.0)
+    // A farm is noncombat and immobile in 1.26a. Unlike an invisible footman,
+    // it can never chase, attack or be mistaken for a playable arena hero.
+    set carrier = CreateUnit(Player(pid), 'hhou', 0.0, 0.0, 270.0)
     if carrier == null then
         return
     endif
     set udg_AuraCarrier[pid] = carrier
     call UnitAddAbility(carrier, 'Aloc')
-    call SetUnitInvulnerable(carrier, true)
+    call UnitRemoveAbility(carrier, 'Aatk')
     call SetUnitPathing(carrier, false)
+    call SetUnitInvulnerable(carrier, true)
+    // Stock aura templates only. No crash-prone custom unit/ability rawcodes.
     call UnitAddAbility(carrier, 'ACae')
     if udg_HumanCount <= 2 then
         call UnitAddAbility(carrier, 'ACua')
@@ -431,7 +456,7 @@ function Arena_SpawnHero takes integer pid, integer kind returns boolean
     call Arena_GiveAuras(hero)
     call SelectUnitForPlayerSingle(hero, Player(pid))
     call PanCameraToTimedForPlayer(Player(pid), x, y, 0.00)
-    call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 8.0, "|cff66ff99Выбран " + Arena_HeroTitle(kind) + ". Проверка запуска пройдена.|r")
+    call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 8.0, "|cff66ff99" + Arena_HeroProfession(kind) + " — " + Arena_HeroTitle(kind) + "|r")
     set hero = null
     return true
 endfunction
@@ -956,7 +981,7 @@ function Arena_CreateSelectionPlaza takes nothing returns nothing
             call SetUnitScale(preview, 1.10, 1.10, 1.10)
         endif
         set label = CreateTextTag()
-        call SetTextTagText(label, I2S(k) + ". " + Arena_HeroTitle(k), 0.025)
+        call SetTextTagText(label, I2S(k) + ". " + Arena_HeroProfession(k), 0.025)
         call SetTextTagPos(label, x - 175.0, y, 200.0)
         call SetTextTagColor(label, 255, 220, 130, 255)
         call SetTextTagPermanent(label, true)
@@ -988,7 +1013,7 @@ function Arena_SelectHero takes integer pid, integer k returns nothing
         call SetUnitPathing(udg_SelectWisp[pid], false)
         call ShowUnit(udg_SelectWisp[pid], false)
     endif
-    call Arena_Msg(GetPlayerName(Player(pid)) + " выбрал: " + Arena_HeroTitle(k))
+    call Arena_Msg(GetPlayerName(Player(pid)) + " выбрал профессию: " + Arena_HeroProfession(k))
     call Arena_TryStartWaves()
 endfunction
 
@@ -1534,8 +1559,6 @@ function Trig_Arena_Actions takes nothing returns nothing
     call SetTimeOfDay(12.00)
     call SetTimeOfDayScale(0.00)
     call SuspendTimeOfDay(true)
-    call SetTimeOfDayScale(0.00)
-    call SuspendTimeOfDay(true)
     call SetCameraPosition(0.0, 0.0)
     set udg_HumanCount = Arena_CountHumans()
     if udg_HumanCount < 1 then
@@ -1680,7 +1703,7 @@ endfunction
 //===========================================================================
 function config takes nothing returns nothing
     call SetMapName("Hero Arena")
-    call SetMapDescription("Кооперативная арена: выбор героя, магазины, 10 волн и босс. Меньше игроков — сильнее ауры.")
+    call SetMapDescription("Кооперативная арена: выбор класса, магазины, 50 волн и босс. Меньше игроков — сильнее ауры.")
     call SetPlayers(4)
     call SetTeams(1)
     call SetGamePlacement(MAP_PLACEMENT_TEAMS_TOGETHER)
