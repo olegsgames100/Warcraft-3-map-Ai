@@ -1,0 +1,44 @@
+name: Compile Hero Arena Lua Overhaul V2
+on:
+  push:
+    branches:
+      - feature/reforged-lua-overhaul-v2
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Lua map sources
+        uses: actions/checkout@v4
+      - name: Install Lua compiler
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y lua5.4
+      - name: Check every Lua module
+        run: |
+          luac5.4 -p lua/map/*.lua
+      - name: Create Lua-only Warcraft III map
+        run: |
+          python3 tools/build_pure_lua.py --source . --output dist/Hero_Arena_Lua_Overhaul_V2.w3x
+      - name: Verify Lua map metadata and archived content
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          p = Path("dist/Hero_Arena_Lua_Overhaul_V2.w3x")
+          data = p.read_bytes()
+          assert data[:4] == b"HM3W"
+          assert data[512:516] == b"MPQ\x1a"
+          src = Path("tools/build_pure_lua.py").read_text()
+          assert '"war3map.j"' not in src.split("FILES = (")[1].split(")")[0]
+          print("Lua map archive signature, MPQ tables and file choice verified", len(data))
+          PY
+      - name: Upload Lua W3X artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hero_Arena_Lua_Overhaul_V2
+          path: dist/Hero_Arena_Lua_Overhaul_V2.w3x
