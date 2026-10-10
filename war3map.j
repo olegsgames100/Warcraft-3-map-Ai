@@ -477,13 +477,16 @@ endfunction
 function Arena_DropLoot takes unit dying returns nothing
     local integer danger = udg_Wave
     local integer roll = GetRandomInt(1, 1000)
-    local integer chance = 9 + danger * 3
+    local integer chance = 9 + danger * 2
     local integer itemId
     if IsUnitType(dying, UNIT_TYPE_HERO) then
         set chance = chance + 20
     endif
     if GetUnitLevel(dying) >= 6 then
         set chance = chance + 15
+    endif
+    if GetUnitUserData(dying) == 888 then
+        set chance = chance + 160
     endif
     // 1.2%-7.4% rare drops, depending on enemy wave and elite rank.
     if roll > chance then
@@ -587,12 +590,10 @@ function Arena_CreateEnemy takes integer unitId, real x, real y returns nothing
         return
     endif
     set udg_EnemiesAlive = udg_EnemiesAlive + 1
-    call SetUnitCreepGuard(u, false)
-    call UnitWakeUp(u)
     call SetUnitUserData(u, 777)
-    call SetUnitAcquireRange(u, 4000.0)
     call SetUnitCreepGuard(u, false)
     call UnitWakeUp(u)
+    call SetUnitAcquireRange(u, 4000.0)
     call IssuePointOrder(u, "attack", 0.0, 0.0)
     set u = null
 endfunction
@@ -610,6 +611,89 @@ function Arena_SpawnRing takes integer unitId, integer count, real dist returns 
         call Arena_CreateEnemy(unitId, dist * Cos(ang) + GetRandomReal(-70.0, 70.0), dist * Sin(ang) + GetRandomReal(-70.0, 70.0))
         set i = i + 1
     endloop
+endfunction
+
+
+function Arena_EliteName takes integer wave returns string
+    if wave == 5 then
+        return "Вожак головорезов"
+    elseif wave == 10 then
+        return "Капитан беззакония"
+    elseif wave == 15 then
+        return "Тролль-знахарь"
+    elseif wave == 20 then
+        return "Огр-землелом"
+    elseif wave == 25 then
+        return "Пророк костей"
+    elseif wave == 30 then
+        return "Могильный исполин"
+    elseif wave == 35 then
+        return "Ловчий Скверны"
+    elseif wave == 40 then
+        return "Пожиратель стали"
+    elseif wave == 45 then
+        return "Сборщик душ"
+    endif
+    return "Предвестник Каз'Рула"
+endfunction
+
+function Arena_EliteType takes integer wave returns integer
+    if wave <= 10 then
+        return 'nrog'
+    elseif wave <= 20 then
+        return 'nogr'
+    elseif wave <= 30 then
+        return 'nska'
+    elseif wave <= 40 then
+        return 'nfel'
+    endif
+    return 'uabo'
+endfunction
+
+function Arena_EliteAnnouncement takes integer wave, real x, real y returns nothing
+    local texttag tag = CreateTextTag()
+    local sound alert = CreateSound("Sound\\Interface\\Warning.wav", false, false, false, 10, 10, "")
+    local string title = Arena_EliteName(wave)
+    call Arena_Msg("|cffff8844[ОСОБАЯ ВОЛНА " + I2S(wave) + "]|r На арене появился " + title + "!|r")
+    call SetTextTagText(tag, "|cffff6622" + title + "|r", 0.035)
+    call SetTextTagPos(tag, x - 180.0, y, 140.0)
+    call SetTextTagColor(tag, 255, 150, 65, 255)
+    call SetTextTagPermanent(tag, false)
+    call SetTextTagLifespan(tag, 7.0)
+    call SetTextTagFadepoint(tag, 5.0)
+    call PingMinimap(x, y, 5.0)
+    call SetSoundVolume(alert, 95)
+    call StartSound(alert)
+    call KillSoundWhenDone(alert)
+    set tag = null
+    set alert = null
+endfunction
+
+function Arena_SpawnElite takes integer wave returns nothing
+    local real x = 0.0
+    local real y = 1510.0
+    local unit elite
+    if udg_EnemiesAlive >= 70 then
+        return
+    endif
+    set elite = CreateUnit(Player(PLAYER_NEUTRAL_AGGRESSIVE), Arena_EliteType(wave), x, y, 270.0)
+    if elite == null then
+        return
+    endif
+    set udg_EnemiesAlive = udg_EnemiesAlive + 1
+    call SetUnitUserData(elite, 888)
+    call SetUnitScale(elite, 1.30 + 0.003 * I2R(wave), 1.30 + 0.003 * I2R(wave), 1.30 + 0.003 * I2R(wave))
+    call SetUnitVertexColor(elite, 255, 155, 110, 255)
+    call SetUnitCreepGuard(elite, false)
+    call UnitWakeUp(elite)
+    call SetUnitAcquireRange(elite, 4500.0)
+    // A small defensive aura makes the miniboss recognizable without a dragon-like damage spike.
+    if wave >= 25 then
+        call UnitAddAbility(elite, 'ACav')
+    endif
+    call Arena_EliteAnnouncement(wave, x, y)
+    call IssuePointOrder(elite, "attack", 0.0, 0.0)
+    set elite = null
 endfunction
 
 function Arena_PayWaveGold takes integer gold returns nothing
@@ -861,7 +945,7 @@ function Arena_KillWaveEnemies takes nothing returns nothing
         set u = FirstOfGroup(g)
         exitwhen u == null
         call GroupRemoveUnit(g, u)
-        if u == udg_Boss or GetUnitUserData(u) == 777 then
+        if u == udg_Boss or GetUnitUserData(u) == 777 or GetUnitUserData(u) == 888 then
             call KillUnit(u)
         endif
     endloop
@@ -876,6 +960,14 @@ function Trig_TestChat_Actions takes nothing returns nothing
     if cmd == "-kill" and pid == 0 then
         call Arena_Msg("Тест: зачистка всех врагов текущей волны.")
         call Arena_KillWaveEnemies()
+    elseif cmd == "-next" and pid == 0 then
+        if udg_WavesStarted and not udg_GameOver and udg_Boss == null then
+            call Arena_KillWaveEnemies()
+            call TimerStart(udg_WaveTimer, 0.05, false, function Arena_DoNothing)
+            call Arena_Msg("|cff88ccffСледующая волна вызывается досрочно.|r")
+        else
+            call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 6.0, "Команда -next доступна после выбора героев и до появления босса.")
+        endif
     elseif cmd == "-revive" then
         if udg_Heroes[pid] != null and GetWidgetLife(udg_Heroes[pid]) <= 0.405 then
             call ReviveHero(udg_Heroes[pid], 0.0, 0.0, true)
@@ -961,6 +1053,9 @@ function Trig_Wave_Actions takes nothing returns nothing
     set udg_Wave = udg_Wave + 1
     set udg_WaveCleared = false
     call Arena_SpawnWaveCreeps(udg_Wave)
+    if ModuloInteger(udg_Wave, 5) == 0 then
+        call Arena_SpawnElite(udg_Wave)
+    endif
     call Arena_PayWaveGold(30 + udg_Wave * 7)
     call Arena_Msg("|cffffcc00Волна " + I2S(udg_Wave) + "/50|r  Врагов: " + I2S(udg_EnemiesAlive))
     if udg_Wave < 50 then
@@ -1033,8 +1128,9 @@ function Trig_Death_Actions takes nothing returns nothing
         endif
         set udg_TotalKills = udg_TotalKills + 1
         call Arena_DropLoot(u)
-        if udg_EnemiesAlive == 0 then
-            call Arena_CheckWaveClear()
+        if GetUnitUserData(u) == 888 then
+            call Arena_Msg("|cffffcc66Побеждён мини-босс! Команде начислена награда.|r")
+            call Arena_PayWaveGold(50 + udg_Wave * 3)
         endif
         if udg_EnemiesAlive == 0 then
             call Arena_CheckWaveClear()
@@ -1392,6 +1488,7 @@ function Trig_Arena_Actions takes nothing returns nothing
 
     set gg_trg_Cheat = CreateTrigger()
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-kill", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-next", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-revive", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(1), "-revive", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(2), "-revive", true)
