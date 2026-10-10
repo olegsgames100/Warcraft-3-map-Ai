@@ -96,3 +96,21 @@ The `object-data` JSON is documentation/source data for object generation. It is
 Replace at minimum **all three** files in the root of the map's MPQ archive: `war3map.j`, `war3map.w3u`, and `war3map.w3a`. Keep `war3map.w3t` to retain the custom items. If you replace **only** `war3map.j`, the custom heroes' proper names and learnable skill lists **will not appear** and the four store types might be missing. `object-data/hero_arena_objects.json` is source documentation and is not imported by the game.
 
 These are source-level validations, not a successful test inside the Warcraft III 1.26a client. Retest in-game before treating the map as a stable release.
+
+
+## 50-wave expansion (Warcraft III 1.26a)
+
+- **50 waves** in five eras: waves 1-10 bandits/gnolls; 11-20 trolls/ogres; 21-30 skeletons/archers; 31-40 fel stalkers/ogres; 41-50 larger skeleton/undead groups with a few abominations every fifth wave. High-damage dragons and infernals were removed from regular waves.
+- Spawn counts slowly increase with wave number and human-player count. No more than **70 living wave enemies** may accumulate. After clearing the last wave unit, the next wave begins after seven seconds; otherwise the countdown is 100 seconds. The final boss arrives after wave 50.
+- **Test commands:** `-kill` (player 1 / red slot only) kills the tracked wave enemies and boss; `-revive` (all human players) revives your own dead hero at the centre. These are testing conveniences, not a competitive-game permissions system.
+- **10 hero choices** in a northern 5-by-2 selection plaza at y=6500/7200. Use the Wisp on a pedestal, or the `-pick 1` through `-pick 10` chat fallback. The starter Wisp begins at y=5700.
+- **24 custom item types** and 44 custom ability types, including 40 learnable hero skills for 10 heroes. Each hero has four unique skill IDs, Q/W/E/R hotkeys, and five ranks per skill. New heroes: Fenn the Alchemist, Torvin the Mountain King, Lyrisa the Warden and Issara the Lich.
+- **Maximum hero level 20:** `war3mapMisc.txt` sets map-specific gameplay constants. Include this file in the MPQ root, in addition to `war3map.j`, `war3map.w3u`, `war3map.w3a` and `war3map.w3t`. Experience pacing and availability of ranks must be confirmed in the Warcraft III 1.26a client.
+- The invisible aura providers are separate units; a central permanent visual magical effect marks the guardian's position in the arena. They do not appear as added hero auras.
+- Day/night cycling is disabled at noon, so neutral mobs stay active.
+
+### Important MPQ Editor test
+
+Replace these **five** files together: `war3map.j`, `war3map.w3u`, `war3map.w3a`, `war3map.w3t` and `war3mapMisc.txt`, all at the root of the map archive. Do not import `object-data/hero_arena_objects.json` into the MPQ. Back up your old map first. Only JASS function structure and Object Editor binary format were checked programmatically; these changes have not been compiled/tested in the 1.26a game client.
+
+Known follow-up: the 20-level skill curve, stage difficulty, item pricing and custom spell order strings still require in-game balance/playability testing. New hero abilities inherit classic spell templates, so some cast orders/animations may overlap; test each hero's four spells before finalizing their kits.
