@@ -306,9 +306,162 @@ function Arena_HeroEpithet takes integer k returns string
     return "Повелительница льда"
 endfunction
 
+function Arena_CustomSpell takes integer kind, integer slot returns integer
+    if kind == 1 then
+        if slot == 1 then
+            return 'A101'
+        elseif slot == 2 then
+            return 'A102'
+        elseif slot == 3 then
+            return 'A10D'
+        elseif slot == 4 then
+            return 'A10E'
+        endif
+    elseif kind == 2 then
+        if slot == 1 then
+            return 'A103'
+        elseif slot == 2 then
+            return 'A104'
+        elseif slot == 3 then
+            return 'A10F'
+        elseif slot == 4 then
+            return 'A10G'
+        endif
+    elseif kind == 3 then
+        if slot == 1 then
+            return 'A105'
+        elseif slot == 2 then
+            return 'A106'
+        elseif slot == 3 then
+            return 'A10H'
+        elseif slot == 4 then
+            return 'A10I'
+        endif
+    elseif kind == 4 then
+        if slot == 1 then
+            return 'A107'
+        elseif slot == 2 then
+            return 'A108'
+        elseif slot == 3 then
+            return 'A10J'
+        elseif slot == 4 then
+            return 'A10K'
+        endif
+    elseif kind == 5 then
+        if slot == 1 then
+            return 'A109'
+        elseif slot == 2 then
+            return 'A10A'
+        elseif slot == 3 then
+            return 'A10L'
+        elseif slot == 4 then
+            return 'A10M'
+        endif
+    elseif kind == 6 then
+        if slot == 1 then
+            return 'A10B'
+        elseif slot == 2 then
+            return 'A10C'
+        elseif slot == 3 then
+            return 'A10N'
+        elseif slot == 4 then
+            return 'A10O'
+        endif
+    elseif kind == 7 then
+        if slot == 1 then
+            return 'A111'
+        elseif slot == 2 then
+            return 'A112'
+        elseif slot == 3 then
+            return 'A113'
+        elseif slot == 4 then
+            return 'A114'
+        endif
+    elseif kind == 8 then
+        if slot == 1 then
+            return 'A115'
+        elseif slot == 2 then
+            return 'A116'
+        elseif slot == 3 then
+            return 'A117'
+        elseif slot == 4 then
+            return 'A118'
+        endif
+    elseif kind == 9 then
+        if slot == 1 then
+            return 'A119'
+        elseif slot == 2 then
+            return 'A11A'
+        elseif slot == 3 then
+            return 'A11B'
+        elseif slot == 4 then
+            return 'A11C'
+        endif
+    elseif kind == 10 then
+        if slot == 1 then
+            return 'A11D'
+        elseif slot == 2 then
+            return 'A11E'
+        elseif slot == 3 then
+            return 'A11F'
+        elseif slot == 4 then
+            return 'A11G'
+        endif
+    endif
+    return 0
+endfunction
+
 function Arena_GiveSkills takes unit u, integer kind returns nothing
-    // Hero skills are learned only through the Warcraft III level-up menu.
-    // Never pre-add or pre-level these custom hero abilities here.
+    local integer slot = 1
+    local integer id
+    local integer pid = GetPlayerId(GetOwningPlayer(u))
+    // Hide classic skill-tree buttons. New QWER unit spells auto-rank with hero levels.
+    if pid >= 0 and pid < 4 then
+        call SetPlayerAbilityAvailable(Player(pid), 'AHer', false)
+    endif
+    loop
+        exitwhen slot > 4
+        set id = Arena_CustomSpell(kind, slot)
+        if id != 0 then
+            if not UnitAddAbility(u, id) then
+                call DisplayTimedTextToPlayer(GetOwningPlayer(u), 0.0, 0.0, 15.0, "|cffff5555Не загружено умение " + I2S(slot) + ". Проверьте war3map.w3a.|r")
+            endif
+        endif
+        set slot = slot + 1
+    endloop
+    call UnitModifySkillPoints(u, -GetHeroSkillPoints(u))
+endfunction
+
+function Arena_UpdateCustomRanks takes nothing returns nothing
+    local integer pid = 0
+    local integer slot
+    local integer id
+    local integer rank
+    local unit hero
+    loop
+        exitwhen pid >= 4
+        set hero = udg_Heroes[pid]
+        if hero != null and udg_HeroKind[pid] >= 1 and GetWidgetLife(hero) > 0.405 then
+            set rank = 1 + (GetHeroLevel(hero) - 1) / 4
+            if rank > 5 then
+                set rank = 5
+            endif
+            set slot = 1
+            loop
+                exitwhen slot > 4
+                set id = Arena_CustomSpell(udg_HeroKind[pid], slot)
+                if GetUnitAbilityLevel(hero, id) > 0 and GetUnitAbilityLevel(hero, id) != rank then
+                    call SetUnitAbilityLevel(hero, id, rank)
+                endif
+                set slot = slot + 1
+            endloop
+            if GetHeroSkillPoints(hero) > 0 then
+                call UnitModifySkillPoints(hero, -GetHeroSkillPoints(hero))
+            endif
+        endif
+        set pid = pid + 1
+    endloop
+    set hero = null
 endfunction
 
 function Arena_ClearAuras takes nothing returns nothing
@@ -444,10 +597,10 @@ function Arena_SpawnHero takes integer pid, integer kind returns boolean
         call SetHeroInt(hero, 30, true)
     endif
     call Arena_NormalizeHeroStats(hero)
+    call Arena_GiveSkills(hero, kind)
     set udg_Heroes[pid] = hero
     set udg_HeroKind[pid] = kind
-    // Hero learnable skills come from a verified built-in hero in this stability test.
-    // Do not use custom W3A spells until custom object validation is completed.
+    // Stock model is crash-safe; four unique Channel spells replace original hero gameplay.
     call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 7.0, "[Выбор 2/3] Герой создан. Выдаём снаряжение...")
     call UnitAddItemById(hero, 'phea')
     call UnitAddItemById(hero, 'pman')
@@ -1492,6 +1645,7 @@ function Trig_Aura_Actions takes nothing returns nothing
     local real mana
     local real addHp
     local real addMp
+    call Arena_UpdateCustomRanks()
     // Aura carriers remain at (0,0), inside the central monument.
     if udg_HumanCount >= 4 then
         return
