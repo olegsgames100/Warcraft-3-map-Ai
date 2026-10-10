@@ -990,6 +990,72 @@ function InitTrig_____________________________________001 takes nothing returns 
     call TriggerAddAction(gg_trg_____________________________________001, function Trig_____________________________________001_Actions)
 endfunction
 
+// Build walkable terrain and low-cost landmark geometry at runtime.
+// No impassable decorations inside hero trigger pads or creep spawn circles.
+function Arena_PaintDisc takes real cx, real cy, real radius, integer terrain returns nothing
+    local real x = cx - radius
+    local real y
+    loop
+        exitwhen x > cx + radius
+        set y = cy - radius
+        loop
+            exitwhen y > cy + radius
+            if (x - cx) * (x - cx) + (y - cy) * (y - cy) <= radius * radius then
+                call SetTerrainType(x, y, terrain, -1, 1, 0)
+            endif
+            set y = y + 128.0
+        endloop
+        set x = x + 128.0
+    endloop
+endfunction
+
+function Arena_CreateGeometry takes nothing returns nothing
+    local integer k = 1
+    local integer i = 0
+    local real x
+    local real y
+    local real angle
+    local destructable d
+    // Flat fighting circle with an inner stone dais and a subtle grassy boundary.
+    call Arena_PaintDisc(0.0, 0.0, 2200.0, 'Lgrs')
+    call Arena_PaintDisc(0.0, 0.0, 1840.0, 'Lrok')
+    call Arena_PaintDisc(0.0, 0.0, 760.0, 'Ldro')
+    // A northern, six-pad paved selection hall with a central stone walkway.
+    call Arena_PaintDisc(0.0, 4380.0, 1900.0, 'Lgrs')
+    set y = 2304.0
+    loop
+        exitwhen y > 3800.0
+        set x = -192.0
+        loop
+            exitwhen x > 192.0
+            call SetTerrainType(x, y, 'Ldro', -1, 1, 0)
+            set x = x + 128.0
+        endloop
+        set y = y + 128.0
+    endloop
+    loop
+        exitwhen k > 6
+        set x = Arena_SelectX(k)
+        set y = Arena_SelectY(k)
+        call Arena_PaintDisc(x, y, 385.0, 'Lrok')
+        call Arena_PaintDisc(x, y, 270.0, 'Ldro')
+        set k = k + 1
+    endloop
+    // Non-blocking effect landmarks: outer arc leaves the four cardinal gates clear.
+    loop
+        exitwhen i >= 32
+        if ModuloInteger(i, 8) != 0 and ModuloInteger(i, 8) != 1 then
+            set angle = 6.2831853 * I2R(i) / 32.0
+            set d = CreateDestructable('LTlt', 2670.0 * Cos(angle), 2670.0 * Sin(angle), 0.0, 0.80, 0)
+            if d != null then
+                call SetDestructableInvulnerable(d, true)
+            endif
+        endif
+        set i = i + 1
+    endloop
+    set d = null
+endfunction
+
 function Trig_Arena_Actions takes nothing returns nothing
     local integer i
     call FogEnableOff()
@@ -1002,6 +1068,7 @@ function Trig_Arena_Actions takes nothing returns nothing
     endif
     call Arena_AllyPlayers()
     call Arena_ApplyHandicap()
+    call Arena_CreateGeometry()
     call Arena_CreateShops()
     call Arena_CreateQuests()
     call Arena_ExplainBalance()
