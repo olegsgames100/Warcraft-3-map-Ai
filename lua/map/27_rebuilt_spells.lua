@@ -50,59 +50,50 @@ local function ultPair(h,kind,amount)A.recordTwinUltimate(h,kind,amount)end
 H[1]={
  function(c)
     local h=c.h
-    local n=forward(h,490,120,c.b*1.28,"physical",function(v)
-        A.stunEnemy(h,v,.4)
-    end)
-    A.taunt(h,610)
-    res(c.pid,"valor",8+n*6)
- end,
- function(c)
-    local h=c.h
-    local anchor={x=c.x,y=c.y,expires=A.clock+10,next=A.clock}
-    s(c.pid).bastion=anchor
-    A.visualRing(LIGHT,c.x,c.y,400,8,2)
-    allies(h,function(u)
-        local dx,dy=pos(u)
-        if (dx-c.x)^2+(dy-c.y)^2<550^2 then
-            defend(h,u,c.b*3,9)
-            if u~=h then A.protect(h,u,.32,9) end
-        end
-    end)
- end,
- function(c)
-    local h=c.h
-    local ally=chooseFriend(h,c.target)
-    A.moveToward(h,GetUnitX(ally),GetUnitY(ally),540)
-    defend(h,ally,c.b*3.8,7)
-    A.protect(h,ally,.44,8)
-    A.taunt(h,420)
+    local hits=forward(h,510,125,c.b*1.15,"physical",function(v) A.stunEnemy(h,v,.4) end)
+    A.taunt(h,680)
+    res(c.pid,"valor",8+hits*7)
     local x,y=pos(h)
-    area(h,x,y,270,c.b*.7,"physical")
+    A.visualRing(LIGHT,x,y,250,7,1.1)
+    A.showValor(c.pid,true)
+ end,
+ function(c)
+    local h=c.h
+    local st=s(c.pid)
+    st.bastion={x=c.x,y=c.y,expires=A.clock+11,next=A.clock,radius=475,caster=h}
+    A.spawnBastionDome(h,st.bastion)
+    A.showValor(c.pid,true)
+ end,
+ function(c)
+    local h=c.h
+    local friend=c.target
+    A.moveToward(h,GetUnitX(friend),GetUnitY(friend),825)
+    defend(h,friend,c.b*2.2*A.statMultiplier(h,"physical"),8)
+    A.protect(h,friend,.36,8)
+    A.taunt(h,360)
+    fx(LIGHT,GetUnitX(friend),GetUnitY(friend))
     res(c.pid,"valor",12)
  end,
  function(c)
     local h=c.h
     local valor=spend(c.pid,"valor")
-    local stored=s(c.pid).resolve or 0
-    s(c.pid).resolve=0
+    local str=A.statMultiplier(h,"physical")
     local x,y=pos(h)
-    for i=0,3 do
-       local friend=A.heroUnits[i]
-       if friend and IsUnitAlly(friend,GetOwningPlayer(h)) then
-          if not A.alive(friend)then ReviveHero(friend,x,y,true)end
-          if A.alive(friend)then
-              A.spellHeal(h,friend,c.b*2+valor*1.3+stored*.43)
-              defend(h,friend,c.b*1.8+stored*.25,9)
-          end
-       end
+    local n=0
+    for pid=0,3 do
+        local u=A.heroUnits[pid]
+        if A.alive(u) and IsUnitAlly(u,GetOwningPlayer(h)) then
+           local dx,dy=GetUnitX(u)-x,GetUnitY(u)-y
+           if dx*dx+dy*dy<=1000*1000 then
+              n=n+1
+              A.grantLastOath(u,10,35)
+              defend(h,u,(c.b+valor*.8)*str,10)
+              fx(LIGHT,GetUnitX(u),GetUnitY(u))
+           end
+        end
     end
-    A.spellRing(h,x,y,190,650,c.b*1.4+stored*.28,"magic",function(v)
-        A.knockAway(h,v,x,y,200)
-    end)
-    local b=s(c.pid).bastion
-    if b and b.expires>A.clock then
-      area(h,b.x,b.y,490,c.b*.75+valor*.6,"magic")
-    end
+    A.visualRing(LIGHT,x,y,560,12,2)
+    A.playerText(c.pid,"|cffffd966Клятва: "..n.." героев защищено, одно воскрешение у каждого.|r")
  end
 }
 
@@ -644,6 +635,19 @@ function A.castHero(hero,ability,snapshot)
     elseif x==0 and y==0 then x,y=hx,hy end
     local data={h=hero,pid=pid,kind=kind,slot=slot,rank=rank,
         target=target,x=x,y=y,b=p(rank)}
+    if kind==1 and slot==3 then
+        if not target or target==hero or not A.alive(target) or
+           not IsUnitAlly(target,GetOwningPlayer(hero)) or
+           not IsUnitType(target,UNIT_TYPE_HERO) then
+            A.playerText(pid,"|cffff7777Выбери другого союзного героя.|r")
+            return false
+        end
+        local dx,dy=GetUnitX(target)-hx,GetUnitY(target)-hy
+        if dx*dx+dy*dy>definition.range*definition.range then
+            A.playerText(pid,"|cffff7777Союзник слишком далеко.|r")
+            return false
+        end
+    end
     -- Lock after validation, not before: invalid target must not eat cooldown.
     A.cooldowns[token]=A.clock+definition.cooldown
     if BlzStartUnitAbilityCooldown then
