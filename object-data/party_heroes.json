@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "title": "Hero Arena Party Roles - 12 heroes, 48 spells",
   "scaling": {
     "physical": {
@@ -52,43 +52,48 @@
           "id": "A101",
           "key": "Q",
           "name": "Световой вызов",
-          "description": "Конусный удар и массовая провокация; пополняет Доблесть.",
+          "description": "Конусный удар провоцирует врагов и копит Доблесть от защищённых союзников.",
           "mana": 28,
           "cooldown": 7,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
+          "target": "instant"
         },
         {
           "id": "A102",
           "key": "W",
-          "name": "Оплот рассвета",
-          "description": "Создаёт узы защиты: паладин принимает часть урона союзников и даёт щиты.",
+          "name": "Клятвенный бастион",
+          "description": "Создаёт защитную печать в точке: герои внутри получают щиты и часть урона перенаправляют паладину.",
           "mana": 44,
           "cooldown": 18,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNDivineShield.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDivineShield.blp",
+          "target": "point"
         },
         {
           "id": "A10D",
           "key": "E",
           "name": "Перехват клятвы",
-          "description": "Приближается к союзнику, прикрывает его и рубит врагов впереди.",
+          "description": "Прыжок к выбранному союзнику, щит, провокация и ответный удар по нападающим.",
           "mana": 36,
           "cooldown": 13,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNDefend.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDefend.blp",
+          "target": "unit"
         },
         {
           "id": "A10E",
           "key": "R",
           "name": "Последний рассвет",
-          "description": "Тратит накопленную защитную мощь и Доблесть на спасение команды и отталкивание врагов.",
+          "description": "Массовое спасение, воскрешение и взрыв накопленной Доблести; усиливает командный бастион.",
           "mana": 115,
           "cooldown": 60,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNResurrection.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNResurrection.blp",
+          "target": "instant"
         }
-      ]
+      ],
+      "attackCooldown": 2.2
     },
     {
       "kind": 2,
@@ -113,44 +118,49 @@
         {
           "id": "A103",
           "key": "Q",
-          "name": "Разящий наскок",
-          "description": "Прыжок к точке и рубящий конус с кровотечением и комбо.",
+          "name": "Режущий шаг",
+          "description": "Рывок в выбранную точку режет всех на пути и накладывает кровотечение.",
           "mana": 22,
           "cooldown": 6,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNWindWalkOn.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNWindWalk.blp",
+          "target": "point"
         },
         {
           "id": "A104",
           "key": "W",
-          "name": "Кровавый вихрь",
-          "description": "Ранит выбранную цель; три стака кровотечения взрываются дополнительным уроном.",
+          "name": "Три раны",
+          "description": "Три рубящих удара по цели накапливают раны; три раны взрываются.",
           "mana": 32,
           "cooldown": 12,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNBladestorm.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNCriticalStrike.blp",
+          "target": "unit"
         },
         {
           "id": "A10F",
           "key": "E",
-          "name": "Мираж клинков",
-          "description": "На 4 секунды готовит парирование; успешный ответ усиливает комбо и ускоряет Q.",
+          "name": "Стойка миража",
+          "description": "Парирует следующую атаку: уклонение, ответный удар и восстановление рывка.",
           "mana": 38,
           "cooldown": 16,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNMirrorImage.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNMirrorImage.blp",
+          "target": "instant"
         },
         {
           "id": "A10G",
           "key": "R",
-          "name": "Тысяча клинков",
-          "description": "Рывок к отмеченной цели, двойное добивание и взрыв всех кровотечений. Сила урона зависит от комбо.",
+          "name": "Танец барханов",
+          "description": "Телепортируется между кровоточащими врагами, расходуя комбо для смертельного финала.",
           "mana": 105,
           "cooldown": 46,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNBladestorm.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBladestorm.blp",
+          "target": "unit"
         }
-      ]
+      ],
+      "attackCooldown": 1.7
     },
     {
       "kind": 3,
@@ -175,44 +185,49 @@
         {
           "id": "A105",
           "key": "Q",
-          "name": "Цепная молния",
-          "description": "Цепь молний прыгает между пятью разными противниками, накапливая Шторм.",
+          "name": "Проводящая молния",
+          "description": "Молния перескакивает между разными врагами, накладывает проводимость.",
           "mana": 28,
           "cooldown": 7,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNChainLightning.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNChainLightning.blp",
+          "target": "unit"
         },
         {
           "id": "A106",
           "key": "W",
-          "name": "Грозовой столб",
-          "description": "Устанавливает грозовой проводник: разряды бьют ближайших врагов и дают заряды.",
+          "name": "Грозовой якорь",
+          "description": "Устанавливает грозовой якорь в выбранной точке; молнии бьют проводящие цели.",
           "mana": 42,
           "cooldown": 15,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNLightningShield.blp",
+          "target": "point"
         },
         {
           "id": "A10H",
           "key": "E",
-          "name": "Магический контур",
-          "description": "Раздаёт ману, усиливает магию союзников и сокращает откат первого умения.",
+          "name": "Манасвязь",
+          "description": "Соединяет мага с союзником, питает маной и усиливает следующую магическую атаку.",
           "mana": 36,
           "cooldown": 17,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNBrilliance.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBrilliance.blp",
+          "target": "unit"
         },
         {
           "id": "A10I",
           "key": "R",
-          "name": "Штормовой катаклизм",
-          "description": "Обрушивает электрические удары в точке и вокруг установленного проводника; заряд усиливает урон.",
+          "name": "Перегрузка небес",
+          "description": "Разряды перескакивают между якорем и выбранной точкой, взрывая проводимость.",
           "mana": 120,
           "cooldown": 50,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp",
+          "target": "point"
         }
-      ]
+      ],
+      "attackCooldown": 2.4
     },
     {
       "kind": 4,
@@ -238,43 +253,48 @@
           "id": "A107",
           "key": "Q",
           "name": "Печать погибели",
-          "description": "Помечает врага проклятием; его смерть даёт души и вызывает взрыв.",
+          "description": "Смертельное проклятие наносит урон при смерти цели и даёт души.",
           "mana": 25,
           "cooldown": 8,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathCoil.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathCoil.blp",
+          "target": "unit"
         },
         {
           "id": "A108",
           "key": "W",
-          "name": "Костяной дозор",
-          "description": "Призывает личную стражу из скелетов на передовую, защищая хозяина.",
+          "name": "Костяная стража",
+          "description": "Скелеты окружают выбранного союзника и перехватывают нападение.",
           "mana": 42,
           "cooldown": 19,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNSkeletalLongevity.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
+          "target": "unit"
         },
         {
           "id": "A10J",
           "key": "E",
-          "name": "Жатва эссенции",
-          "description": "Собирает силу врагов вблизи для лечения самого раненого союзника.",
+          "name": "Нить жизни",
+          "description": "Перекачивает жизнь врага в здоровье выбранного слабого союзника.",
           "mana": 38,
           "cooldown": 13,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathPact.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathPact.blp",
+          "target": "unit"
         },
         {
           "id": "A10K",
           "key": "R",
           "name": "Чёрный легион",
-          "description": "Обменивает души на отряд скелетов и командные щиты; продлевает проклятия.",
+          "description": "Призывает эшелоны павших к точке и усиливает их собранными душами.",
           "mana": 110,
           "cooldown": 52,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
+          "target": "point"
         }
-      ]
+      ],
+      "attackCooldown": 2.1
     },
     {
       "kind": 5,
@@ -299,44 +319,49 @@
         {
           "id": "A109",
           "key": "Q",
-          "name": "Разрез разлома",
-          "description": "Прыжок к точке с двойной ударной волной в точке старта и финиша.",
+          "name": "Разлом пространства",
+          "description": "Рывок по направлению оставляет опасный шрам разлома.",
           "mana": 24,
           "cooldown": 6,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp",
+          "target": "point"
         },
         {
           "id": "A10A",
           "key": "W",
-          "name": "Пожиратель магии",
-          "description": "Магический урон выбранному врагу возвращает ману и лечит самого героя.",
+          "name": "Сжечь ману",
+          "description": "Сжигает ману выбранной цели и питается уничтоженной магией.",
           "mana": 34,
           "cooldown": 12,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp",
+          "target": "unit"
         },
         {
           "id": "A10L",
           "key": "E",
-          "name": "Ловушка скверны",
-          "description": "Размещает до трёх скрытых мин; ближайший противник подрывает мину и замедляется.",
+          "name": "Охотничьи руны",
+          "description": "Ставит три близких руны, взрывающиеся при приближении врагов.",
           "mana": 40,
           "cooldown": 16,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNImmolationOn.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNImmolation.blp",
+          "target": "point"
         },
         {
           "id": "A10M",
           "key": "R",
-          "name": "Облик разрушителя",
-          "description": "Демоническая форма усиливает атаки, ускоряет движение, даёт вампиризм и подрывает установленные мины.",
+          "name": "Демонический облик",
+          "description": "Превращается в демона: базовые атаки выпускают взрывы и подрывают руны.",
           "mana": 105,
           "cooldown": 49,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNMetamorphosis.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNMetamorphosis.blp",
+          "target": "instant"
         }
-      ]
+      ],
+      "attackCooldown": 1.9
     },
     {
       "kind": 6,
@@ -361,44 +386,49 @@
         {
           "id": "A10B",
           "key": "Q",
-          "name": "Лунное прикосновение",
-          "description": "Исцеляет конкретного союзника сильнее при низком HP; избыток лечения становится щитом.",
+          "name": "Лунная милость",
+          "description": "Сильное точечное лечение, излишек превращается в защитный щит.",
           "mana": 24,
           "cooldown": 5,
           "type": "heal",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNHeal.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNHeal.blp",
+          "target": "unit"
         },
         {
           "id": "A10C",
           "key": "W",
-          "name": "Священная роща",
-          "description": "Устанавливает лечебную рощу: исцеляет союзников в точке на протяжении 11 секунд.",
+          "name": "Роща спокойствия",
+          "description": "Высаживает лунную рощу в точке, собирающую энергию лечения.",
           "mana": 44,
           "cooldown": 17,
           "type": "heal",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNTranquility.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNTranquility.blp",
+          "target": "point"
         },
         {
           "id": "A10N",
           "key": "E",
-          "name": "Покров затмения",
-          "description": "Защищает выбранную цель щитом, сопротивлением урону и дополнительным лечением.",
+          "name": "Нить спасения",
+          "description": "Связывает выбранного союзника, спасая его от смертельного урона.",
           "mana": 39,
           "cooldown": 16,
           "type": "heal",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNStarfall.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDivineShield.blp",
+          "target": "unit"
         },
         {
           "id": "A10O",
           "key": "R",
-          "name": "Благословение луны",
-          "description": "Массовое воскрешение и лечение; усиливает работающую лечебную рощу.",
+          "name": "Восход луны",
+          "description": "Волна лунного света воскрешает и цепочкой лечит самых раненых героев.",
           "mana": 120,
           "cooldown": 60,
           "type": "heal",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNResurrection.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNResurrection.blp",
+          "target": "instant"
         }
-      ]
+      ],
+      "attackCooldown": 2.5
     },
     {
       "kind": 7,
@@ -423,44 +453,49 @@
         {
           "id": "A111",
           "key": "Q",
-          "name": "Боевой стимулятор",
-          "description": "Усиливает физический урон союзников и реально повышает скорость атаки и движения.",
+          "name": "Эликсир ярости",
+          "description": "Усиливает физический урон и скорость выбранного союзника.",
           "mana": 28,
           "cooldown": 12,
           "type": "buff",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNHealingSpray.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNHealingSpray.blp",
+          "target": "unit"
         },
         {
           "id": "A112",
           "key": "W",
-          "name": "Коррозионная смесь",
-          "description": "Кислотная бомба заражает позицию, делая врагов уязвимее и повреждая их повторно.",
+          "name": "Кислотный флакон",
+          "description": "Кидает кислотный снаряд в точку, снижает защиту и помечает врагов.",
           "mana": 39,
           "cooldown": 15,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp",
+          "target": "point"
         },
         {
           "id": "A113",
           "key": "E",
-          "name": "Золотая формула",
-          "description": "Возвращает союзникам ману, улучшает их магический урон и сокращает перезарядку W.",
+          "name": "Катализатор",
+          "description": "Восстанавливает ману выбранного союзника и сокращает время до его ключевой способности.",
           "mana": 36,
           "cooldown": 18,
           "type": "buff",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNTransmute.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNTransmute.blp",
+          "target": "unit"
         },
         {
           "id": "A114",
           "key": "R",
-          "name": "Великий эликсир",
-          "description": "Групповой боевой эликсир: щиты, лечение, ускорение, бонус обоих типов урона и ускорение восстановления E.",
+          "name": "Золотая трансмутация",
+          "description": "Превращает химические метки в золото, щиты и мощное усиление команды.",
           "mana": 110,
           "cooldown": 54,
           "type": "buff",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNChemicalRage.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNChemicalRage.blp",
+          "target": "instant"
         }
-      ]
+      ],
+      "attackCooldown": 2.3
     },
     {
       "kind": 8,
@@ -485,44 +520,49 @@
         {
           "id": "A115",
           "key": "Q",
-          "name": "Громовой удар",
-          "description": "Фронтальный удар прерывает врагов.",
+          "name": "Метательный молот",
+          "description": "Метает молот во врага, оглушает и возвращает его рикошетом.",
           "mana": 26,
           "cooldown": 7,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp",
+          "target": "unit"
         },
         {
           "id": "A116",
           "key": "W",
-          "name": "Магнитный кулак",
-          "description": "Стягивает врагов в ближний бой, оглушает и заставляет нападать на танка.",
+          "name": "Гравитационный удар",
+          "description": "Удар притягивает врагов к указанной точке и прерывает их.",
           "mana": 36,
           "cooldown": 17,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
+          "target": "point"
         },
         {
           "id": "A117",
           "key": "E",
-          "name": "Гранитная кожа",
-          "description": "Гранитный щит; каждый третий полученный удар вызывает ответное землетрясение.",
+          "name": "Гранитная стойка",
+          "description": "Стойка глыбы поглощает атаки и вызывает ответные ударные волны.",
           "mana": 38,
           "cooldown": 22,
           "type": "buff",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNAvatar.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAvatar.blp",
+          "target": "instant"
         },
         {
           "id": "A118",
           "key": "R",
-          "name": "Сотрясение арены",
-          "description": "Отбрасывает и оглушает кольцо врагов, затем получает щит по числу поражённых целей.",
+          "name": "Король гор",
+          "description": "Разделяет арену ударом, отбрасывает врагов и создаёт каменную стену.",
           "mana": 115,
           "cooldown": 55,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAvatar.blp",
+          "target": "instant"
         }
-      ]
+      ],
+      "attackCooldown": 2.25
     },
     {
       "kind": 9,
@@ -547,44 +587,49 @@
         {
           "id": "A119",
           "key": "Q",
-          "name": "Шаг тени",
-          "description": "Заходит врагу за спину и сохраняет точку для возможного возвращения.",
+          "name": "Удар из тени",
+          "description": "Появляется за выбранным врагом и ранит его спину.",
           "mana": 24,
           "cooldown": 6,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp",
+          "target": "unit"
         },
         {
           "id": "A11A",
           "key": "W",
-          "name": "Знак казни",
-          "description": "Устанавливает метку казни и уязвимость на выбранной цели.",
+          "name": "Клеймо казни",
+          "description": "Помечает врага клеймом казни и открывает уязвимость.",
           "mana": 31,
           "cooldown": 11,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp",
+          "target": "unit"
         },
         {
           "id": "A11B",
           "key": "E",
-          "name": "Дымовой побег",
-          "description": "Возвращается в сохранённую точку и ненадолго парирует входящую атаку.",
+          "name": "Прыжок в сумрак",
+          "description": "Возвращается к оставленной тени или прыгает к выбранной точке.",
           "mana": 35,
           "cooldown": 18,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNFanOfKnives.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFanOfKnives.blp",
+          "target": "point"
         },
         {
           "id": "A11C",
           "key": "R",
-          "name": "Приговор ночи",
-          "description": "Добивает отмеченного врага; чем меньше HP, тем сильнее удар. Метка сокращает откат Q.",
+          "name": "Последний приговор",
+          "description": "Добивает помеченную цель; казнь обновляет атакующий навык.",
           "mana": 110,
           "cooldown": 42,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp",
+          "target": "unit"
         }
-      ]
+      ],
+      "attackCooldown": 1.75
     },
     {
       "kind": 10,
@@ -609,44 +654,49 @@
         {
           "id": "A11D",
           "key": "Q",
-          "name": "Ледяное копьё",
-          "description": "Запускает летящее ледяное копьё, накапливающее холод на поражённых врагах.",
+          "name": "Копьё инея",
+          "description": "Летящее копьё накапливает мороз и пронзает врагов.",
           "mana": 26,
           "cooldown": 7,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostNova.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostNova.blp",
+          "target": "point"
         },
         {
           "id": "A11E",
           "key": "W",
-          "name": "Морозные цепи",
-          "description": "Замораживает выбранную цель и распространяет холод на соседних.",
+          "name": "Ледяная тюрьма",
+          "description": "Заковывает выбранную цель во лёд и заражает морозом соседей.",
           "mana": 40,
           "cooldown": 17,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostArmor.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostArmor.blp",
+          "target": "unit"
         },
         {
           "id": "A11F",
           "key": "E",
-          "name": "Холодный фронт",
-          "description": "Выстраивает ледяную стену, которая замедляет, отталкивает и накапливает холод.",
+          "name": "Стена вечной мерзлоты",
+          "description": "Создаёт ледяную стену, замедляющую и отталкивающую преследователей.",
           "mana": 40,
           "cooldown": 18,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlizzard.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlizzard.blp",
+          "target": "point"
         },
         {
           "id": "A11G",
           "key": "R",
-          "name": "Вечная зима",
-          "description": "Раскалывает накопленный лёд на всех ближайших врагах; оглушение и урон растут от стаков.",
+          "name": "Белая мгла",
+          "description": "Кольца метели замораживают, затем разбивают накопленные ледяные метки.",
           "mana": 125,
           "cooldown": 53,
           "type": "magic",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNFreezingBreath.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFreezingBreath.blp",
+          "target": "instant"
         }
-      ]
+      ],
+      "attackCooldown": 2.4
     },
     {
       "kind": 11,
@@ -674,43 +724,48 @@
           "id": "A121",
           "key": "Q",
           "name": "Костяной болт",
-          "description": "Дальнобойная летящая стрела с костяной меткой; точность и усиление от Гело повышают урон.",
+          "description": "Дальнобойный костяной снаряд помечает врагов; Гело усиливает его.",
           "mana": 25,
           "cooldown": 6,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlackArrow.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlackArrow.blp",
+          "target": "point"
         },
         {
           "id": "A122",
           "key": "W",
-          "name": "Дождь могильных стрел",
-          "description": "Серия семи падений стрел в выбранной области с метками для Гело.",
+          "name": "Залп семи могил",
+          "description": "Семь прицельных залпов стрел в выбранную область.",
           "mana": 40,
           "cooldown": 15,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNClusterRockets.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNClusterRockets.blp",
+          "target": "point"
         },
         {
           "id": "A123",
           "key": "E",
           "name": "Призрачная тетива",
-          "description": "Увеличивает собственный урон и скорость; прикрывает Гело щитом.",
+          "description": "Прицеливание усиливает следующий болт и выдаёт Гело защитный щит.",
           "mana": 32,
           "cooldown": 18,
           "type": "buff",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNTrueshot.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNTrueshot.blp",
+          "target": "instant"
         },
         {
           "id": "A124",
           "key": "R",
-          "name": "Клятва костей",
-          "description": "Пять прицельных залпов по выбранной точке; вместе с ультой Гело запускает Смертельный союз.",
+          "name": "Прицельная казнь",
+          "description": "Выстрел по выбранной цели запускает преследующие костяные стрелы; взаимодействует с ультой Гело.",
           "mana": 115,
           "cooldown": 49,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNStarfall.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNStarfall.blp",
+          "target": "unit"
         }
-      ]
+      ],
+      "attackCooldown": 2.1
     },
     {
       "kind": 12,
@@ -738,45 +793,50 @@
           "id": "A125",
           "key": "Q",
           "name": "Костолом",
-          "description": "Конусный удар уничтожает метки Авалса, оглушает и ломает броню целей.",
+          "description": "Широкий удар детонирует костяные метки Авалса.",
           "mana": 25,
           "cooldown": 7,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNCriticalStrike.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNCriticalStrike.blp",
+          "target": "instant"
         },
         {
           "id": "A126",
           "key": "W",
-          "name": "Щит могилы",
-          "description": "Заставляет врагов атаковать себя и защищает Авалса связью и щитом.",
+          "name": "Щит братства",
+          "description": "Выбирает союзника и перехватывает часть урона, защищая Авалса сильнее.",
           "mana": 42,
           "cooldown": 18,
           "type": "buff",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNDivineShield.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDefend.blp",
+          "target": "unit"
         },
         {
           "id": "A127",
           "key": "E",
-          "name": "Костяной таран",
-          "description": "Таран к точке дробит костяные метки и усиливает следующую стрелу Авалса.",
+          "name": "Могильный таран",
+          "description": "Рывок в точку стягивает противников и усиливает следующий болт Авалса.",
           "mana": 35,
           "cooldown": 13,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNCharge.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNCharge.blp",
+          "target": "point"
         },
         {
           "id": "A128",
           "key": "R",
           "name": "Марш павших",
-          "description": "Массовое сотрясение с оглушением и скелетами; вместе с ультой Авалса запускает Смертельный союз.",
+          "description": "Стена скелетов и натиск; совместно с ультой Авалса вызывает Смертельный союз.",
           "mana": 115,
           "cooldown": 52,
           "type": "physical",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
+          "target": "instant"
         }
-      ]
+      ],
+      "attackCooldown": 2.15
     }
   ],
-  "rework": "Unique tactical kits and real team buffs; spells use dedicated lua/map/26_unique_kits.lua",
+  "rework": "v3: distinct roles, native Channel point/unit/instant targeting, 48 bespoke Lua mechanics, attack restoration",
   "fixNotes": "Bone heroes both inherit from tested stock hero Udea. Explicit normal vs missile weapon types, correct attack cooldown, base damage and projectile art are generated."
 }
