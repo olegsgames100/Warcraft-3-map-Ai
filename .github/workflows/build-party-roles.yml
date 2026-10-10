@@ -77,7 +77,7 @@ jobs:
                   assert spell["mana"]+4*spell["manaGrowth"]<1000
                   range_mod=[m for m in obj["mods"] if m["field"]=="aran" and m["rank"]==level]
                   assert range_mod and abs(range_mod[0]["val"]-spell["range"])<0.02
-          target_ids={"instant":0,"unit":1,"point":2}
+          target_ids={"instant":0,"unit":1,"point":2,"passive":0}
           for hero in roster:
               for index,spell in enumerate(hero["skills"]):
                   fields=[m for m in abilities[spell["id"]]["mods"]
@@ -89,7 +89,8 @@ jobs:
                   assert get("Ncl2")["val"]==target_ids[spell["target"]]
                   assert get("Ncl3") and get("Ncl3")["type"]==0 and get("Ncl3")["val"]&1
                   assert get("Ncl6") and get("Ncl6")["type"]==3
-                  orders={"instant":{"avatar","berserk","phaseshift","roar"},
+                  orders={"passive":{"avatar","berserk","phaseshift","roar"},
+                          "instant":{"avatar","berserk","phaseshift","roar"},
                           "unit":{"chainlightning","acidbomb","cripple","curse"},
                           "point":{"blink","blizzard","carrionswarm","earthquake"}}
                   assert get("Ncl6")["val"] in orders[spell["target"]]
