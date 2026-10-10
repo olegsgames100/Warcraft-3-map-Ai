@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "title": "Hero Arena Party Roles - 12 heroes, 48 spells",
   "scaling": {
     "physical": {
@@ -651,7 +651,7 @@
     {
       "kind": 11,
       "id": "U003",
-      "base": "Ndrk",
+      "base": "Udea",
       "name": "Авалс, Костяной Снайпер",
       "proper": "Авалс",
       "role": "Лучник-скелет / физический дальний бой",
@@ -777,5 +777,6 @@
       ]
     }
   ],
-  "rework": "Unique tactical kits and real team buffs; spells use dedicated lua/map/26_unique_kits.lua"
+  "rework": "Unique tactical kits and real team buffs; spells use dedicated lua/map/26_unique_kits.lua",
+  "fixNotes": "Bone heroes both inherit from tested stock hero Udea. Explicit normal vs missile weapon types, correct attack cooldown, base damage and projectile art are generated."
 }
