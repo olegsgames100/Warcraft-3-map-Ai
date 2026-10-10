@@ -195,7 +195,9 @@ function A.castHero(hero,ability)
   elseif kind==11 then -- AVАLS: bone archer who supports Gelo
     local gelo=A.allyOfKind(12,hero)
     if slot==1 then
-      A.spellLine(hero,900,110,b*1.6,"physical",function(u)A.markBone(hero,u,9)end)
+      local resonance=(A.boneBlessing[pid] or 0)>A.clock and 1.75 or 1
+      A.boneBlessing[pid]=nil
+      A.spellLine(hero,900,110,b*1.6*resonance,"physical",function(u)A.markBone(hero,u,9)end)
     elseif slot==2 then
       pulse(hero,x,y,480,6,.5,b*(gelo and 1.0 or .75),"physical",function(u)A.markBone(hero,u,9)end)
     elseif slot==3 then
