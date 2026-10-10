@@ -50,6 +50,7 @@ globals
     integer                 udg_EnemiesAlive = 0
     integer                 udg_TotalKills = 0
     integer                 udg_BossPhase = 0
+    boolean                 udg_WaveCleared = false
     integer         array   udg_PlayerKills
     boolean         array   udg_BonusAdded
     trigger                 gg_trg_Leave = null
@@ -562,6 +563,8 @@ function Arena_CreateEnemy takes integer unitId, real x, real y returns nothing
         return
     endif
     set udg_EnemiesAlive = udg_EnemiesAlive + 1
+    call SetUnitCreepGuard(u, false)
+    call UnitWakeUp(u)
     call SetUnitAcquireRange(u, 4000.0)
     call SetUnitCreepGuard(u, false)
     call UnitWakeUp(u)
@@ -577,7 +580,7 @@ function Arena_SpawnRing takes integer unitId, integer count, real dist returns 
         set scaled = 2
     endif
     loop
-        exitwhen i >= scaled or udg_EnemiesAlive >= 85
+        exitwhen i >= scaled or udg_EnemiesAlive >= 70
         set ang = (3.14159 * 2.0) * I2R(i) / I2R(scaled)
         call Arena_CreateEnemy(unitId, dist * Cos(ang) + GetRandomReal(-70.0, 70.0), dist * Sin(ang) + GetRandomReal(-70.0, 70.0))
         set i = i + 1
@@ -596,37 +599,31 @@ function Arena_PayWaveGold takes integer gold returns nothing
 endfunction
 
 function Arena_SpawnWaveCreeps takes integer wave returns nothing
-    if wave == 1 then
-        call Arena_SpawnRing('nban', 8, 1200.0)
-        call Arena_SpawnRing('nrog', 4, 1350.0)
-    elseif wave == 2 then
-        call Arena_SpawnRing('ngno', 8, 1200.0)
-        call Arena_SpawnRing('ngna', 6, 1400.0)
-    elseif wave == 3 then
-        call Arena_SpawnRing('nftr', 8, 1200.0)
-        call Arena_SpawnRing('nftb', 6, 1400.0)
-    elseif wave == 4 then
-        call Arena_SpawnRing('nogr', 8, 1250.0)
-        call Arena_SpawnRing('nomg', 4, 1450.0)
-    elseif wave == 5 then
-        call Arena_SpawnRing('uske', 10, 1200.0)
-        call Arena_SpawnRing('nska', 6, 1450.0)
-    elseif wave == 6 then
-        call Arena_SpawnRing('nfel', 8, 1250.0)
-        call Arena_SpawnRing('nfov', 4, 1500.0)
-    elseif wave == 7 then
-        call Arena_SpawnRing('nrwm', 6, 1300.0)
-        call Arena_SpawnRing('nrdk', 6, 1500.0)
-    elseif wave == 8 then
-        call Arena_SpawnRing('uabo', 6, 1300.0)
-        call Arena_SpawnRing('unec', 4, 1500.0)
-    elseif wave == 9 then
-        call Arena_SpawnRing('nbal', 5, 1400.0)
-        call Arena_SpawnRing('ninf', 3, 1600.0)
+    local integer tier = (wave - 1) / 10
+    local integer front = 5 + wave / 7
+    local integer support = 2 + wave / 12
+    if ModuloInteger(wave, 10) == 0 then
+        set front = front + 2
+        set support = support + 1
+    endif
+    if tier == 0 then
+        call Arena_SpawnRing('nban', front, 1200.0)
+        call Arena_SpawnRing('ngno', support, 1420.0)
+    elseif tier == 1 then
+        call Arena_SpawnRing('nftr', front, 1250.0)
+        call Arena_SpawnRing('nogr', support, 1450.0)
+    elseif tier == 2 then
+        call Arena_SpawnRing('uske', front + 2, 1230.0)
+        call Arena_SpawnRing('nska', support, 1440.0)
+    elseif tier == 3 then
+        call Arena_SpawnRing('nfel', front, 1250.0)
+        call Arena_SpawnRing('nogr', support + 1, 1480.0)
     else
-        call Arena_SpawnRing('nbal', 4, 1400.0)
-        call Arena_SpawnRing('ninf', 4, 1600.0)
-        call Arena_SpawnRing('nsgg', 2, 1100.0)
+        call Arena_SpawnRing('uske', front + 3, 1250.0)
+        call Arena_SpawnRing('nfel', support, 1460.0)
+        if ModuloInteger(wave, 5) == 0 then
+            call Arena_SpawnRing('uabo', 2, 1580.0)
+        endif
     endif
 endfunction
 
@@ -878,24 +875,22 @@ function Trig_Wave_Actions takes nothing returns nothing
     if udg_GameOver then
         return
     endif
-    if udg_Wave >= 10 then
+    if udg_Wave >= 50 then
         call TimerDialogDisplay(udg_WaveTD, false)
         call Arena_SpawnBoss()
         return
     endif
     set udg_Wave = udg_Wave + 1
+    set udg_WaveCleared = false
     call Arena_SpawnWaveCreeps(udg_Wave)
-    call Arena_PayWaveGold(40 + udg_Wave * 15)
-    call Arena_Msg("|cffffcc00Волна " + I2S(udg_Wave) + "/10|r  +" + I2S(40 + udg_Wave * 15) + " золота. Врагов: " + I2S(udg_EnemiesAlive))
-    call PingMinimap(0.0, 1200.0, 3.00)
-    if udg_Wave < 10 then
+    call Arena_PayWaveGold(30 + udg_Wave * 7)
+    call Arena_Msg("|cffffcc00Волна " + I2S(udg_Wave) + "/50|r  Врагов: " + I2S(udg_EnemiesAlive))
+    if udg_Wave < 50 then
         call TimerDialogSetTitle(udg_WaveTD, "Волна " + I2S(udg_Wave + 1))
     else
-        call TimerDialogSetTitle(udg_WaveTD, "Каз'Рул")
-        call Arena_Msg("|cffff8844Последняя минута перед боссом!|r")
+        call TimerDialogSetTitle(udg_WaveTD, "Финальный босс")
     endif
-    // Maximum wait if enemies stay alive; clearing every wave creep skips it.
-    call TimerStart(udg_WaveTimer, 95.00, false, function Arena_DoNothing)
+    call TimerStart(udg_WaveTimer, 100.00, false, function Arena_DoNothing)
 endfunction
 
 //===========================================================================
@@ -942,9 +937,9 @@ function Trig_Revive3 takes nothing returns nothing
 endfunction
 
 function Arena_CheckWaveClear takes nothing returns nothing
-    // Only ordinary waves count. Boss-stage summons cannot start another wave.
-    if udg_WavesStarted and udg_Wave >= 1 and udg_Wave <= 10 and udg_EnemiesAlive == 0 and udg_Boss == null and not udg_GameOver then
-        call Arena_Msg("|cff66ff99Волна " + I2S(udg_Wave) + " очищена! Следующая через 7 секунд.|r")
+    if udg_WavesStarted and udg_Wave >= 1 and udg_Wave <= 50 and udg_EnemiesAlive == 0 and not udg_WaveCleared and udg_Boss == null and not udg_GameOver then
+        set udg_WaveCleared = true
+        call Arena_Msg("|cff66ff99Волна зачищена! Следующая через 7 секунд.|r")
         call TimerStart(udg_WaveTimer, 7.00, false, function Arena_DoNothing)
     endif
 endfunction
@@ -1248,6 +1243,8 @@ function Trig_Arena_Actions takes nothing returns nothing
     call FogEnableOff()
     call FogMaskEnableOff()
     call SetTimeOfDay(12.00)
+    call SetTimeOfDayScale(0.00)
+    call SuspendTimeOfDay(true)
     call SetTimeOfDayScale(0.00)
     call SuspendTimeOfDay(true)
     call SetCameraPosition(0.0, 0.0)
