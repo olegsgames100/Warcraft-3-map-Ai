@@ -190,7 +190,7 @@ def generate(root):
                     ("amcs",int(skill["mana"]+(level-1)*skill["manaGrowth"]),0),
                     ("acdn",float(skill["cooldown"]),1),
                     ("Ncl1",0.0,1),("Ncl2",target_types.get(skill["target"],0),0),
-                    ("Ncl3",0 if skill["target"]=="passive" else 1,0),("Ncl4",0.0,1),
+                    ("Ncl3",1,0),("Ncl4",0.0,1),
                     ("Ncl5",0,0),("Ncl6",chosen,3),
                 ):
                     field(obj,code,value,level,typ=typ)
