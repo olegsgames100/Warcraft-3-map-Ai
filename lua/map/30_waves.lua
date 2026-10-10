@@ -46,6 +46,7 @@ function A.spawnEnemy(raw,rank,elite)
     local id=GetHandleId(u)
     A.waveUnits[id]={unit=u,wave=A.wave,elite=elite and true or false}
     A.waveAlive=A.waveAlive+1
+    BlzSetUnitRealField(u, UNIT_RF_PRIORITY, 1.0)
     SetUnitCreepGuard(u,false)
     UnitWakeUp(u)
     SetUnitAcquireRange(u,4100)
@@ -205,6 +206,7 @@ function A.tickWaves()
     end
 end
 function A.initWaves()
+    SetPlayerHandicapXP(Player(PLAYER_NEUTRAL_AGGRESSIVE),1.0)
     local deathTrigger=CreateTrigger()
     TriggerRegisterAnyUnitEventBJ(deathTrigger,EVENT_PLAYER_UNIT_DEATH)
     TriggerAddAction(deathTrigger,function()A.enemyDied(GetTriggerUnit())end)
