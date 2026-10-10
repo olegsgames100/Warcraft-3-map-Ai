@@ -28,8 +28,12 @@ globals
     integer         array   udg_HeroKind
     integer         array   udg_ReviveWait
 
-    dialog          array   udg_PickDialog
-    button          array   udg_PickButton
+    region          array   udg_SelectRegion
+    unit            array   udg_SelectPreview
+    unit            array   udg_SelectWisp
+    trigger                 gg_trg_SelectPoll = null
+    trigger                 gg_trg_SelectChat = null
+    timer                   udg_SelectTimeout = null
 
     timer                   udg_WaveTimer                  = null
     timerdialog             udg_WaveTD                     = null
@@ -497,73 +501,213 @@ function Arena_SpawnBoss takes nothing returns nothing
 endfunction
 
 //===========================================================================
+function Arena_CountPickedHumans takes nothing returns integer
+    local integer pid = 0
+    local integer count = 0
+    loop
+        exitwhen pid >= 4
+        if Arena_IsHuman(pid) and udg_Picked[pid] then
+            set count = count + 1
+        endif
+        set pid = pid + 1
+    endloop
+    return count
+endfunction
+
 function Arena_TryStartWaves takes nothing returns nothing
-    if udg_WavesStarted then
-        return
-    endif
-    if udg_PickCount < udg_HumanCount then
+    if udg_WavesStarted or Arena_CountPickedHumans() < udg_HumanCount then
         return
     endif
     set udg_WavesStarted = true
+    call DisableTrigger(gg_trg_Pick)
+    call DisableTrigger(gg_trg_SelectPoll)
+    call PauseTimer(udg_SelectTimeout)
     call TimerStart(udg_WaveTimer, 15.00, false, function Arena_DoNothing)
     call TimerDialogSetTitle(udg_WaveTD, "Волна 1")
     call TimerDialogDisplay(udg_WaveTD, true)
     call Arena_Msg("Все герои выбраны. Первая волна через 15 сек. Магазины по углам центра.")
 endfunction
 
-function Trig_Pick_Actions takes nothing returns nothing
-    local player p = GetTriggerPlayer()
-    local integer pid = GetPlayerId(p)
-    local button b = GetClickedButton()
-    local integer k = 1
-    if udg_Picked[pid] then
-        set p = null
-        set b = null
-        return
+
+function Arena_SelectX takes integer k returns real
+    if k == 1 or k == 4 then
+        return -1000.0
+    elseif k == 2 or k == 5 then
+        return 0.0
     endif
-    loop
-        exitwhen k > 6
-        if b == udg_PickButton[pid * 8 + k] then
-            set udg_Picked[pid] = true
-            set udg_PickCount = udg_PickCount + 1
-            call DialogDisplay(p, udg_PickDialog[pid], false)
-            call Arena_SpawnHero(pid, k)
-            call Arena_Msg(GetPlayerName(p) + " выбрал: |cffffcc00" + Arena_HeroTitle(k) + "|r")
-            call Arena_TryStartWaves()
-            set p = null
-            set b = null
-            return
-        endif
-        set k = k + 1
-    endloop
-    set p = null
-    set b = null
+    return 1000.0
 endfunction
 
-function Arena_BuildPickDialog takes integer pid returns nothing
-    local dialog d = DialogCreate()
-    set udg_PickDialog[pid] = d
-    call DialogSetMessage(d, "Выберите героя")
-    set udg_PickButton[pid * 8 + 1] = DialogAddButton(d, "1. Арбитр (танк, свет)", 49)
-    set udg_PickButton[pid * 8 + 2] = DialogAddButton(d, "2. Клинок Пыли (мили)", 50)
-    set udg_PickButton[pid * 8 + 3] = DialogAddButton(d, "3. Хранитель Бури (маг)", 51)
-    set udg_PickButton[pid * 8 + 4] = DialogAddButton(d, "4. Повелитель Праха (нежить)", 52)
-    set udg_PickButton[pid * 8 + 5] = DialogAddButton(d, "5. Охотник Бездны (ловкость)", 53)
-    set udg_PickButton[pid * 8 + 6] = DialogAddButton(d, "6. Лунная Стражница (даль)", 54)
-    call TriggerRegisterDialogEvent(gg_trg_Pick, d)
-    set d = null
+function Arena_SelectY takes integer k returns real
+    if k <= 3 then
+        return 4100.0
+    endif
+    return 4800.0
+endfunction
+
+function Arena_CreateSelectionPlaza takes nothing returns nothing
+    local integer k = 1
+    local real x
+    local real y
+    local rect zone
+    local texttag label
+    local unit preview
+    loop
+        exitwhen k > 6
+        set x = Arena_SelectX(k)
+        set y = Arena_SelectY(k)
+        set zone = Rect(x - 235.0, y - 235.0, x + 235.0, y + 235.0)
+        set udg_SelectRegion[k] = CreateRegion()
+        call RegionAddRect(udg_SelectRegion[k], zone)
+        call TriggerRegisterEnterRegion(gg_trg_Pick, udg_SelectRegion[k], null)
+        set preview = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), Arena_HeroType(k), x, y, 270.0)
+        set udg_SelectPreview[k] = preview
+        if preview != null then
+            call SetUnitInvulnerable(preview, true)
+            call SetUnitPathing(preview, false)
+            call PauseUnit(preview, true)
+            call SetUnitScale(preview, 1.10, 1.10, 1.10)
+        endif
+        set label = CreateTextTag()
+        call SetTextTagText(label, I2S(k) + ". " + Arena_HeroTitle(k), 0.025)
+        call SetTextTagPos(label, x - 175.0, y, 200.0)
+        call SetTextTagColor(label, 255, 220, 130, 255)
+        call SetTextTagPermanent(label, true)
+        call SetTextTagVisibility(label, true)
+        call RemoveRect(zone)
+        set k = k + 1
+    endloop
+    set preview = null
+    set zone = null
+    set label = null
+endfunction
+
+function Arena_SelectHero takes integer pid, integer k returns nothing
+    if pid < 0 or pid >= 4 or k < 1 or k > 6 then
+        return
+    endif
+    if udg_GameOver or udg_Picked[pid] or not Arena_IsHuman(pid) then
+        return
+    endif
+    // Set the guard first; a region and a polling tick may fire together.
+    set udg_Picked[pid] = true
+    set udg_PickCount = udg_PickCount + 1
+    if udg_SelectWisp[pid] != null then
+        call RemoveUnit(udg_SelectWisp[pid])
+        set udg_SelectWisp[pid] = null
+    endif
+    call Arena_SpawnHero(pid, k)
+    call Arena_Msg(GetPlayerName(Player(pid)) + " выбрал: |cffffcc00" + Arena_HeroTitle(k) + "|r")
+    call Arena_TryStartWaves()
+endfunction
+
+function Trig_Pick_Actions takes nothing returns nothing
+    local unit u = GetEnteringUnit()
+    local integer pid
+    local integer k = 1
+    if u == null then
+        return
+    endif
+    set pid = GetPlayerId(GetOwningPlayer(u))
+    if pid >= 0 and pid < 4 and u == udg_SelectWisp[pid] and not udg_Picked[pid] then
+        loop
+            exitwhen k > 6
+            if GetTriggeringRegion() == udg_SelectRegion[k] then
+                call Arena_SelectHero(pid, k)
+                exitwhen true
+            endif
+            set k = k + 1
+        endloop
+    endif
+    set u = null
+endfunction
+
+function Trig_SelectPoll_Actions takes nothing returns nothing
+    local integer pid = 0
+    local integer k
+    local real dx
+    local real dy
+    local unit u
+    loop
+        exitwhen pid >= 4
+        set u = udg_SelectWisp[pid]
+        if u != null and Arena_IsHuman(pid) and not udg_Picked[pid] then
+            set k = 1
+            loop
+                exitwhen k > 6 or udg_Picked[pid]
+                set dx = GetUnitX(u) - Arena_SelectX(k)
+                set dy = GetUnitY(u) - Arena_SelectY(k)
+                if dx * dx + dy * dy <= 52900.0 then
+                    call Arena_SelectHero(pid, k)
+                endif
+                set k = k + 1
+            endloop
+        endif
+        set pid = pid + 1
+    endloop
+    set u = null
+endfunction
+
+function Trig_SelectChat_Actions takes nothing returns nothing
+    local integer pid = GetPlayerId(GetTriggerPlayer())
+    local string msg = GetEventPlayerChatString()
+    local integer k
+    if pid < 0 or pid >= 4 or udg_Picked[pid] then
+        return
+    endif
+    if SubString(msg, 0, 6) == "-pick " then
+        set k = S2I(SubString(msg, 6, 8))
+        if k >= 1 and k <= 6 then
+            call Arena_SelectHero(pid, k)
+        else
+            call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 8.0, "Команда: -pick 1 ... -pick 6")
+        endif
+    endif
+endfunction
+
+function Arena_AutoPick takes nothing returns nothing
+    local integer pid = 0
+    loop
+        exitwhen pid >= 4
+        if Arena_IsHuman(pid) and not udg_Picked[pid] then
+            call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 8.0, "Время вышло: случайный герой.")
+            call Arena_SelectHero(pid, GetRandomInt(1, 6))
+        endif
+        set pid = pid + 1
+    endloop
 endfunction
 
 function Arena_ShowPicks takes nothing returns nothing
-    local integer i = 0
+    local integer pid = 0
+    local unit wisp
+    call Arena_CreateSelectionPlaza()
+    set gg_trg_SelectPoll = CreateTrigger()
+    call TriggerRegisterTimerEvent(gg_trg_SelectPoll, 0.25, true)
+    call TriggerAddAction(gg_trg_SelectPoll, function Trig_SelectPoll_Actions)
+    set gg_trg_SelectChat = CreateTrigger()
     loop
-        exitwhen i > 3
-        if Arena_IsHuman(i) then
-            call Arena_BuildPickDialog(i)
-            call DialogDisplay(Player(i), udg_PickDialog[i], true)
+        exitwhen pid >= 4
+        call TriggerRegisterPlayerChatEvent(gg_trg_SelectChat, Player(pid), "-pick ", false)
+        if Arena_IsHuman(pid) then
+            set wisp = CreateUnit(Player(pid), 'ewsp', -225.0 + 150.0 * I2R(pid), 3350.0, 90.0)
+            set udg_SelectWisp[pid] = wisp
+            if wisp != null then
+                call SetUnitInvulnerable(wisp, true)
+                call SetUnitMoveSpeed(wisp, 310.0)
+                call SelectUnitForPlayerSingle(wisp, Player(pid))
+                call PanCameraToTimedForPlayer(Player(pid), 0.0, 4190.0, 0.00)
+                call SetCameraFieldForPlayer(Player(pid), CAMERA_FIELD_TARGET_DISTANCE, 2300.0, 0.00)
+                call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 18.0, "|cffffcc00ВЫБОР ГЕРОЯ|r: подведите светлячка к герою. Запасной способ: -pick 1 ... -pick 6. Автовыбор через 90 сек.")
+            else
+                call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 15.0, "Светлячок не создан: используйте -pick 1 ... -pick 6.")
+            endif
         endif
-        set i = i + 1
+        set pid = pid + 1
     endloop
+    call TriggerAddAction(gg_trg_SelectChat, function Trig_SelectChat_Actions)
+    set udg_SelectTimeout = CreateTimer()
+    call TimerStart(udg_SelectTimeout, 90.00, false, function Arena_AutoPick)
+    set wisp = null
 endfunction
 
 //===========================================================================
@@ -908,6 +1052,8 @@ endfunction
 
 function InitTrig_Arena takes nothing returns nothing
     set gg_trg_Arena = CreateTrigger()
+    // Delay until the game UI is initialized; dialogs in main() were unreliable.
+    call TriggerRegisterTimerEvent(gg_trg_Arena, 0.50, false)
     call TriggerAddAction(gg_trg_Arena, function Trig_Arena_Actions)
 endfunction
 
@@ -956,7 +1102,6 @@ function main takes nothing returns nothing
     call InitGlobals()
     call InitCustomTriggers()
     call RunInitializationTriggers()
-    call ConditionalTriggerExecute(gg_trg_Arena)
 endfunction
 
 //===========================================================================
