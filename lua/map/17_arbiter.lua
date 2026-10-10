@@ -73,8 +73,14 @@ function A.tickCombat()
                     A.forAllies(h,nil,function(u)
                         local dx,dy=GetUnitX(u)-b.x,GetUnitY(u)-b.y
                         if dx*dx+dy*dy<=b.radius*b.radius then
-                            A.buff(u,"resist",.22,1.2)
-                            if u~=h then A.protect(h,u,.22,1.2) end
+                            local valor=A.resources[pid].valor or 0
+                            A.buff(u,"resist",.14+.0016*valor,1.2)
+                            if u~=h then A.protect(h,u,.14+.0018*valor,1.2) end
+                            b.shielded=b.shielded or {}
+                            if not b.shielded[GetHandleId(u)] then
+                                b.shielded[GetHandleId(u)]=true
+                                A.addShield(u,(60+valor*1.7)*A.statMultiplier(h,"physical"),9)
+                            end
                         end
                     end)
                 end
