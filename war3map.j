@@ -720,6 +720,31 @@ function Arena_SelectY takes integer k returns real
     return 7200.0
 endfunction
 
+// Keep the selection showcase independent of custom object imports.
+// The selected playable hero still uses the custom hero ID via Arena_HeroType.
+function Arena_HeroPreviewType takes integer kind returns integer
+    if kind == 1 then
+        return 'Hpal'
+    elseif kind == 2 then
+        return 'Obla'
+    elseif kind == 3 then
+        return 'Hamg'
+    elseif kind == 4 then
+        return 'Udea'
+    elseif kind == 5 then
+        return 'Edem'
+    elseif kind == 6 then
+        return 'Emoo'
+    elseif kind == 7 then
+        return 'Nalc'
+    elseif kind == 8 then
+        return 'Hmkg'
+    elseif kind == 9 then
+        return 'Ewar'
+    endif
+    return 'Ulic'
+endfunction
+
 function Arena_CreateSelectionPlaza takes nothing returns nothing
     local integer k = 1
     local real x
@@ -735,7 +760,7 @@ function Arena_CreateSelectionPlaza takes nothing returns nothing
         set udg_SelectRegion[k] = CreateRegion()
         call RegionAddRect(udg_SelectRegion[k], zone)
         call TriggerRegisterEnterRegion(gg_trg_Pick, udg_SelectRegion[k], null)
-        set preview = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), Arena_HeroType(k), x, y, 270.0)
+        set preview = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), Arena_HeroPreviewType(k), x, y, 270.0)
         set udg_SelectPreview[k] = preview
         if preview != null then
             call SetUnitInvulnerable(preview, true)
@@ -890,7 +915,8 @@ endfunction
 function Arena_ShowPicks takes nothing returns nothing
     local integer pid = 0
     local unit wisp
-    call Arena_CreateSelectionPlaza()
+    // IMPORTANT: spawn the player's controllable Wisp before any hero previews.
+    // This makes the first interaction independent of custom Object Editor files.
     set gg_trg_SelectPoll = CreateTrigger()
     call TriggerRegisterTimerEvent(gg_trg_SelectPoll, 0.25, true)
     call TriggerAddAction(gg_trg_SelectPoll, function Trig_SelectPoll_Actions)
@@ -915,6 +941,8 @@ function Arena_ShowPicks takes nothing returns nothing
         set pid = pid + 1
     endloop
     call TriggerAddAction(gg_trg_SelectChat, function Trig_SelectChat_Actions)
+    call Arena_Msg("|cff88ff88[Арена 2/4]|r Светлячки созданы; создаём зал героев.")
+    call Arena_CreateSelectionPlaza()
     set udg_SelectTimeout = CreateTimer()
     call TimerStart(udg_SelectTimeout, 90.00, false, function Arena_AutoPick)
     set wisp = null
@@ -1307,11 +1335,9 @@ function Trig_Arena_Actions takes nothing returns nothing
     endif
     call Arena_AllyPlayers()
     call Arena_ApplyHandicap()
-    call Arena_CreateGeometry()
-    call Arena_CreateShops()
-    call AddSpecialEffect("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl", 0.0, 0.0)
-    call Arena_CreateQuests()
-    call Arena_ExplainBalance()
+    // 1.26a may terminate a trigger that paints thousands of terrain cells.
+    // Runtime geometry is disabled during startup; keep the original terrain.
+    call Arena_Msg("|cff88ff88[Арена 1/4]|r Инициализация игроков.")
 
     set udg_WaveTimer = CreateTimer()
     set udg_WaveTD = CreateTimerDialog(udg_WaveTimer)
@@ -1376,6 +1402,11 @@ function Trig_Arena_Actions takes nothing returns nothing
     call TriggerAddAction(gg_trg_Aura, function Trig_Aura_Actions)
 
     call Arena_ShowPicks()
+    call Arena_Msg("|cff88ff88[Арена 3/4]|r Выбор героев готов.")
+    call Arena_CreateShops()
+    call Arena_CreateQuests()
+    call Arena_ExplainBalance()
+    call Arena_Msg("|cff88ff88[Арена 4/4]|r Магазины и события готовы. Используйте -pick 1 ... -pick 10.")
 endfunction
 
 function InitTrig_Arena takes nothing returns nothing
