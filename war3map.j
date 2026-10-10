@@ -302,9 +302,179 @@ function Arena_HeroEpithet takes integer k returns string
     return "Повелительница льда"
 endfunction
 
-function Arena_GiveSkills takes unit u, integer kind returns nothing
-    // Hero skills are learned only through the Warcraft III level-up menu.
-    // Never pre-add or pre-level these custom hero abilities here.
+function Arena_CustomSpell takes integer kind, integer slot returns integer
+    if kind == 1 then
+        if slot == 1 then
+            return 'A101'
+        elseif slot == 2 then
+            return 'A102'
+        elseif slot == 3 then
+            return 'A10D'
+        elseif slot == 4 then
+            return 'A10E'
+        endif
+    elseif kind == 2 then
+        if slot == 1 then
+            return 'A103'
+        elseif slot == 2 then
+            return 'A104'
+        elseif slot == 3 then
+            return 'A10F'
+        elseif slot == 4 then
+            return 'A10G'
+        endif
+    elseif kind == 3 then
+        if slot == 1 then
+            return 'A105'
+        elseif slot == 2 then
+            return 'A106'
+        elseif slot == 3 then
+            return 'A10H'
+        elseif slot == 4 then
+            return 'A10I'
+        endif
+    elseif kind == 4 then
+        if slot == 1 then
+            return 'A107'
+        elseif slot == 2 then
+            return 'A108'
+        elseif slot == 3 then
+            return 'A10J'
+        elseif slot == 4 then
+            return 'A10K'
+        endif
+    elseif kind == 5 then
+        if slot == 1 then
+            return 'A109'
+        elseif slot == 2 then
+            return 'A10A'
+        elseif slot == 3 then
+            return 'A10L'
+        elseif slot == 4 then
+            return 'A10M'
+        endif
+    elseif kind == 6 then
+        if slot == 1 then
+            return 'A10B'
+        elseif slot == 2 then
+            return 'A10C'
+        elseif slot == 3 then
+            return 'A10N'
+        elseif slot == 4 then
+            return 'A10O'
+        endif
+    elseif kind == 7 then
+        if slot == 1 then
+            return 'A111'
+        elseif slot == 2 then
+            return 'A112'
+        elseif slot == 3 then
+            return 'A113'
+        elseif slot == 4 then
+            return 'A114'
+        endif
+    elseif kind == 8 then
+        if slot == 1 then
+            return 'A115'
+        elseif slot == 2 then
+            return 'A116'
+        elseif slot == 3 then
+            return 'A117'
+        elseif slot == 4 then
+            return 'A118'
+        endif
+    elseif kind == 9 then
+        if slot == 1 then
+            return 'A119'
+        elseif slot == 2 then
+            return 'A11A'
+        elseif slot == 3 then
+            return 'A11B'
+        elseif slot == 4 then
+            return 'A11C'
+        endif
+    elseif kind == 10 then
+        if slot == 1 then
+            return 'A11D'
+        elseif slot == 2 then
+            return 'A11E'
+        elseif slot == 3 then
+            return 'A11F'
+        elseif slot == 4 then
+            return 'A11G'
+        endif
+    endif
+    return 0
+endfunction
+
+function Arena_GiveSkills takes unit hero, integer kind returns nothing
+    local integer slot = 1
+    local integer id
+    local integer success = 0
+    if hero == null then
+        return
+    endif
+    loop
+        exitwhen slot > 4
+        set id = Arena_CustomSpell(kind, slot)
+        if id != 0 then
+            if GetUnitAbilityLevel(hero, id) == 0 then
+                call UnitAddAbility(hero, id)
+            endif
+            if GetUnitAbilityLevel(hero, id) > 0 then
+                set success = success + 1
+            endif
+        endif
+        set slot = slot + 1
+    endloop
+    if GetHeroSkillPoints(hero) > 0 then
+        call UnitModifySkillPoints(hero, -GetHeroSkillPoints(hero))
+    endif
+    if success == 4 then
+        call DisplayTimedTextToPlayer(GetOwningPlayer(hero), 0.0, 0.0, 8.0, "|cff66ff99Умения Q/W/E/R доступны с 1 уровня.|r")
+    else
+        call DisplayTimedTextToPlayer(GetOwningPlayer(hero), 0.0, 0.0, 15.0, "|cffff5555Загружено умений: " + I2S(success) + "/4. Проверь war3map.w3a и war3map.w3u.|r")
+    endif
+endfunction
+
+function Arena_UpdateCustomRanks takes nothing returns nothing
+    local integer pid = 0
+    local integer rank
+    local integer slot
+    local integer id
+    local unit hero
+    loop
+        exitwhen pid >= 4
+        set hero = udg_Heroes[pid]
+        if hero != null and GetWidgetLife(hero) > 0.405 and udg_HeroKind[pid] >= 1 then
+            set rank = 1 + (GetHeroLevel(hero) - 1) / 4
+            if rank > 5 then
+                set rank = 5
+            endif
+            if rank < 1 then
+                set rank = 1
+            endif
+            set slot = 1
+            loop
+                exitwhen slot > 4
+                set id = Arena_CustomSpell(udg_HeroKind[pid], slot)
+                if id != 0 then
+                    if GetUnitAbilityLevel(hero, id) == 0 then
+                        call UnitAddAbility(hero, id)
+                    endif
+                    if GetUnitAbilityLevel(hero, id) > 0 and GetUnitAbilityLevel(hero, id) != rank then
+                        call SetUnitAbilityLevel(hero, id, rank)
+                    endif
+                endif
+                set slot = slot + 1
+            endloop
+            if GetHeroSkillPoints(hero) > 0 then
+                call UnitModifySkillPoints(hero, -GetHeroSkillPoints(hero))
+            endif
+        endif
+        set pid = pid + 1
+    endloop
+    set hero = null
 endfunction
 
 function Arena_ClearAuras takes nothing returns nothing
@@ -440,6 +610,7 @@ function Arena_SpawnHero takes integer pid, integer kind returns boolean
         call SetHeroInt(hero, 30, true)
     endif
     call Arena_NormalizeHeroStats(hero)
+    call Arena_GiveSkills(hero, kind)
     set udg_Heroes[pid] = hero
     set udg_HeroKind[pid] = kind
     // Reforged custom hero class with four native Object Editor spells.
@@ -1771,6 +1942,8 @@ function Trig_Aura_Actions takes nothing returns nothing
     local real mana
     local real addHp
     local real addMp
+    // Update custom QWER ranks for every player, including four-player matches.
+    call Arena_UpdateCustomRanks()
     // Aura carriers remain at (0,0), inside the central monument.
     if udg_HumanCount >= 4 then
         return
