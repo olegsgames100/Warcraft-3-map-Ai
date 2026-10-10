@@ -728,14 +728,24 @@ function Arena_EliteName takes integer wave returns string
 endfunction
 
 function Arena_EliteType takes integer wave returns integer
-    if wave <= 10 then
+    if wave == 5 then
         return 'nrog'
-    elseif wave <= 20 then
+    elseif wave == 10 then
+        return 'ngno'
+    elseif wave == 15 then
+        return 'nftr'
+    elseif wave == 20 then
         return 'nogr'
-    elseif wave <= 30 then
+    elseif wave == 25 then
         return 'nska'
-    elseif wave <= 40 then
+    elseif wave == 30 then
+        return 'ucry'
+    elseif wave == 35 then
         return 'nfel'
+    elseif wave == 40 then
+        return 'nogr'
+    elseif wave == 45 then
+        return 'uabo'
     endif
     return 'uabo'
 endfunction
@@ -810,7 +820,7 @@ function Arena_SpawnElite takes integer wave returns nothing
     endif
     set udg_EnemiesAlive = udg_EnemiesAlive + 1
     call SetUnitUserData(elite, 888)
-    call SetUnitScale(elite, 1.30 + 0.003 * I2R(wave), 1.30 + 0.003 * I2R(wave), 1.30 + 0.003 * I2R(wave))
+    call SetUnitScale(elite, 1.20 + 0.003 * I2R(wave), 1.20 + 0.003 * I2R(wave), 1.20 + 0.003 * I2R(wave))
     call SetUnitVertexColor(elite, 255, 155, 110, 255)
     call SetUnitCreepGuard(elite, false)
     call UnitWakeUp(elite)
@@ -835,32 +845,71 @@ function Arena_PayWaveGold takes integer gold returns nothing
     endloop
 endfunction
 
-function Arena_SpawnWaveCreeps takes integer wave returns nothing
-    local integer tier = (wave - 1) / 10
-    local integer front = 5 + wave / 7
-    local integer support = 2 + wave / 12
-    if ModuloInteger(wave, 10) == 0 then
-        set front = front + 2
-        set support = support + 1
+function Arena_WaveTheme takes integer wave returns string
+    local integer chapter = (wave - 1) / 5
+    if chapter == 0 then
+        return "Разбойничий тракт"
+    elseif chapter == 1 then
+        return "Гнолльи стаи"
+    elseif chapter == 2 then
+        return "Троллья засада"
+    elseif chapter == 3 then
+        return "Огрские заставы"
+    elseif chapter == 4 then
+        return "Восстание костей"
+    elseif chapter == 5 then
+        return "Склеп паучьего короля"
+    elseif chapter == 6 then
+        return "Осквернённая охота"
+    elseif chapter == 7 then
+        return "Врата Скверны"
+    elseif chapter == 8 then
+        return "Некрополь"
     endif
-    if tier == 0 then
-        call Arena_SpawnRing('nban', front, 1200.0)
-        call Arena_SpawnRing('ngno', support, 1420.0)
-    elseif tier == 1 then
-        call Arena_SpawnRing('nftr', front, 1250.0)
-        call Arena_SpawnRing('nogr', support, 1450.0)
-    elseif tier == 2 then
-        call Arena_SpawnRing('uske', front + 2, 1230.0)
-        call Arena_SpawnRing('nska', support, 1440.0)
-    elseif tier == 3 then
+    return "Последняя армия Каз'Рула"
+endfunction
+
+function Arena_SpawnWaveCreeps takes integer wave returns nothing
+    local integer chapter = (wave - 1) / 5
+    local integer front = 5 + wave / 8
+    local integer back = 2 + wave / 15
+    local integer eliteSupport = 0
+    // 10 chapters of 5 waves, each with a coherent battlefield identity.
+    // Tanky units enter slowly; no dragons or huge surprise damage spikes.
+    if ModuloInteger(wave, 5) == 0 then
+        set eliteSupport = 1
+    endif
+    if chapter == 0 then
+        call Arena_SpawnRing('nban', front, 1210.0)
+        call Arena_SpawnRing('ngno', back, 1480.0)
+    elseif chapter == 1 then
+        call Arena_SpawnRing('nrog', front, 1220.0)
+        call Arena_SpawnRing('ngna', back, 1450.0)
+    elseif chapter == 2 then
+        call Arena_SpawnRing('nftr', front, 1260.0)
+        call Arena_SpawnRing('nftb', back, 1480.0)
+    elseif chapter == 3 then
+        call Arena_SpawnRing('ngno', front + 2, 1220.0)
+        call Arena_SpawnRing('nogr', back, 1470.0)
+    elseif chapter == 4 then
+        call Arena_SpawnRing('uske', front + 2, 1210.0)
+        call Arena_SpawnRing('nska', back + 1, 1490.0)
+    elseif chapter == 5 then
+        call Arena_SpawnRing('uske', front, 1240.0)
+        call Arena_SpawnRing('ucry', back, 1490.0)
+    elseif chapter == 6 then
         call Arena_SpawnRing('nfel', front, 1250.0)
-        call Arena_SpawnRing('nogr', support + 1, 1480.0)
+        call Arena_SpawnRing('nska', back, 1490.0)
+    elseif chapter == 7 then
+        call Arena_SpawnRing('nfel', front + 1, 1220.0)
+        call Arena_SpawnRing('nogr', back, 1480.0)
+    elseif chapter == 8 then
+        call Arena_SpawnRing('uske', front + 3, 1210.0)
+        call Arena_SpawnRing('nfel', back + 1, 1480.0)
     else
-        call Arena_SpawnRing('uske', front + 3, 1250.0)
-        call Arena_SpawnRing('nfel', support, 1460.0)
-        if ModuloInteger(wave, 5) == 0 then
-            call Arena_SpawnRing('uabo', 2, 1580.0)
-        endif
+        call Arena_SpawnRing('uske', front + 4, 1240.0)
+        call Arena_SpawnRing('uabo', 1 + eliteSupport, 1480.0)
+        call Arena_SpawnRing('nska', back + 1, 1600.0)
     endif
 endfunction
 
@@ -1193,8 +1242,8 @@ function Trig_Wave_Actions takes nothing returns nothing
     if ModuloInteger(udg_Wave, 5) == 0 then
         call Arena_SpawnElite(udg_Wave)
     endif
-    call Arena_PayWaveGold(30 + udg_Wave * 7)
-    call Arena_Msg("|cffffcc00Волна " + I2S(udg_Wave) + "/50|r  Врагов: " + I2S(udg_EnemiesAlive))
+    call Arena_PayWaveGold(38 + udg_Wave * 5)
+    call Arena_Msg("|cffffcc00Волна " + I2S(udg_Wave) + "/50|r — " + Arena_WaveTheme(udg_Wave) + ". Врагов: " + I2S(udg_EnemiesAlive))
     if udg_Wave < 50 then
         call TimerDialogSetTitle(udg_WaveTD, "Волна " + I2S(udg_Wave + 1))
     else
@@ -1275,7 +1324,7 @@ function Trig_Death_Actions takes nothing returns nothing
         if killer != null then
             set pid = GetPlayerId(GetOwningPlayer(killer))
             if pid >= 0 and pid < 4 and Arena_IsHuman(pid) then
-                set reward = 4 + 2 * udg_Wave
+                set reward = 5 + udg_Wave
                 set udg_PlayerKills[pid] = udg_PlayerKills[pid] + 1
                 call SetPlayerState(Player(pid), PLAYER_STATE_RESOURCE_GOLD, GetPlayerState(Player(pid), PLAYER_STATE_RESOURCE_GOLD) + reward)
             endif
