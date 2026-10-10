@@ -93,7 +93,7 @@
           "target": "instant"
         }
       ],
-      "attackCooldown": 2.2
+      "attackCooldown": 3
     },
     {
       "kind": 2,
@@ -160,7 +160,7 @@
           "target": "unit"
         }
       ],
-      "attackCooldown": 1.7
+      "attackCooldown": 2.45
     },
     {
       "kind": 3,
@@ -227,7 +227,7 @@
           "target": "point"
         }
       ],
-      "attackCooldown": 2.4
+      "attackCooldown": 3.25
     },
     {
       "kind": 4,
@@ -294,7 +294,7 @@
           "target": "point"
         }
       ],
-      "attackCooldown": 2.1
+      "attackCooldown": 3.05
     },
     {
       "kind": 5,
@@ -361,7 +361,7 @@
           "target": "instant"
         }
       ],
-      "attackCooldown": 1.9
+      "attackCooldown": 2.7
     },
     {
       "kind": 6,
@@ -428,7 +428,7 @@
           "target": "instant"
         }
       ],
-      "attackCooldown": 2.5
+      "attackCooldown": 3.2
     },
     {
       "kind": 7,
@@ -495,7 +495,7 @@
           "target": "instant"
         }
       ],
-      "attackCooldown": 2.3
+      "attackCooldown": 3.1
     },
     {
       "kind": 8,
@@ -562,7 +562,7 @@
           "target": "instant"
         }
       ],
-      "attackCooldown": 2.25
+      "attackCooldown": 3
     },
     {
       "kind": 9,
@@ -629,7 +629,7 @@
           "target": "unit"
         }
       ],
-      "attackCooldown": 1.75
+      "attackCooldown": 2.4
     },
     {
       "kind": 10,
@@ -696,7 +696,7 @@
           "target": "instant"
         }
       ],
-      "attackCooldown": 2.4
+      "attackCooldown": 3.3
     },
     {
       "kind": 11,
@@ -765,7 +765,7 @@
           "target": "unit"
         }
       ],
-      "attackCooldown": 2.1
+      "attackCooldown": 2.8
     },
     {
       "kind": 12,
@@ -834,9 +834,10 @@
           "target": "instant"
         }
       ],
-      "attackCooldown": 2.15
+      "attackCooldown": 3
     }
   ],
   "rework": "v3: distinct roles, native Channel point/unit/instant targeting, 48 bespoke Lua mechanics, attack restoration",
-  "fixNotes": "Bone heroes both inherit from tested stock hero Udea. Explicit normal vs missile weapon types, correct attack cooldown, base damage and projectile art are generated."
+  "fixNotes": "Bone heroes both inherit from tested stock hero Udea. Explicit normal vs missile weapon types, correct attack cooldown, base damage and projectile art are generated.",
+  "balanceNote": "Native attack cooldown 2.40–3.30 sec before Warcraft agility; ability damage retains STR/INT scaling."
 }
