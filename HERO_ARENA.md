@@ -80,3 +80,19 @@ Place `dist/Hero_Arena_126a.w3x` in Warcraft III's Maps folder. It contains the 
 A GitHub Actions workflow, `.github/workflows/build-map.yml`, can also build and upload the map artifact if Actions is enabled for the repository. Find it under Actions -> Build Warcraft III 1.26a map -> Run workflow (choose the feature branch) -> Artifacts -> Hero_Arena_126a. If no run appears, use the local Python command above.
 
 The `object-data` JSON is documentation/source data for object generation. It is not an in-game archive component and should not be manually imported through MPQ Editor.
+
+## October 10 hero progression and pacing update (Warcraft III 1.26a)
+
+- **Hero learning menu:** use the **six custom hero IDs** (`H001`, `O001`, `H002`, `U001`, `E001`, `E002`). Their `uhab` lists now contain **four custom learnable skills each** (24 total; `A101`–`A10O`). Custom ability objects also contain level-specific research tooltips. Do **not** grant these abilities on spawn with `UnitAddAbility`: progression is entirely via the level-up interface.
+- **Hero name labels:** the permanently following `texttag` was removed. Proper character names come from `war3map.w3u`.
+- **Wave size:** the creature scaling multiplier was restored to the larger `(count * (activePlayers + 2) + 3) / 4`, with a cap of 85 existing wave enemies.
+- **Wave pacing:** regular wave timeout is 95 seconds. If all wave enemies are killed, the next wave (or the boss after wave 10) is scheduled in **7 seconds** instead. Wave 1 still starts 15 seconds after everyone has chosen a hero.
+- **Neutral enemies:** they are woken and removed from standard creep guard behavior on spawn, with an attack order towards the middle of the arena.
+- **Permanent daylight:** the time is set to midday and suspended, so neutral creeps do not return to their normal night sleep cycle.
+- **Four shops:** distinct custom unit types `nS01`–`nS04` with separate Object Editor `usei` inventories. The original `ngme` spawning/stock code is removed; invalid building-model overrides were removed from the custom data.
+
+### Critical when testing using MPQ Editor
+
+Replace at minimum **all three** files in the root of the map's MPQ archive: `war3map.j`, `war3map.w3u`, and `war3map.w3a`. Keep `war3map.w3t` to retain the custom items. If you replace **only** `war3map.j`, the custom heroes' proper names and learnable skill lists **will not appear** and the four store types might be missing. `object-data/hero_arena_objects.json` is source documentation and is not imported by the game.
+
+These are source-level validations, not a successful test inside the Warcraft III 1.26a client. Retest in-game before treating the map as a stable release.
