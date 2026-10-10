@@ -210,27 +210,31 @@ function Arena_CreateShops takes nothing returns nothing
 endfunction
 
 //===========================================================================
-function Arena_HeroType takes integer k returns integer
-    if k == 1 then
-        return 'H001'
-    elseif k == 2 then
-        return 'O001'
-    elseif k == 3 then
-        return 'H002'
-    elseif k == 4 then
-        return 'U001'
-    elseif k == 5 then
-        return 'E001'
-    elseif k == 6 then
-        return 'E002'
-    elseif k == 7 then
-        return 'N001'
-    elseif k == 8 then
-        return 'H003'
-    elseif k == 9 then
-        return 'E003'
+function Arena_HeroType takes integer kind returns integer
+    // Compatibility mode for classic Warcraft III 1.26a.
+    // Do not instantiate the unverified H001/O001/etc object files during selection.
+    // Those custom heroes started triggering native 0xC0000005 crashes again.
+    // Ten base models are used so all ten character choices remain available.
+    if kind == 1 then
+        return 'Hpal'
+    elseif kind == 2 then
+        return 'Obla'
+    elseif kind == 3 then
+        return 'Hamg'
+    elseif kind == 4 then
+        return 'Udea'
+    elseif kind == 5 then
+        return 'Edem'
+    elseif kind == 6 then
+        return 'Emoo'
+    elseif kind == 7 then
+        return 'Nalc'
+    elseif kind == 8 then
+        return 'Hmkg'
+    elseif kind == 9 then
+        return 'Ewar'
     endif
-    return 'U002'
+    return 'Ulic'
 endfunction
 
 function Arena_HeroTitle takes integer k returns string
@@ -302,22 +306,25 @@ function Arena_GiveAuras takes unit hero returns nothing
     if pid < 0 or pid > 3 or udg_HumanCount >= 4 then
         return
     endif
+    // Diagnostic compatibility mode: only stock 1.26a unit/ability IDs.
+    // The aura carrier remains invisible at the centre and never follows heroes.
     set carrier = CreateUnit(Player(pid), 'hfoo', 0.0, 0.0, 0.0)
-    set udg_AuraCarrier[pid] = carrier
-    if carrier != null then
-        call UnitAddAbility(carrier, 'Aloc')
-        call SetUnitInvulnerable(carrier, true)
-        call SetUnitPathing(carrier, false)
-        call UnitAddAbility(carrier, 'A201')
-        if udg_HumanCount <= 2 then
-            call UnitAddAbility(carrier, 'A202')
-        endif
-        if udg_HumanCount == 1 then
-            call UnitAddAbility(carrier, 'A203')
-            call UnitAddAbility(carrier, 'A204')
-        endif
-        call SetUnitVertexColor(carrier, 255, 255, 255, 0)
+    if carrier == null then
+        return
     endif
+    set udg_AuraCarrier[pid] = carrier
+    call UnitAddAbility(carrier, 'Aloc')
+    call SetUnitInvulnerable(carrier, true)
+    call SetUnitPathing(carrier, false)
+    call UnitAddAbility(carrier, 'ACae')
+    if udg_HumanCount <= 2 then
+        call UnitAddAbility(carrier, 'ACua')
+    endif
+    if udg_HumanCount == 1 then
+        call UnitAddAbility(carrier, 'ACav')
+        call UnitAddAbility(carrier, 'ACac')
+    endif
+    call SetUnitVertexColor(carrier, 255, 255, 255, 0)
     set carrier = null
 endfunction
 
@@ -351,7 +358,7 @@ function Arena_NormalizeHeroStats takes unit hero returns nothing
     endif
 endfunction
 
-function Arena_SpawnHero takes integer pid, integer kind returns nothing
+function Arena_SpawnHero takes integer pid, integer kind returns boolean
     local real x = -144.0
     local real y = -144.0
     local unit hero
@@ -363,11 +370,13 @@ function Arena_SpawnHero takes integer pid, integer kind returns nothing
         set x = 144.0
         set y = 144.0
     endif
+    call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 7.0, "[Выбор 1/3] Создание базового героя...")
     set hero = CreateUnit(Player(pid), Arena_HeroType(kind), x, y, 270.0)
     if hero == null then
-        call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 10.0, "Ошибка создания героя.")
-        return
+        call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 9.0, "|cffff4444Создание героя не удалось. Попробуйте другой номер.|r")
+        return false
     endif
+    // Set up distinct starting stats while staying with engine-defined hero data.
     if kind == 1 then
         call SetHeroStr(hero, 28, true)
         call SetHeroAgi(hero, 14, true)
@@ -388,22 +397,43 @@ function Arena_SpawnHero takes integer pid, integer kind returns nothing
         call SetHeroStr(hero, 20, true)
         call SetHeroAgi(hero, 28, true)
         call SetHeroInt(hero, 17, true)
-    else
+    elseif kind == 6 then
         call SetHeroStr(hero, 18, true)
         call SetHeroAgi(hero, 25, true)
         call SetHeroInt(hero, 24, true)
+    elseif kind == 7 then
+        call SetHeroStr(hero, 19, true)
+        call SetHeroAgi(hero, 16, true)
+        call SetHeroInt(hero, 29, true)
+    elseif kind == 8 then
+        call SetHeroStr(hero, 30, true)
+        call SetHeroAgi(hero, 15, true)
+        call SetHeroInt(hero, 17, true)
+    elseif kind == 9 then
+        call SetHeroStr(hero, 20, true)
+        call SetHeroAgi(hero, 27, true)
+        call SetHeroInt(hero, 20, true)
+    else
+        call SetHeroStr(hero, 17, true)
+        call SetHeroAgi(hero, 18, true)
+        call SetHeroInt(hero, 30, true)
     endif
     call Arena_NormalizeHeroStats(hero)
-    call Arena_GiveSkills(hero, kind)
+    set udg_Heroes[pid] = hero
+    set udg_HeroKind[pid] = kind
+    // Hero learnable skills come from a verified built-in hero in this stability test.
+    // Do not use custom W3A spells until custom object validation is completed.
+    call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 7.0, "[Выбор 2/3] Герой создан. Выдаём снаряжение...")
     call UnitAddItemById(hero, 'phea')
     call UnitAddItemById(hero, 'pman')
     call UnitAddItemById(hero, 'ciri')
-    set udg_Heroes[pid] = hero
-    set udg_HeroKind[pid] = kind
+    call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 7.0, "[Выбор 3/3] Создаём отдельного носителя бонусов...")
     call Arena_GiveAuras(hero)
     call SelectUnitForPlayerSingle(hero, Player(pid))
     call PanCameraToTimedForPlayer(Player(pid), x, y, 0.00)
+    call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 8.0, "|cff66ff99Выбран " + Arena_HeroTitle(kind) + ". Проверка запуска пройдена.|r")
     set hero = null
+    return true
 endfunction
 
 //===========================================================================
@@ -946,14 +976,18 @@ function Arena_SelectHero takes integer pid, integer k returns nothing
     if udg_GameOver or udg_Picked[pid] or not Arena_IsHuman(pid) then
         return
     endif
-    // Hero selection occurs in timer callback, never directly in region event.
+    // Never commit the pick or hide the Wisp until a hero is created successfully.
+    if not Arena_SpawnHero(pid, k) then
+        set udg_PendingPick[pid] = 0
+        return
+    endif
     set udg_Picked[pid] = true
     set udg_PendingPick[pid] = 0
     set udg_PickCount = udg_PickCount + 1
     if udg_SelectWisp[pid] != null then
+        call SetUnitPathing(udg_SelectWisp[pid], false)
         call ShowUnit(udg_SelectWisp[pid], false)
     endif
-    call Arena_SpawnHero(pid, k)
     call Arena_Msg(GetPlayerName(Player(pid)) + " выбрал: " + Arena_HeroTitle(k))
     call Arena_TryStartWaves()
 endfunction
