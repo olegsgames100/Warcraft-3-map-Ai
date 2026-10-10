@@ -64,3 +64,19 @@ Kaz'Rul scales its stats with player count, summons reinforcements and releases 
 - Existing terrain/pathing and map assets are unchanged.
 
 Structural checks: JASS functions are balanced and native call names were compared to an older `common.j`/`blizzard.j` reference; custom binary Object Editor records were checked for structure and sizes. **These checks are not equivalent to compiling in the World Editor or testing gameplay in Warcraft III 1.26a.** If imports fail, verify archive paths and object-editor rawcodes. Test with 1–4 clients and check spell hotkeys, skill progression, shop purchasing, loot rarity, aura effect radius, and victory flow.
+
+## Build a playable 1.26a .w3x (instead of manually creating a blank MPQ)
+
+A Warcraft III map has a 512-byte `HM3W` header followed by an MPQ archive. A plain MPQ archive renamed to `.w3x` is not an adequate replacement.
+
+**Windows / any computer with Python 3:** download the complete feature branch as a ZIP, extract it, open a terminal in the extracted repository root and run:
+
+```powershell
+py -3 tools/build_map.py --source . --output dist/Hero_Arena_126a.w3x
+```
+
+Place `dist/Hero_Arena_126a.w3x` in Warcraft III's Maps folder. It contains the script plus all `war3map.*` assets, including custom `.w3u`, `.w3t`, and `.w3a`. It converts Object Editor names and JASS text to Windows-1251 for the classic Russian client. It also checks for late JASS locals and missing required source files. **The builder's structural checks do not constitute a successful in-game launch test.**
+
+A GitHub Actions workflow, `.github/workflows/build-map.yml`, can also build and upload the map artifact if Actions is enabled for the repository. Find it under Actions -> Build Warcraft III 1.26a map -> Run workflow (choose the feature branch) -> Artifacts -> Hero_Arena_126a. If no run appears, use the local Python command above.
+
+The `object-data` JSON is documentation/source data for object generation. It is not an in-game archive component and should not be manually imported through MPQ Editor.
