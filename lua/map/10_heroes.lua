@@ -153,6 +153,8 @@ function A.pick(pid,kind)
  A.heroUnits[pid]=hero
  A.heroKind[pid]=kind
  A.assignStats(pid)
+ -- All custom heroes need an inventory ability before receiving starter items.
+ if GetUnitAbilityLevel(hero,A.raw("AInv"))==0 then UnitAddAbility(hero,A.raw("AInv")) end
  UnitAddItemById(hero,A.raw("phea"))
  UnitAddItemById(hero,A.raw("pman"))
  local wisp=A.wisp[pid]
