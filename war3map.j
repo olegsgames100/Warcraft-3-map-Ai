@@ -490,6 +490,80 @@ function Arena_DropLoot takes unit dying returns nothing
     call CreateItem(itemId, GetUnitX(dying), GetUnitY(dying))
 endfunction
 
+
+function Arena_HeroBurst takes unit caster, real radius, real damage, boolean heal returns nothing
+    local group g = CreateGroup()
+    local unit u
+    local real x = GetUnitX(caster)
+    local real y = GetUnitY(caster)
+    call GroupEnumUnitsInRange(g, x, y, radius, null)
+    loop
+        set u = FirstOfGroup(g)
+        exitwhen u == null
+        call GroupRemoveUnit(g, u)
+        if GetWidgetLife(u) > 0.405 then
+            if heal then
+                if IsUnitAlly(u, GetOwningPlayer(caster)) then
+                    call SetUnitState(u, UNIT_STATE_LIFE, GetUnitState(u, UNIT_STATE_LIFE) + damage)
+                endif
+            elseif IsUnitEnemy(u, GetOwningPlayer(caster)) and u != caster then
+                call UnitDamageTarget(caster, u, damage, true, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
+            endif
+        endif
+    endloop
+    call DestroyGroup(g)
+    set g = null
+    set u = null
+endfunction
+
+function Trig_HeroSpell_Actions takes nothing returns nothing
+    local unit hero = GetTriggerUnit()
+    local integer id = GetSpellAbilityId()
+    local real level = I2R(GetUnitAbilityLevel(hero, id))
+    if id == 'A101' then
+        call Arena_HeroBurst(hero, 260.0, 30.0 + level * 12.0, false)
+    elseif id == 'A102' then
+        call Arena_HeroBurst(hero, 420.0, 55.0 + level * 30.0, true)
+    elseif id == 'A103' then
+        call Arena_HeroBurst(hero, 400.0, 45.0 + level * 25.0, false)
+    elseif id == 'A104' then
+        call SetUnitState(hero, UNIT_STATE_LIFE, GetUnitState(hero, UNIT_STATE_LIFE) + 40.0 + level * 28.0)
+    elseif id == 'A105' then
+        call Arena_HeroBurst(hero, 500.0, 45.0 + level * 32.0, false)
+    elseif id == 'A106' then
+        call Arena_ItemPulses(hero, 0.0, 35.0 + level * 18.0)
+    elseif id == 'A107' then
+        call SetUnitState(hero, UNIT_STATE_LIFE, GetUnitState(hero, UNIT_STATE_LIFE) + 35.0 + level * 22.0)
+    elseif id == 'A108' then
+        call Arena_HeroBurst(hero, 300.0, 38.0 + level * 24.0, false)
+    elseif id == 'A109' then
+        call Arena_HeroBurst(hero, 280.0, 42.0 + level * 28.0, false)
+    elseif id == 'A10A' then
+        call SetUnitState(hero, UNIT_STATE_LIFE, GetUnitState(hero, UNIT_STATE_LIFE) + 55.0 + level * 19.0)
+    elseif id == 'A10B' then
+        call Arena_HeroBurst(hero, 320.0, 35.0 + level * 22.0, false)
+    elseif id == 'A10C' then
+        call Arena_ItemPulses(hero, 45.0 + level * 20.0, 18.0 + level * 12.0)
+    endif
+    set hero = null
+endfunction
+
+function Arena_UpdateHeroLabels takes nothing returns nothing
+    local integer pid = 0
+    loop
+        exitwhen pid >= 4
+        if udg_Heroes[pid] != null and udg_HeroSubtitle[pid] != null then
+            if GetWidgetLife(udg_Heroes[pid]) > 0.405 then
+                call SetTextTagPosUnit(udg_HeroSubtitle[pid], udg_Heroes[pid], -70.0)
+                call SetTextTagVisibility(udg_HeroSubtitle[pid], true)
+            else
+                call SetTextTagVisibility(udg_HeroSubtitle[pid], false)
+            endif
+        endif
+        set pid = pid + 1
+    endloop
+endfunction
+
 function Arena_CreateEnemy takes integer unitId, real x, real y returns nothing
     local unit u = CreateUnit(Player(PLAYER_NEUTRAL_AGGRESSIVE), unitId, x, y, 270.0)
     if u == null then
@@ -994,6 +1068,7 @@ function Trig_Leave_Actions takes nothing returns nothing
 endfunction
 
 function Trig_Aura_Actions takes nothing returns nothing
+    call Arena_UpdateHeroLabels()
     local integer i = 0
     local unit u
     local real life
@@ -1200,6 +1275,10 @@ function Trig_Arena_Actions takes nothing returns nothing
     set gg_trg_BossThink = CreateTrigger()
     call TriggerRegisterTimerEvent(gg_trg_BossThink, 1.00, true)
     call TriggerAddAction(gg_trg_BossThink, function Trig_BossThink_Actions)
+
+    set gg_trg_HeroSpell = CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(gg_trg_HeroSpell, EVENT_PLAYER_UNIT_SPELL_EFFECT)
+    call TriggerAddAction(gg_trg_HeroSpell, function Trig_HeroSpell_Actions)
 
     set gg_trg_ItemPickup = CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(gg_trg_ItemPickup, EVENT_PLAYER_UNIT_PICKUP_ITEM)
