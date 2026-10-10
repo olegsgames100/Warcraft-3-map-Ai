@@ -103,27 +103,12 @@ H[2]={
     local h=c.h
     A.moveToward(h,c.x,c.y,460)
     forward(h,330,95,c.b*1.6,"physical",function(v)
-        A.applyBleed(h,v,1,9)
+        A.applyBleed(h,v,2,9)
     end)
     res(c.pid,"combo",18)
  end,
- function(c)
-    local h=c.h
-    local t=enemy(h,c.target)
-    if not t then return end
-    for n=1,3 do
-       delayed(h,n*.15,function()
-           if A.isEnemy(h,t)then
-               wound(h,t,c.b*.48,"physical")
-               A.applyBleed(h,t,1,10)
-               if n==3 and A.bleedCount(t)>=3 then
-                   A.popBleed(h,t,c.b*.72)
-                   res(c.pid,"combo",22)
-               end
-           end
-       end)
-    end
- end,
+ -- W is a persistent attack passive, processed by A.modifyIncoming.
+ function(c) return end,
  function(c)
     local h=c.h
     s(c.pid).parry=A.clock+5
@@ -635,6 +620,7 @@ function A.castHero(hero,ability,snapshot)
     elseif x==0 and y==0 then x,y=hx,hy end
     local data={h=hero,pid=pid,kind=kind,slot=slot,rank=rank,
         target=target,x=x,y=y,b=p(rank)}
+    if kind==2 and slot==2 then return false end
     if kind==1 and slot==3 then
         if not target or target==hero or not A.alive(target) or
            not IsUnitAlly(target,GetOwningPlayer(hero)) or
