@@ -60,6 +60,7 @@ globals
 
     unit            array   udg_AuraCarrier
     texttag         array   udg_HeroSubtitle
+    trigger                 gg_trg_Cheat = null
     trigger                 gg_trg_HeroSpell = null
     trigger                 gg_trg_ItemPickup = null
     trigger                 gg_trg_ItemDrop = null
@@ -565,6 +566,7 @@ function Arena_CreateEnemy takes integer unitId, real x, real y returns nothing
     set udg_EnemiesAlive = udg_EnemiesAlive + 1
     call SetUnitCreepGuard(u, false)
     call UnitWakeUp(u)
+    call SetUnitUserData(u, 777)
     call SetUnitAcquireRange(u, 4000.0)
     call SetUnitCreepGuard(u, false)
     call UnitWakeUp(u)
@@ -808,6 +810,39 @@ function Trig_SelectPoll_Actions takes nothing returns nothing
     set u = null
 endfunction
 
+function Arena_KillWaveEnemies takes nothing returns nothing
+    local group g = CreateGroup()
+    local unit u
+    call GroupEnumUnitsOfPlayer(g, Player(PLAYER_NEUTRAL_AGGRESSIVE), null)
+    loop
+        set u = FirstOfGroup(g)
+        exitwhen u == null
+        call GroupRemoveUnit(g, u)
+        if u == udg_Boss or GetUnitUserData(u) == 777 then
+            call KillUnit(u)
+        endif
+    endloop
+    call DestroyGroup(g)
+    set g = null
+    set u = null
+endfunction
+
+function Trig_TestChat_Actions takes nothing returns nothing
+    local integer pid = GetPlayerId(GetTriggerPlayer())
+    local string cmd = GetEventPlayerChatString()
+    if pid != 0 then
+        return
+    endif
+    if cmd == "-kill" then
+        call Arena_Msg("Тест: зачистка всех врагов текущей волны.")
+        call Arena_KillWaveEnemies()
+    elseif cmd == "-revive" then
+        if udg_Heroes[pid] != null and GetWidgetLife(udg_Heroes[pid]) <= 0.405 then
+            call ReviveHero(udg_Heroes[pid], 0.0, 0.0, true)
+        endif
+    endif
+endfunction
+
 function Trig_SelectChat_Actions takes nothing returns nothing
     local integer pid = GetPlayerId(GetTriggerPlayer())
     local string msg = GetEventPlayerChatString()
@@ -955,6 +990,9 @@ function Trig_Death_Actions takes nothing returns nothing
         endif
         set udg_TotalKills = udg_TotalKills + 1
         call Arena_DropLoot(u)
+        if udg_EnemiesAlive == 0 then
+            call Arena_CheckWaveClear()
+        endif
         if udg_EnemiesAlive == 0 then
             call Arena_CheckWaveClear()
         endif
@@ -1310,6 +1348,10 @@ function Trig_Arena_Actions takes nothing returns nothing
     call TriggerRegisterAnyUnitEventBJ(gg_trg_ItemUse, EVENT_PLAYER_UNIT_USE_ITEM)
     call TriggerAddAction(gg_trg_ItemUse, function Trig_ItemUse_Actions)
 
+    set gg_trg_Cheat = CreateTrigger()
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-kill", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-revive", true)
+    call TriggerAddAction(gg_trg_Cheat, function Trig_TestChat_Actions)
     set gg_trg_Aura = CreateTrigger()
     call TriggerRegisterTimerEvent(gg_trg_Aura, 1.00, true)
     call TriggerAddAction(gg_trg_Aura, function Trig_Aura_Actions)
