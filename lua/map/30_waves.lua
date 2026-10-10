@@ -128,6 +128,15 @@ function A.enemyDied(unit)
         A.waveUnits[id]=nil
         A.waveAlive=math.max(0,A.waveAlive-1)
         A.kills=A.kills+1
+        -- XP is explicitly controlled here before removing the tracked enemy.
+        local killer=GetKillingUnit()
+        if killer then
+            local pid=GetPlayerId(GetOwningPlayer(killer))
+            local hero=pid>=0 and pid<=3 and A.heroUnits[pid] or nil
+            if A.alive(hero) then
+                AddHeroXP(hero,math.floor(4+A.wave*.65+(tracked.elite and 24 or 0)),true)
+            end
+        end
         A.dropLoot(unit,tracked.elite)
         if A.onEnemyKill then A.onEnemyKill(unit,tracked.elite) end
         A.rewardGold(2+math.floor(A.wave*.45))
