@@ -627,6 +627,61 @@ function Arena_SpellAid takes unit caster, real heal, real mana returns nothing
     call Arena_ItemPulses(caster, heal, mana)
 endfunction
 
+// Profession-specific rider effects on RELIABLE stock hero spells.
+// The original classic skills remain fully learnable, without loading custom W3A.
+function Arena_ProfessionSpell takes unit caster, integer pid returns nothing
+    local integer profession = udg_HeroKind[pid]
+    local integer ability = GetSpellAbilityId()
+    local real level = I2R(GetUnitAbilityLevel(caster, ability))
+    local real boost = 12.0 + 14.0 * level
+    local unit target = GetSpellTargetUnit()
+    if level < 1.0 then
+        return
+    endif
+    if profession == 1 then
+        // Paladin: battlefield triage and an oath that punishes nearby enemies.
+        call Arena_ItemPulses(caster, 25.0 + 20.0 * level, 0.0)
+        call Arena_HeroBurst(caster, 215.0, boost, false)
+    elseif profession == 2 then
+        // Blademaster: a precise strike followed by a short-radius blade whirl.
+        call Arena_HeroBurst(caster, 270.0, boost * 1.30, false)
+    elseif profession == 3 then
+        // Archmage: storm discharge plus party mana restoration.
+        call Arena_HeroBurst(caster, 360.0, boost * 1.10, false)
+        call Arena_ItemPulses(caster, 0.0, 10.0 + 11.0 * level)
+    elseif profession == 4 then
+        // Death knight: drain enemies, strengthen the caster.
+        call Arena_HeroBurst(caster, 255.0, boost * 1.2, false)
+        call SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + boost * 1.1)
+    elseif profession == 5 then
+        // Demon hunter: close range fel eruption with mana recuperation.
+        call Arena_HeroBurst(caster, 260.0, boost * 1.35, false)
+        call SetUnitState(caster, UNIT_STATE_MANA, GetUnitState(caster, UNIT_STATE_MANA) + 10.0 + 7.0 * level)
+    elseif profession == 6 then
+        // Moon priestess: party moonlight blessing with modest splash damage.
+        call Arena_ItemPulses(caster, 18.0 + 15.0 * level, 5.0 * level)
+        call Arena_HeroBurst(caster, 280.0, boost * 0.65, false)
+    elseif profession == 7 then
+        // Alchemist: unstable reagent bursts followed by a small antidote pulse.
+        call Arena_HeroBurst(caster, 330.0, boost * 1.10, false)
+        call Arena_ItemPulses(caster, 12.0 + 12.0 * level, 0.0)
+    elseif profession == 8 then
+        // Mountain king: ground-shattering shockwave with heavy local damage.
+        call Arena_HeroBurst(caster, 245.0, boost * 1.55, false)
+    elseif profession == 9 then
+        // Warden: shadow execution; more effective with a valid selected target.
+        if target != null and IsUnitEnemy(target, GetOwningPlayer(caster)) and GetWidgetLife(target) > 0.405 then
+            call UnitDamageTarget(caster, target, boost * 1.10, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
+        endif
+        call Arena_HeroBurst(caster, 235.0, boost * 0.80, false)
+    elseif profession == 10 then
+        // Lich: deathly frost field with sustain from the siphoned essence.
+        call Arena_HeroBurst(caster, 365.0, boost * 1.25, false)
+        call SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + boost * 0.55)
+    endif
+    set target = null
+endfunction
+
 function Trig_HeroSpell_Actions takes nothing returns nothing
     local unit hero = GetTriggerUnit()
     local integer id = GetSpellAbilityId()
@@ -634,6 +689,11 @@ function Trig_HeroSpell_Actions takes nothing returns nothing
     local real amount = 30.0 + 20.0 * lv
     if hero == null or lv < 1.0 then
         return
+    endif
+    if GetPlayerId(GetOwningPlayer(hero)) >= 0 and GetPlayerId(GetOwningPlayer(hero)) < 4 then
+        if hero == udg_Heroes[GetPlayerId(GetOwningPlayer(hero))] then
+            call Arena_ProfessionSpell(hero, GetPlayerId(GetOwningPlayer(hero)))
+        endif
     endif
     if id == 'A101' or id == 'A10B' then
         call Arena_HeroBurst(hero, 260.0, amount, false)
@@ -924,10 +984,10 @@ function Arena_SpawnBoss takes nothing returns nothing
         return
     endif
     // SetHeroProperName is unavailable on 1.26a; name is announced via messages/quest.
-    call SetHeroLevel(udg_Boss, 9 + 2 * udg_HumanCount, false)
-    call SetHeroStr(udg_Boss, 70 + 25 * udg_HumanCount, true)
-    call SetHeroAgi(udg_Boss, 20 + 7 * udg_HumanCount, true)
-    call SetHeroInt(udg_Boss, 28 + 6 * udg_HumanCount, true)
+    call SetHeroLevel(udg_Boss, 14 + udg_HumanCount, false)
+    call SetHeroStr(udg_Boss, 52 + 12 * udg_HumanCount, true)
+    call SetHeroAgi(udg_Boss, 20 + 3 * udg_HumanCount, true)
+    call SetHeroInt(udg_Boss, 25 + 4 * udg_HumanCount, true)
     call SetUnitState(udg_Boss, UNIT_STATE_LIFE, GetUnitState(udg_Boss, UNIT_STATE_MAX_LIFE))
     call UnitAddAbility(udg_Boss, 'ACua')
     call UnitAddAbility(udg_Boss, 'ACah')
@@ -1400,14 +1460,14 @@ function Trig_BossThink_Actions takes nothing returns nothing
         set udg_BossPhase = 1
         call Arena_Msg("|cffff8844Kaz'Rul summons his Bone Legion!|r")
         call Arena_SpawnRing('uske', 4 + 2 * udg_HumanCount, 780.0)
-        call Arena_BossNova(75.0 + 20.0 * udg_HumanCount)
+        call Arena_BossNova(45.0 + 12.0 * udg_HumanCount)
     elseif udg_BossPhase == 1 and health <= 30.0 then
         set udg_BossPhase = 2
         call Arena_Msg("|cffff4444Kaz'Rul is enraged!|r")
-        call Arena_SpawnRing('ninf', 2 + udg_HumanCount, 850.0)
+        call Arena_SpawnRing('uske', 3 + udg_HumanCount, 850.0)
         call UnitAddAbility(udg_Boss, 'ACro')
         call IssueImmediateOrder(udg_Boss, "roar")
-        call Arena_BossNova(115.0 + 25.0 * udg_HumanCount)
+        call Arena_BossNova(70.0 + 16.0 * udg_HumanCount)
     endif
 endfunction
 
