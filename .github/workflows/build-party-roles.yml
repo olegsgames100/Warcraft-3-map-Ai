@@ -57,14 +57,16 @@ jobs:
           for hero in roster:
               unit=units[hero["id"]]
               fields={m["field"]:m for m in unit["mods"]}
-              assert fields["ua1w"]["type"]==3
-              assert fields["ua1w"]["val"]==("missile" if hero["attack"]=="ranged" else "normal")
               assert fields["ua1c"]["type"]==1
-              assert 0.5<=fields["ua1c"]["val"]<=3.0
+              assert .5<=fields["ua1c"]["val"]<=3.0
               assert fields["uaen"]["val"]==1
-              assert fields["ua1b"]["val"]>0
               if hero["kind"]>=11:
+                  assert fields["ua1w"]["type"]==3
+                  assert fields["ua1w"]["val"]==("missile" if hero["attack"]=="ranged" else "normal")
+                  assert fields["ua1b"]["val"]>0
                   assert unit["base"]=="Udea"
+              else:
+                  assert "ua1m" not in fields, "Original ranged art should not be replaced"
               inventory=next((m["val"] for m in unit["mods"] if m["field"]=="uabi"),"")
               assert "AInv" in inventory.split(","),(hero["id"],inventory)
               for spell in hero["skills"]:
@@ -74,7 +76,16 @@ jobs:
                       assert costs and all(m["type"]==0 and m["val"]==spell["mana"] for m in costs),(spell["id"],level,costs)
                       assert any(m["field"]=="aart" and m["rank"]==level and m["val"]==spell["icon"] for m in obj["mods"])
                   assert spell["mana"]<1000
-          print("All 12 inventories and all 240 level-specific integer mana values validated")
+          target_ids={"instant":0,"unit":1,"point":2}
+          for hero in roster:
+              for index,spell in enumerate(hero["skills"]):
+                  fields=[m for m in abilities[spell["id"]]["mods"]
+                          if m["rank"]==1]
+                  get=lambda k:next((m for m in fields if m["field"]==k),None)
+                  assert get("Ncl1") and get("Ncl1")["type"]==0
+                  assert get("Ncl1")["val"]==target_ids[spell["target"]]
+                  assert get("Ncl6") and get("Ncl6")["type"]==3
+          print("12 inventories, 48 target modes and 240 integer mana costs validated")
           PY
       - name: Package pure Lua W3X
         run: python3 tools/build_pure_lua.py --source . --output dist/Hero_Arena_Party_Roles_12.w3x
