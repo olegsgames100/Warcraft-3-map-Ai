@@ -27,9 +27,10 @@
           "name": "Клеймо света",
           "description": "Луч по направлению взгляда отмечает врагов; попадания накапливают доблесть.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp",
-          "mana": 22,
-          "cooldown": 6,
-          "ranks": 5
+          "mana": 23,
+          "cooldown": 7,
+          "ranks": 5,
+          "visualTheme": "holy"
         },
         {
           "raw": "A102",
@@ -39,9 +40,10 @@
           "name": "Купол клятвы",
           "description": "Создаёт святилище на 7 секунд: каждые полсекунды лечит союзников и помогает удерживать позицию.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNDivineShield.blp",
-          "mana": 42,
-          "cooldown": 16,
-          "ranks": 5
+          "mana": 40,
+          "cooldown": 14,
+          "ranks": 5,
+          "visualTheme": "holy"
         },
         {
           "raw": "A10D",
@@ -51,9 +53,10 @@
           "name": "Перехват",
           "description": "Рывок к противникам, стягивание врагов и кратковременный личный щит.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNDefend.blp",
-          "mana": 35,
-          "cooldown": 14,
-          "ranks": 5
+          "mana": 46,
+          "cooldown": 17,
+          "ranks": 5,
+          "visualTheme": "holy"
         },
         {
           "raw": "A10E",
@@ -63,9 +66,10 @@
           "name": "Последний рассвет",
           "description": "Массовое исцеление, воскрешение погибших союзников и мощная волна святого урона.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNResurrection.blp",
-          "mana": 110,
-          "cooldown": 55,
-          "ranks": 5
+          "mana": 113,
+          "cooldown": 64,
+          "ranks": 5,
+          "visualTheme": "holy"
         }
       ]
     },
@@ -82,9 +86,10 @@
           "name": "Песчаный рывок",
           "description": "Пронзает врагов серией ударов при стремительном рывке.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNWindWalkOn.blp",
-          "mana": 20,
-          "cooldown": 6,
-          "ranks": 5
+          "mana": 23,
+          "cooldown": 7,
+          "ranks": 5,
+          "visualTheme": "blade"
         },
         {
           "raw": "A104",
@@ -94,9 +99,10 @@
           "name": "Рваные клинки",
           "description": "Оставляет смертоносные следы: враги в вихре получают периодический урон.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNCriticalStrike.blp",
-          "mana": 30,
-          "cooldown": 13,
-          "ranks": 5
+          "mana": 40,
+          "cooldown": 14,
+          "ranks": 5,
+          "visualTheme": "blade"
         },
         {
           "raw": "A10F",
@@ -106,9 +112,10 @@
           "name": "Миражи барханов",
           "description": "Призывает двух временных теневых бойцов, атакующих вместе с героем.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNMirrorImage.blp",
-          "mana": 40,
-          "cooldown": 20,
-          "ranks": 5
+          "mana": 46,
+          "cooldown": 17,
+          "ranks": 5,
+          "visualTheme": "blade"
         },
         {
           "raw": "A10G",
@@ -118,9 +125,10 @@
           "name": "Буря тысячи лезвий",
           "description": "Запускает многократный вихрь вокруг героя; накопленные комбо усиливают урон.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNBladestorm.blp",
-          "mana": 100,
-          "cooldown": 45,
-          "ranks": 5
+          "mana": 105,
+          "cooldown": 52,
+          "ranks": 5,
+          "visualTheme": "blade"
         }
       ]
     },
@@ -137,9 +145,10 @@
           "name": "Цепной разряд",
           "description": "Молния перепрыгивает между группами врагов и накапливает заряды шторма.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNChainLightning.blp",
-          "mana": 24,
+          "mana": 28,
           "cooldown": 7,
-          "ranks": 5
+          "ranks": 5,
+          "visualTheme": "storm"
         },
         {
           "raw": "A106",
@@ -148,10 +157,11 @@
           "order": "roar",
           "name": "Грозовой столб",
           "description": "Длительное электрическое поле наносит урон стоящим в нём врагам.",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp",
-          "mana": 38,
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
+          "mana": 45,
           "cooldown": 16,
-          "ranks": 5
+          "ranks": 5,
+          "visualTheme": "storm"
         },
         {
           "raw": "A10H",
@@ -161,9 +171,10 @@
           "name": "Магический контур",
           "description": "Превращает накопленные заряды в ману союзникам и локальный разряд.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNBrilliance.blp",
-          "mana": 28,
-          "cooldown": 13,
-          "ranks": 5
+          "mana": 51,
+          "cooldown": 17,
+          "ranks": 5,
+          "visualTheme": "storm"
         },
         {
           "raw": "A10I",
@@ -174,8 +185,9 @@
           "description": "Вызывает три последовательных грозовых удара по всей арене вокруг героя.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNBlizzard.blp",
           "mana": 110,
-          "cooldown": 48,
-          "ranks": 5
+          "cooldown": 52,
+          "ranks": 5,
+          "visualTheme": "storm"
         }
       ]
     },
@@ -192,9 +204,10 @@
           "name": "Печать погибели",
           "description": "Помечает ближайшего врага проклятием. Добивание метки приносит душу.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathCoil.blp",
-          "mana": 24,
+          "mana": 23,
           "cooldown": 7,
-          "ranks": 5
+          "ranks": 5,
+          "visualTheme": "death"
         },
         {
           "raw": "A108",
@@ -204,9 +217,10 @@
           "name": "Костяной дозор",
           "description": "Призывает скелетов, временно защищающих своего господина.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNRaiseDead.blp",
-          "mana": 36,
-          "cooldown": 18,
-          "ranks": 5
+          "mana": 40,
+          "cooldown": 14,
+          "ranks": 5,
+          "visualTheme": "death"
         },
         {
           "raw": "A10J",
@@ -216,9 +230,10 @@
           "name": "Жатва эссенции",
           "description": "Высасывает здоровье у окружающих врагов и накапливает души.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathPact.blp",
-          "mana": 38,
-          "cooldown": 13,
-          "ranks": 5
+          "mana": 46,
+          "cooldown": 17,
+          "ranks": 5,
+          "visualTheme": "death"
         },
         {
           "raw": "A10K",
@@ -229,8 +244,9 @@
           "description": "Тратит накопленные души, поднимая армию нежити с боевыми усилениями.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
           "mana": 105,
-          "cooldown": 50,
-          "ranks": 5
+          "cooldown": 52,
+          "ranks": 5,
+          "visualTheme": "death"
         }
       ]
     },
@@ -248,8 +264,9 @@
           "description": "Телепортационный рывок оставляет позади огненную полосу.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp",
           "mana": 23,
-          "cooldown": 6,
-          "ranks": 5
+          "cooldown": 7,
+          "ranks": 5,
+          "visualTheme": "fel"
         },
         {
           "raw": "A10A",
@@ -259,9 +276,10 @@
           "name": "Выжечь разум",
           "description": "Сжигает ману врагов и восстанавливает здоровье и ярость героя.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp",
-          "mana": 34,
-          "cooldown": 12,
-          "ranks": 5
+          "mana": 40,
+          "cooldown": 14,
+          "ranks": 5,
+          "visualTheme": "fel"
         },
         {
           "raw": "A10L",
@@ -271,9 +289,10 @@
           "name": "Фел-ловушка",
           "description": "Размещает руну, которая взрывается через несколько секунд.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNImmolationOn.blp",
-          "mana": 38,
-          "cooldown": 15,
-          "ranks": 5
+          "mana": 46,
+          "cooldown": 17,
+          "ranks": 5,
+          "visualTheme": "fel"
         },
         {
           "raw": "A10M",
@@ -283,9 +302,10 @@
           "name": "Владыка бездны",
           "description": "На 10 секунд превращает героя в живой источник периодических огненных взрывов.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNMetamorphosis.blp",
-          "mana": 100,
-          "cooldown": 48,
-          "ranks": 5
+          "mana": 105,
+          "cooldown": 52,
+          "ranks": 5,
+          "visualTheme": "fel"
         }
       ]
     },
@@ -302,9 +322,10 @@
           "name": "Серебряная стрела",
           "description": "Пронзающая стрела поражает врагов на линии и лечит ближайшего союзника.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNSearingArrowsOn.blp",
-          "mana": 20,
-          "cooldown": 6,
-          "ranks": 5
+          "mana": 23,
+          "cooldown": 7,
+          "ranks": 5,
+          "visualTheme": "moon"
         },
         {
           "raw": "A10C",
@@ -314,9 +335,10 @@
           "name": "Священная роща",
           "description": "Разворачивает зону постоянного лечения и восстановления маны.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNTranquility.blp",
-          "mana": 42,
-          "cooldown": 18,
-          "ranks": 5
+          "mana": 40,
+          "cooldown": 14,
+          "ranks": 5,
+          "visualTheme": "moon"
         },
         {
           "raw": "A10N",
@@ -326,9 +348,10 @@
           "name": "Плащ затмения",
           "description": "Краткая неуязвимость и скрытный уход из-под удара с поддержкой союзников.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNHide.blp",
-          "mana": 35,
-          "cooldown": 20,
-          "ranks": 5
+          "mana": 46,
+          "cooldown": 17,
+          "ranks": 5,
+          "visualTheme": "moon"
         },
         {
           "raw": "A10O",
@@ -338,9 +361,10 @@
           "name": "Падение созвездий",
           "description": "Многократный звёздный дождь обрушивается на врагов вокруг жрицы.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNStarfall.blp",
-          "mana": 110,
-          "cooldown": 50,
-          "ranks": 5
+          "mana": 105,
+          "cooldown": 52,
+          "ranks": 5,
+          "visualTheme": "moon"
         }
       ]
     },
@@ -357,9 +381,10 @@
           "name": "Гремучий флакон",
           "description": "Бросает нестабильную смесь: через 2 секунды она взрывается.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp",
-          "mana": 24,
+          "mana": 23,
           "cooldown": 7,
-          "ranks": 5
+          "ranks": 5,
+          "visualTheme": "alchemy"
         },
         {
           "raw": "A112",
@@ -369,9 +394,10 @@
           "name": "Кислотная воронка",
           "description": "Заливает землю кислотой и постоянно повреждает врагов.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp",
-          "mana": 38,
-          "cooldown": 17,
-          "ranks": 5
+          "mana": 40,
+          "cooldown": 16,
+          "ranks": 5,
+          "visualTheme": "alchemy"
         },
         {
           "raw": "A113",
@@ -381,9 +407,10 @@
           "name": "Жадная трансмутация",
           "description": "Перерабатывает жизненную силу противника в золото и лечение.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNTransmute.blp",
-          "mana": 30,
-          "cooldown": 13,
-          "ranks": 5
+          "mana": 46,
+          "cooldown": 17,
+          "ranks": 5,
+          "visualTheme": "alchemy"
         },
         {
           "raw": "A114",
@@ -394,8 +421,9 @@
           "description": "Активирует алхимический реактор, периодически лечащий союзников и поджигающий врагов.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNHealingSpray.blp",
           "mana": 105,
-          "cooldown": 48,
-          "ranks": 5
+          "cooldown": 52,
+          "ranks": 5,
+          "visualTheme": "alchemy"
         }
       ]
     },
@@ -412,9 +440,10 @@
           "name": "Раскол земной коры",
           "description": "Продольная ударная волна пробивает строй врагов.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNShockWave.blp",
-          "mana": 24,
+          "mana": 23,
           "cooldown": 7,
-          "ranks": 5
+          "ranks": 5,
+          "visualTheme": "earth"
         },
         {
           "raw": "A116",
@@ -424,9 +453,10 @@
           "name": "Магнитный кулак",
           "description": "Притягивает врагов с большого радиуса к своей позиции.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
-          "mana": 35,
-          "cooldown": 16,
-          "ranks": 5
+          "mana": 40,
+          "cooldown": 14,
+          "ranks": 5,
+          "visualTheme": "earth"
         },
         {
           "raw": "A117",
@@ -436,9 +466,10 @@
           "name": "Гранитная твердыня",
           "description": "Краткая каменная неуязвимость и ответный урон в ближнем бою.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNAvatar.blp",
-          "mana": 40,
-          "cooldown": 22,
-          "ranks": 5
+          "mana": 46,
+          "cooldown": 17,
+          "ranks": 5,
+          "visualTheme": "earth"
         },
         {
           "raw": "A118",
@@ -447,10 +478,11 @@
           "order": "berserk",
           "name": "Гнев исполина",
           "description": "Серия разрушительных землетрясений с призывом горных стражей.",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
-          "mana": 110,
-          "cooldown": 50,
-          "ranks": 5
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNEarthquake.blp",
+          "mana": 105,
+          "cooldown": 52,
+          "ranks": 5,
+          "visualTheme": "earth"
         }
       ]
     },
@@ -467,9 +499,10 @@
           "name": "Шаг за грань",
           "description": "Скачок к ближайшему противнику с мощным ударом из тени.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp",
-          "mana": 24,
+          "mana": 23,
           "cooldown": 7,
-          "ranks": 5
+          "ranks": 5,
+          "visualTheme": "shadow"
         },
         {
           "raw": "A11A",
@@ -479,9 +512,10 @@
           "name": "Клеймо охотницы",
           "description": "Накладывает метку приоритета; повторное применение усиливает урон по цели.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp",
-          "mana": 28,
-          "cooldown": 10,
-          "ranks": 5
+          "mana": 40,
+          "cooldown": 14,
+          "ranks": 5,
+          "visualTheme": "shadow"
         },
         {
           "raw": "A11B",
@@ -490,10 +524,11 @@
           "order": "fanofknives",
           "name": "Дымовая завеса",
           "description": "На мгновение делает героя неуязвимым и создаёт повреждающий дым.",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp",
-          "mana": 35,
-          "cooldown": 18,
-          "ranks": 5
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFanOfKnives.blp",
+          "mana": 46,
+          "cooldown": 17,
+          "ranks": 5,
+          "visualTheme": "shadow"
         },
         {
           "raw": "A11C",
@@ -502,10 +537,11 @@
           "order": "berserk",
           "name": "Приговор ночи",
           "description": "Казнит раненую цель; если цель выживает, получает крупный урон и взрыв вокруг.",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNFanOfKnives.blp",
-          "mana": 100,
-          "cooldown": 40,
-          "ranks": 5
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlackArrowOn.blp",
+          "mana": 105,
+          "cooldown": 56,
+          "ranks": 5,
+          "visualTheme": "shadow"
         }
       ]
     },
@@ -522,9 +558,10 @@
           "name": "Копьё вечного льда",
           "description": "Ледяной снаряд режет врагов по прямой линии.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostNova.blp",
-          "mana": 24,
+          "mana": 23,
           "cooldown": 7,
-          "ranks": 5
+          "ranks": 5,
+          "visualTheme": "frost"
         },
         {
           "raw": "A11E",
@@ -534,9 +571,10 @@
           "name": "Ледяные цепи",
           "description": "Ненадолго сковывает ближайших врагов и замедляет их.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNFreezingBreath.blp",
-          "mana": 38,
-          "cooldown": 17,
-          "ranks": 5
+          "mana": 40,
+          "cooldown": 16,
+          "ranks": 5,
+          "visualTheme": "frost"
         },
         {
           "raw": "A11F",
@@ -546,9 +584,10 @@
           "name": "Орбита холода",
           "description": "Создаёт постоянную морозную область, которая движется вместе с целью только при активации.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostArmor.blp",
-          "mana": 42,
-          "cooldown": 18,
-          "ranks": 5
+          "mana": 46,
+          "cooldown": 17,
+          "ranks": 5,
+          "visualTheme": "frost"
         },
         {
           "raw": "A11G",
@@ -558,9 +597,10 @@
           "name": "Вечная зима",
           "description": "Большая снежная буря замедляет врагов и подпитывает жизнью героя.",
           "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathAndDecay.blp",
-          "mana": 115,
+          "mana": 105,
           "cooldown": 52,
-          "ranks": 5
+          "ranks": 5,
+          "visualTheme": "frost"
         }
       ]
     }

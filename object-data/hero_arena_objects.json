@@ -231,7 +231,10 @@
       "slot": 1,
       "key": "Q",
       "order": "thunderclap",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 7,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp",
+      "mana": 23
     },
     {
       "id": "A102",
@@ -241,7 +244,10 @@
       "slot": 2,
       "key": "W",
       "order": "roar",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 14,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNDivineShield.blp",
+      "mana": 40
     },
     {
       "id": "A103",
@@ -251,7 +257,10 @@
       "slot": 1,
       "key": "Q",
       "order": "thunderclap",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 7,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNWindWalkOn.blp",
+      "mana": 23
     },
     {
       "id": "A104",
@@ -261,7 +270,10 @@
       "slot": 2,
       "key": "W",
       "order": "roar",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 14,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNCriticalStrike.blp",
+      "mana": 40
     },
     {
       "id": "A105",
@@ -271,7 +283,10 @@
       "slot": 1,
       "key": "Q",
       "order": "thunderclap",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 7,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNChainLightning.blp",
+      "mana": 28
     },
     {
       "id": "A106",
@@ -281,7 +296,10 @@
       "slot": 2,
       "key": "W",
       "order": "roar",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 16,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
+      "mana": 45
     },
     {
       "id": "A107",
@@ -291,7 +309,10 @@
       "slot": 1,
       "key": "Q",
       "order": "thunderclap",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 7,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathCoil.blp",
+      "mana": 23
     },
     {
       "id": "A108",
@@ -301,7 +322,10 @@
       "slot": 2,
       "key": "W",
       "order": "roar",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 14,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNRaiseDead.blp",
+      "mana": 40
     },
     {
       "id": "A109",
@@ -311,7 +335,10 @@
       "slot": 1,
       "key": "Q",
       "order": "thunderclap",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 7,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp",
+      "mana": 23
     },
     {
       "id": "A10A",
@@ -321,7 +348,10 @@
       "slot": 2,
       "key": "W",
       "order": "roar",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 14,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp",
+      "mana": 40
     },
     {
       "id": "A10B",
@@ -331,7 +361,10 @@
       "slot": 1,
       "key": "Q",
       "order": "thunderclap",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 7,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNSearingArrowsOn.blp",
+      "mana": 23
     },
     {
       "id": "A10C",
@@ -341,7 +374,10 @@
       "slot": 2,
       "key": "W",
       "order": "roar",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 14,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNTranquility.blp",
+      "mana": 40
     },
     {
       "id": "A10D",
@@ -352,7 +388,10 @@
       "slot": 3,
       "key": "E",
       "order": "fanofknives",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 17,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNDefend.blp",
+      "mana": 46
     },
     {
       "id": "A10E",
@@ -363,7 +402,10 @@
       "slot": 4,
       "key": "R",
       "order": "berserk",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 64,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNResurrection.blp",
+      "mana": 113
     },
     {
       "id": "A10F",
@@ -374,7 +416,10 @@
       "slot": 3,
       "key": "E",
       "order": "fanofknives",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 17,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNMirrorImage.blp",
+      "mana": 46
     },
     {
       "id": "A10G",
@@ -385,7 +430,10 @@
       "slot": 4,
       "key": "R",
       "order": "berserk",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 52,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNBladestorm.blp",
+      "mana": 105
     },
     {
       "id": "A10H",
@@ -396,7 +444,10 @@
       "slot": 3,
       "key": "E",
       "order": "fanofknives",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 17,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNBrilliance.blp",
+      "mana": 51
     },
     {
       "id": "A10I",
@@ -407,7 +458,10 @@
       "slot": 4,
       "key": "R",
       "order": "berserk",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 52,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNBlizzard.blp",
+      "mana": 110
     },
     {
       "id": "A10J",
@@ -418,7 +472,10 @@
       "slot": 3,
       "key": "E",
       "order": "fanofknives",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 17,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathPact.blp",
+      "mana": 46
     },
     {
       "id": "A10K",
@@ -429,7 +486,10 @@
       "slot": 4,
       "key": "R",
       "order": "berserk",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 52,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
+      "mana": 105
     },
     {
       "id": "A10L",
@@ -440,7 +500,10 @@
       "slot": 3,
       "key": "E",
       "order": "fanofknives",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 17,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNImmolationOn.blp",
+      "mana": 46
     },
     {
       "id": "A10M",
@@ -451,7 +514,10 @@
       "slot": 4,
       "key": "R",
       "order": "berserk",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 52,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNMetamorphosis.blp",
+      "mana": 105
     },
     {
       "id": "A10N",
@@ -462,7 +528,10 @@
       "slot": 3,
       "key": "E",
       "order": "fanofknives",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 17,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNHide.blp",
+      "mana": 46
     },
     {
       "id": "A10O",
@@ -473,7 +542,10 @@
       "slot": 4,
       "key": "R",
       "order": "berserk",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 52,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNStarfall.blp",
+      "mana": 105
     },
     {
       "id": "A111",
@@ -484,7 +556,10 @@
       "slot": 1,
       "key": "Q",
       "order": "thunderclap",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 7,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp",
+      "mana": 23
     },
     {
       "id": "A112",
@@ -495,7 +570,10 @@
       "slot": 2,
       "key": "W",
       "order": "roar",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 16,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp",
+      "mana": 40
     },
     {
       "id": "A113",
@@ -506,7 +584,10 @@
       "slot": 3,
       "key": "E",
       "order": "fanofknives",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 17,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNTransmute.blp",
+      "mana": 46
     },
     {
       "id": "A114",
@@ -517,7 +598,10 @@
       "slot": 4,
       "key": "R",
       "order": "berserk",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 52,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNHealingSpray.blp",
+      "mana": 105
     },
     {
       "id": "A115",
@@ -528,7 +612,10 @@
       "slot": 1,
       "key": "Q",
       "order": "thunderclap",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 7,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNShockWave.blp",
+      "mana": 23
     },
     {
       "id": "A116",
@@ -539,7 +626,10 @@
       "slot": 2,
       "key": "W",
       "order": "roar",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 14,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
+      "mana": 40
     },
     {
       "id": "A117",
@@ -550,7 +640,10 @@
       "slot": 3,
       "key": "E",
       "order": "fanofknives",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 17,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNAvatar.blp",
+      "mana": 46
     },
     {
       "id": "A118",
@@ -561,7 +654,10 @@
       "slot": 4,
       "key": "R",
       "order": "berserk",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 52,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNEarthquake.blp",
+      "mana": 105
     },
     {
       "id": "A119",
@@ -572,7 +668,10 @@
       "slot": 1,
       "key": "Q",
       "order": "thunderclap",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 7,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp",
+      "mana": 23
     },
     {
       "id": "A11A",
@@ -583,7 +682,10 @@
       "slot": 2,
       "key": "W",
       "order": "roar",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 14,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp",
+      "mana": 40
     },
     {
       "id": "A11B",
@@ -594,7 +696,10 @@
       "slot": 3,
       "key": "E",
       "order": "fanofknives",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 17,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNFanOfKnives.blp",
+      "mana": 46
     },
     {
       "id": "A11C",
@@ -605,7 +710,10 @@
       "slot": 4,
       "key": "R",
       "order": "berserk",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 56,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNBlackArrowOn.blp",
+      "mana": 105
     },
     {
       "id": "A11D",
@@ -616,7 +724,10 @@
       "slot": 1,
       "key": "Q",
       "order": "thunderclap",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 7,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostNova.blp",
+      "mana": 23
     },
     {
       "id": "A11E",
@@ -627,7 +738,10 @@
       "slot": 2,
       "key": "W",
       "order": "roar",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 16,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNFreezingBreath.blp",
+      "mana": 40
     },
     {
       "id": "A11F",
@@ -638,7 +752,10 @@
       "slot": 3,
       "key": "E",
       "order": "fanofknives",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 17,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostArmor.blp",
+      "mana": 46
     },
     {
       "id": "A11G",
@@ -649,7 +766,10 @@
       "slot": 4,
       "key": "R",
       "order": "berserk",
-      "ranks": 5
+      "ranks": 5,
+      "cooldown": 52,
+      "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathAndDecay.blp",
+      "mana": 105
     }
   ],
   "aura": [
