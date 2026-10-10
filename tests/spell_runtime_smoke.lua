@@ -111,7 +111,7 @@ for kind=1,12 do
   now=0
   for slot,id in ipairs(Arena.spells[kind]) do
     local before=damageCount
-    local ok,err=pcall(Arena.castHero,hero,id,{x=310,y=0,target=enemy})
+    local ok,err=pcall(Arena.castHero,hero,id,{x=kind==1 and slot==3 and 90 or 310,y=0,target=kind==1 and slot==3 and friend or enemy})
     assert(ok,"hero "..kind.." slot "..slot.." broke: "..tostring(err))
     advance(now+2)
     assert(Arena.cooldowns[GetHandleId(hero)..":"..id],"missing cooldown "..kind.."/"..slot)
