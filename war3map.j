@@ -848,10 +848,7 @@ endfunction
 function Trig_TestChat_Actions takes nothing returns nothing
     local integer pid = GetPlayerId(GetTriggerPlayer())
     local string cmd = GetEventPlayerChatString()
-    if pid != 0 then
-        return
-    endif
-    if cmd == "-kill" then
+    if cmd == "-kill" and pid == 0 then
         call Arena_Msg("Тест: зачистка всех врагов текущей волны.")
         call Arena_KillWaveEnemies()
     elseif cmd == "-revive" then
@@ -1184,7 +1181,7 @@ endfunction
 function Arena_CreateQuests takes nothing returns nothing
     set udg_QuestMain = CreateQuest()
     call QuestSetTitle(udg_QuestMain, "Арена героев")
-    call QuestSetDescription(udg_QuestMain, "Выберите героя. Зачистка волны ускоряет следующую (7 сек). После 10 волны босс. Четыре разных магазина у центра. Вечный день.")
+    call QuestSetDescription(udg_QuestMain, "50 волн; каждые 10 волн новый этап. Полная зачистка ускоряет следующую волну. Команды: -kill (хост), -revive (каждый игрок). Максимальный уровень 20.")
     call QuestSetIconPath(udg_QuestMain, "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp")
     call QuestSetRequired(udg_QuestMain, true)
     call QuestSetDiscovered(udg_QuestMain, true)
@@ -1370,6 +1367,9 @@ function Trig_Arena_Actions takes nothing returns nothing
     set gg_trg_Cheat = CreateTrigger()
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-kill", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-revive", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(1), "-revive", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(2), "-revive", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(3), "-revive", true)
     call TriggerAddAction(gg_trg_Cheat, function Trig_TestChat_Actions)
     set gg_trg_Aura = CreateTrigger()
     call TriggerRegisterTimerEvent(gg_trg_Aura, 1.00, true)
