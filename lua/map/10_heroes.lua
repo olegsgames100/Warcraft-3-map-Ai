@@ -117,7 +117,7 @@ function A.selectorPos(kind)
 end
 
 function A.prepareSelections()
- local stock={"Hpal","Obla","Hamg","Udea","Edem","Emoo","Nalc","Hmkg","Ewar","Ulic","Ndrk","Udea"}
+ local stock={"Hpal","Obla","Hamg","Udea","Edem","Emoo","Nalc","Hmkg","Ewar","Ulic","U003","U004"}
  for kind=1,12 do
    local x,y=A.selectorPos(kind)
    A.markers[kind]={x=x,y=y}
