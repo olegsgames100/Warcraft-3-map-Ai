@@ -4,12 +4,20 @@ Cooperative **Warcraft III (classic 1.26a) JASS** arena for **1–4 human player
 
 ## Core game loop
 
-1. All human players select a hero through an opening dialog.
+1. A Wisp spawns for each human at the northern selection hall. Move it onto any of six hero statues (the selection region accepts the Wisp), or type `-pick 1` ... `-pick 6`. An automatic random choice occurs after 90 seconds.
 2. Each hero receives a starter inventory and abilities on top of their standard Warcraft III hero toolkit.
 3. Four neutral shops stand around the centre (weapons, armour, consumables, relics).
 4. First wave arrives **15 seconds after everyone chooses**, followed by **one wave every 60 seconds**.
 5. There are ten progressively stronger enemy compositions, followed **60 seconds after wave 10** by the final boss **Kaz'Rul**.
 6. Defeat Kaz'Rul for victory. Dead heroes revive after 12 seconds.
+
+## Physical map layout
+
+- A **stone fighting circle** with a central paved dais and decorative perimeter trees.
+- A separate **northern selection plaza** with six stone hero platforms (3 x 2), hero previews, floating name labels and walk-in trigger regions.
+- A paved north-to-centre walkway.
+- All layout terrain and decorations are created dynamically from `war3map.j`, using `SetTerrainType` and destructable placement. The existing `war3map.w3e` binary remains untouched.
+- Start initialization occurs after 0.5 seconds of game time to allow the client interface to come up before selection. The selection timer is 90 seconds.
 
 ## Heroes
 
