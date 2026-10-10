@@ -191,7 +191,6 @@ function A.castHero(hero,ability)
     elseif slot==2 then A.spellArea(hero,hx,hy,460,b*.85,"magic",function(u)A.rootEnemy(hero,u,2.2)end)
     elseif slot==3 then pulse(hero,x,y,480,7,.7,b*.52,"magic",function(u)A.slowEnemy(hero,u,.3,2)end)
     else pulse(hero,hx,hy,750,9,.5,b*.8,"magic",function(u)A.rootEnemy(hero,u,1.2)end)
-    end
   elseif kind==11 then -- AVАLS: bone archer who supports Gelo
     local gelo=A.allyOfKind(12,hero)
     if slot==1 then
