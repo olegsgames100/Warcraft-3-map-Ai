@@ -82,9 +82,15 @@ jobs:
                   fields=[m for m in abilities[spell["id"]]["mods"]
                           if m["rank"]==1]
                   get=lambda k:next((m for m in fields if m["field"]==k),None)
-                  assert get("Ncl1") and get("Ncl1")["type"]==0
-                  assert get("Ncl1")["val"]==target_ids[spell["target"]]
+                  assert get("Ncl1") and get("Ncl1")["type"]==1 and get("Ncl1")["val"]==0.0
+                  assert get("Ncl2") and get("Ncl2")["type"]==0
+                  assert get("Ncl2")["val"]==target_ids[spell["target"]]
+                  assert get("Ncl3") and get("Ncl3")["type"]==0 and get("Ncl3")["val"]&1
                   assert get("Ncl6") and get("Ncl6")["type"]==3
+                  orders={"instant":{"avatar","berserk","phaseshift","roar"},
+                          "unit":{"chainlightning","acidbomb","cripple","curse"},
+                          "point":{"blink","blizzard","carrionswarm","earthquake"}}
+                  assert get("Ncl6")["val"] in orders[spell["target"]]
           print("12 inventories, 48 target modes and 240 integer mana costs validated")
           PY
       - name: Package pure Lua W3X
