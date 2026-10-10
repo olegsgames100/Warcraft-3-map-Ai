@@ -257,7 +257,7 @@ function A.reduceDamage()
         TriggerRegisterPlayerUnitEvent(t, Player(pid), EVENT_PLAYER_UNIT_DAMAGING, nil)
     end
     TriggerAddAction(t, function()
-        BlzSetEventDamage(A.modifyIncoming(GetTriggerUnit(),GetEventDamage()))
+        BlzSetEventDamage(A.modifyLastOath(GetTriggerUnit(),A.modifyIncoming(GetTriggerUnit(),GetEventDamage())))
     end)
 end
 
