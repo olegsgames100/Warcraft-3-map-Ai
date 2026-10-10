@@ -1,0 +1,57 @@
+name: Compile Hero Arena Party Roles
+on:
+  push:
+    branches:
+      - feature/reforged-party-roles-bone-brothers
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Lua 5.4 parser
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y lua5.4
+      - name: Validate 8 Lua modules
+        run: luac5.4 -p lua/map/*.lua
+      - name: Regenerate Object Editor hero and ability files
+        run: python3 tools/generate_party_objects.py
+      - name: Assert 12 heroes and 48 spells
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from tools.generate_party_objects import parse
+          data=json.loads(Path("object-data/party_heroes.json").read_text())
+          _,hero_groups=parse(Path("war3map.w3u"),False)
+          _,spell_groups=parse(Path("war3map.w3a"),True)
+          hids={o["id"] for g in hero_groups for o in g}
+          sids={o["id"] for g in spell_groups for o in g}
+          assert len(data["heroes"])==12
+          assert all(h["id"] in hids for h in data["heroes"])
+          assert all(skill["id"] in sids for h in data["heroes"] for skill in h["skills"])
+          assert len({skill["id"] for h in data["heroes"] for skill in h["skills"]})==48
+          print("Object IDs: 12 heroes / 48 abilities")
+          PY
+      - name: Package pure Lua W3X
+        run: python3 tools/build_pure_lua.py --source . --output dist/Hero_Arena_Party_Roles_12.w3x
+      - name: Check MPQ Lua script and signatures
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("dist/Hero_Arena_Party_Roles_12.w3x")
+          contents=p.read_bytes()
+          assert contents[:4]==b"HM3W"
+          assert contents[512:516]==b"MPQ\\x1a"
+          assert b"war3map.lua" in contents or len(contents)>20000
+          print("Valid HM3W/MPQ",len(contents))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Hero_Arena_Party_Roles_12
+          path: dist/Hero_Arena_Party_Roles_12.w3x
