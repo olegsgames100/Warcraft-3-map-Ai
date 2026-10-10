@@ -256,12 +256,26 @@ function A.castHero(hero,ability)
     return true
 end
 
+-- Every hero ability uses one registered cast dispatcher with visible errors.
 function A.initAbilities()
-    local spellTrigger=CreateTrigger()
+    local spells=CreateTrigger()
     for pid=0,3 do
-        TriggerRegisterPlayerUnitEvent(spellTrigger,Player(pid),EVENT_PLAYER_UNIT_SPELL_EFFECT,nil)
+        TriggerRegisterPlayerUnitEvent(spells,Player(pid),EVENT_PLAYER_UNIT_SPELL_EFFECT,nil)
     end
-    TriggerAddAction(spellTrigger,function()
-        A.castHero(GetTriggerUnit(),GetSpellAbilityId())
+    TriggerAddAction(spells,function()
+        local hero=GetTriggerUnit()
+        local ability=GetSpellAbilityId()
+        local pid=GetPlayerId(GetOwningPlayer(hero))
+        local ok,result=xpcall(function()
+            return A.castHero(hero,ability)
+        end,function(err)
+            return tostring(err)..(debug and debug.traceback and debug.traceback("",2) or "")
+        end)
+        if not ok then
+            if pid>=0 and pid<=3 then A.playerText(pid,"|cffff3333[LUA SPELL ERROR]|r "..tostring(result)) end
+            A.say("|cffff3333Ошибка способности: "..tostring(result):sub(1,160).."|r")
+        elseif result and pid>=0 and pid<=3 and A.spellDebug then
+            A.playerText(pid,"|cff66ff66CAST OK|r "..tostring(ability))
+        end
     end)
 end
