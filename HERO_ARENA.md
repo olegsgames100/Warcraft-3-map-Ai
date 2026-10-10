@@ -114,3 +114,12 @@ These are source-level validations, not a successful test inside the Warcraft II
 Replace these **five** files together: `war3map.j`, `war3map.w3u`, `war3map.w3a`, `war3map.w3t` and `war3mapMisc.txt`, all at the root of the map archive. Do not import `object-data/hero_arena_objects.json` into the MPQ. Back up your old map first. Only JASS function structure and Object Editor binary format were checked programmatically; these changes have not been compiled/tested in the 1.26a game client.
 
 Known follow-up: the 20-level skill curve, stage difficulty, item pricing and custom spell order strings still require in-game balance/playability testing. New hero abilities inherit classic spell templates, so some cast orders/animations may overlap; test each hero's four spells before finalizing their kits.
+
+## Combat / elites / hotkeys update — Oct 10
+
+- `-next`: first player calls the next wave early; remaining tracked enemies are removed first. `-kill` kills tracked enemies; `-revive` resurrects the sending player's hero.
+- Every fifth wave (5 through 50) summons a named, enlarged elite, announces it in chat, places a temporary world-space warning label, pings the minimap and plays a standard warning sound. Elite kills award the team extra gold and have better item-drop odds.
+- Custom spells have updated cast/research hotkey fields `ahky` and `arhk` at **level 0** (ability-wide) rather than incorrect level-specific records, and explicit `abpx`, `abpy`, `arpx`, `arpy` button positioning. Q/W/E/R hotkeys and item descriptions are stored in `war3map.w3a`/`war3map.w3t`.
+- The last four heroes' active spells now trigger extra radius damage, party healing, self-healing/defensive effects, and area burst/support effects, scaled by learned ability level. Those spells still inherit Warcraft III base-spell animations, targeting rules and orders.
+- Solo/duo/trio unit-health handicaps were reduced to 1.20x/1.12x/1.06x; hero STR/AGI/INT are limited to 60 at creation. **A reported ~10,000 HP gain per level has not been reproduced in the game client**, so this is not a verified root-cause fix.
+- **MPQ Editor:** replace `war3map.j`, `war3map.w3a`, and `war3map.w3t` together. Keep current `war3map.w3u` and `war3mapMisc.txt` too. Verify changes in Warcraft III 1.26a directly; static checks are not equivalent to gameplay testing.
