@@ -24,6 +24,9 @@ Arena = {
     currentWaveTimer = nil,
     kills = 0,
     stockShops = {},
+    cooldowns = {},
+    visualEffects = {},
+    itemsByUnit = {},
 }
 local A = Arena
 
@@ -72,7 +75,24 @@ end
 
 function A.fx(path, x, y)
     local effect = AddSpecialEffect(path, x, y)
-    if effect ~= nil then DestroyEffect(effect) end
+    if effect ~= nil then
+        A.after(.75, function() DestroyEffect(effect) end)
+    end
+end
+
+function A.visual(path, x, y, seconds, scale)
+    local e=AddSpecialEffect(path,x,y)
+    if e then
+        if scale then BlzSetSpecialEffectScale(e,scale) end
+        A.after(seconds or 1.2,function() DestroyEffect(e) end)
+    end
+end
+
+function A.visualRing(path,x,y,radius,count,seconds)
+    for i=1,count do
+        local angle=i*2*math.pi/count
+        A.visual(path,x+math.cos(angle)*radius,y+math.sin(angle)*radius,seconds or 1.0,.9)
+    end
 end
 
 function A.text(x, y, msg, size, life)
@@ -155,7 +175,7 @@ end
 function A.zone(caster, x, y, radius, duration, pulse, amount, friendly, art)
     local times = math.max(1, math.floor(duration / pulse))
     local ticks = 0
-    if art then A.fx(art, x, y) end
+    if art then A.visualRing(art, x, y, math.min(radius*.75,400), 7, duration) end
     A.after(pulse, function()
         -- Each pulse schedules the next callback independently.
         local function eachTick()
@@ -174,7 +194,7 @@ function A.zone(caster, x, y, radius, duration, pulse, amount, friendly, art)
 end
 
 function A.trap(caster, x, y, delay, radius, damage)
-    A.fx([[Abilities\Spells\Other\GeneralAuraTarget\GeneralAuraTarget.mdl]], x, y)
+    A.visualRing([[Abilities\Spells\Other\GeneralAuraTarget\GeneralAuraTarget.mdl]], x, y, radius*.7, 6, delay)
     A.after(delay, function()
         if A.alive(caster) then
             A.fx([[Abilities\Spells\Human\ThunderClap\ThunderClapCaster.mdl]], x, y)
@@ -186,8 +206,8 @@ end
 function A.guard(unit, seconds)
     A.guards[GetHandleId(unit)] = math.max(
         A.guards[GetHandleId(unit)] or 0, A.clock + seconds)
-    A.fx([[Abilities\Spells\Human\DivineShield\DivineShieldTarget.mdl]],
-        GetUnitX(unit), GetUnitY(unit))
+    A.visual([[Abilities\Spells\Human\DivineShield\DivineShieldTarget.mdl]],
+        GetUnitX(unit), GetUnitY(unit), seconds)
 end
 
 function A.summon(caster, typeId, count, lifetime)
@@ -284,6 +304,8 @@ function A.start()
     A.initInputs()
     A.initHeroEvents()
     A.reduceDamage()
+    if A.initItems then A.initItems() end
+    if A.initExperience then A.initExperience() end
     A.every(A.tickRate, A.gameTick)
 
     for pid = 0, 3 do
