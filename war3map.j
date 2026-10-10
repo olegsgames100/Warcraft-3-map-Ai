@@ -42,6 +42,16 @@ globals
     unit                    udg_ShopMagic                  = null
     unit                    udg_ShopRelic                  = null
 
+    integer                 udg_EnemiesAlive = 0
+    integer                 udg_TotalKills = 0
+    integer                 udg_BossPhase = 0
+    integer         array   udg_PlayerKills
+    boolean         array   udg_BonusAdded
+    trigger                 gg_trg_Leave = null
+    trigger                 gg_trg_BossThink = null
+    trigger                 gg_trg_Signature = null
+    trigger                 gg_trg_Craft = null
+
     quest                   udg_QuestMain                  = null
     quest                   udg_QuestBoss                  = null
 endglobals
@@ -282,24 +292,73 @@ function Arena_GiveSkills takes unit u, integer kind returns nothing
     endif
 endfunction
 
+function Arena_BonusAbility takes integer n returns integer
+    if n == 1 then
+        return 'ACua'
+    elseif n == 2 then
+        return 'ACae'
+    elseif n == 3 then
+        return 'ACav'
+    elseif n == 4 then
+        return 'ACac'
+    elseif n == 5 then
+        return 'ACah'
+    endif
+    return 'ACev'
+endfunction
+
 function Arena_GiveAuras takes unit u returns nothing
+    local integer pid = GetPlayerId(GetOwningPlayer(u))
+    local integer n = 1
+    local integer a
+    local boolean wanted
+    // Remember which bonuses were added, so hero's natural skills are never removed.
+    loop
+        exitwhen n > 6
+        set a = Arena_BonusAbility(n)
+        if udg_BonusAdded[pid * 8 + n] then
+            call UnitRemoveAbility(u, a)
+            set udg_BonusAdded[pid * 8 + n] = false
+        endif
+        set n = n + 1
+    endloop
     if udg_HumanCount >= 4 then
         return
     endif
-    if udg_HumanCount <= 1 then
-        call UnitAddAbility(u, 'ACua')
-        call UnitAddAbility(u, 'ACae')
-        call UnitAddAbility(u, 'ACav')
-        call UnitAddAbility(u, 'ACac')
-        call UnitAddAbility(u, 'ACah')
-        call UnitAddAbility(u, 'ACev')
-    elseif udg_HumanCount == 2 then
-        call UnitAddAbility(u, 'ACae')
-        call UnitAddAbility(u, 'ACav')
-        call UnitAddAbility(u, 'ACev')
-    else
-        call UnitAddAbility(u, 'ACae')
+    set n = 1
+    loop
+        exitwhen n > 6
+        if udg_HumanCount == 1 then
+            set wanted = true
+        elseif udg_HumanCount == 2 then
+            set wanted = n == 2 or n == 3 or n == 6
+        else
+            set wanted = n == 2
+        endif
+        set a = Arena_BonusAbility(n)
+        if wanted and GetUnitAbilityLevel(u, a) == 0 then
+            if UnitAddAbility(u, a) then
+                set udg_BonusAdded[pid * 8 + n] = true
+            endif
+        endif
+        set n = n + 1
+    endloop
+endfunction
+
+function Arena_RefreshBalance takes nothing returns nothing
+    local integer i = 0
+    set udg_HumanCount = Arena_CountHumans()
+    if udg_HumanCount < 1 then
+        set udg_HumanCount = 1
     endif
+    call Arena_ApplyHandicap()
+    loop
+        exitwhen i > 3
+        if Arena_IsHuman(i) and udg_Heroes[i] != null then
+            call Arena_GiveAuras(udg_Heroes[i])
+        endif
+        set i = i + 1
+    endloop
 endfunction
 
 function Arena_SpawnHero takes integer pid, integer kind returns nothing
@@ -340,6 +399,7 @@ function Arena_CreateEnemy takes integer unitId, real x, real y returns nothing
     if u == null then
         return
     endif
+    set udg_EnemiesAlive = udg_EnemiesAlive + 1
     call SetUnitAcquireRange(u, 4000.0)
     call IssuePointOrder(u, "attack", 0.0, 0.0)
     set u = null
@@ -347,15 +407,15 @@ endfunction
 
 function Arena_SpawnRing takes integer unitId, integer count, real dist returns nothing
     local integer i = 0
+    local integer scaled = (count * (udg_HumanCount + 2) + 3) / 4
     local real ang
-    local real x
-    local real y
+    if scaled < 2 then
+        set scaled = 2
+    endif
     loop
-        exitwhen i >= count
-        set ang = (3.14159 * 2.0) * I2R(i) / I2R(count)
-        set x = dist * Cos(ang) + GetRandomReal(-70.0, 70.0)
-        set y = dist * Sin(ang) + GetRandomReal(-70.0, 70.0)
-        call Arena_CreateEnemy(unitId, x, y)
+        exitwhen i >= scaled or udg_EnemiesAlive >= 130
+        set ang = (3.14159 * 2.0) * I2R(i) / I2R(scaled)
+        call Arena_CreateEnemy(unitId, dist * Cos(ang) + GetRandomReal(-70.0, 70.0), dist * Sin(ang) + GetRandomReal(-70.0, 70.0))
         set i = i + 1
     endloop
 endfunction
@@ -407,28 +467,30 @@ function Arena_SpawnWaveCreeps takes integer wave returns nothing
 endfunction
 
 function Arena_SpawnBoss takes nothing returns nothing
-    local integer i
+    if udg_Boss != null or udg_GameOver then
+        return
+    endif
+    set udg_BossPhase = 0
     set udg_Boss = CreateUnit(Player(PLAYER_NEUTRAL_AGGRESSIVE), 'Nplh', 0.0, 900.0, 270.0)
-    call SetHeroProperName(udg_Boss, "Каз'Рул Пожиратель Волн")
-    call SetHeroLevel(udg_Boss, 12, false)
-    set i = 0
-    loop
-        exitwhen i >= 12
-        call UnitAddItemById(udg_Boss, 'manh')
-        call UnitAddItemById(udg_Boss, 'tstr')
-        set i = i + 1
-    endloop
-    call UnitAddAbility(udg_Boss, 'ACev')
+    if udg_Boss == null then
+        call Arena_Msg("Boss creation failed: check Nplh in Object Editor.")
+        return
+    endif
+    call SetHeroProperName(udg_Boss, "Kaz'Rul, Devourer of Waves")
+    call SetHeroLevel(udg_Boss, 9 + 2 * udg_HumanCount, false)
+    call SetHeroStr(udg_Boss, 70 + 25 * udg_HumanCount, true)
+    call SetHeroAgi(udg_Boss, 20 + 7 * udg_HumanCount, true)
+    call SetHeroInt(udg_Boss, 28 + 6 * udg_HumanCount, true)
+    call SetUnitState(udg_Boss, UNIT_STATE_LIFE, GetUnitState(udg_Boss, UNIT_STATE_MAX_LIFE))
     call UnitAddAbility(udg_Boss, 'ACua')
     call UnitAddAbility(udg_Boss, 'ACah')
-    call UnitAddItemById(udg_Boss, 'modt')
     call UnitAddItemById(udg_Boss, 'ckng')
+    call UnitAddItemById(udg_Boss, 'modt')
     call SetUnitAcquireRange(udg_Boss, 5000.0)
     call IssuePointOrder(udg_Boss, "attack", 0.0, 0.0)
     call QuestSetEnabled(udg_QuestBoss, true)
     call QuestSetDiscovered(udg_QuestBoss, true)
-    call QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_DISCOVERED, "|cffff0000БОСС|r: Каз'Рул Пожиратель Волн")
-    call Arena_Msg("|cffff4444Каз'Рул выходит на арену!|r")
+    call Arena_Msg("|cffff4444Kaz'Rul has arrived! At 65% and 30% health he summons reinforcements.|r")
     call PingMinimap(0.0, 900.0, 6.00)
 endfunction
 
@@ -515,15 +577,15 @@ function Trig_Wave_Actions takes nothing returns nothing
     set udg_Wave = udg_Wave + 1
     call Arena_SpawnWaveCreeps(udg_Wave)
     call Arena_PayWaveGold(40 + udg_Wave * 15)
-    call Arena_Msg("|cffffcc00Волна " + I2S(udg_Wave) + "/10|r  (+золото)")
+    call Arena_Msg("|cffffcc00Волна " + I2S(udg_Wave) + "/10|r  +" + I2S(40 + udg_Wave * 15) + " золота. Врагов: " + I2S(udg_EnemiesAlive))
     call PingMinimap(0.0, 1200.0, 3.00)
     if udg_Wave < 10 then
         call TimerDialogSetTitle(udg_WaveTD, "Волна " + I2S(udg_Wave + 1))
-        call TimerStart(udg_WaveTimer, 60.00, false, null)
     else
-        call TimerDialogSetTitle(udg_WaveTD, "БОСС")
-        call TimerStart(udg_WaveTimer, 20.00, false, null)
+        call TimerDialogSetTitle(udg_WaveTD, "Каз'Рул")
+        call Arena_Msg("|cffff8844Последняя минута перед боссом!|r")
     endif
+    call TimerStart(udg_WaveTimer, 60.00, false, function Arena_DoNothing)
 endfunction
 
 //===========================================================================
@@ -571,18 +633,35 @@ endfunction
 
 function Trig_Death_Actions takes nothing returns nothing
     local unit u = GetDyingUnit()
+    local unit killer = GetKillingUnit()
     local integer pid
-    if IsUnitType(u, UNIT_TYPE_HERO) == false then
+    local integer reward
+    if GetOwningPlayer(u) == Player(PLAYER_NEUTRAL_AGGRESSIVE) and u != udg_Boss then
+        if udg_EnemiesAlive > 0 then
+            set udg_EnemiesAlive = udg_EnemiesAlive - 1
+        endif
+        set udg_TotalKills = udg_TotalKills + 1
+        if killer != null then
+            set pid = GetPlayerId(GetOwningPlayer(killer))
+            if pid >= 0 and pid < 4 and Arena_IsHuman(pid) then
+                set reward = 4 + 2 * udg_Wave
+                set udg_PlayerKills[pid] = udg_PlayerKills[pid] + 1
+                call SetPlayerState(Player(pid), PLAYER_STATE_RESOURCE_GOLD, GetPlayerState(Player(pid), PLAYER_STATE_RESOURCE_GOLD) + reward)
+            endif
+        endif
         set u = null
+        set killer = null
         return
     endif
-    if GetOwningPlayer(u) == Player(PLAYER_NEUTRAL_AGGRESSIVE) then
+    if IsUnitType(u, UNIT_TYPE_HERO) == false or GetOwningPlayer(u) == Player(PLAYER_NEUTRAL_AGGRESSIVE) then
         set u = null
+        set killer = null
         return
     endif
     set pid = GetPlayerId(GetOwningPlayer(u))
-    if pid < 0 or pid > 3 then
+    if pid < 0 or pid > 3 or not Arena_IsHuman(pid) or u != udg_Heroes[pid] then
         set u = null
+        set killer = null
         return
     endif
     call DisplayTimedTextToPlayer(Player(pid), 0, 0, 8.00, "Смерть. Воскрешение через 12 сек.")
@@ -596,6 +675,7 @@ function Trig_Death_Actions takes nothing returns nothing
         call TimerStart(udg_ReviveTimer[3], 12.00, false, function Trig_Revive3)
     endif
     set u = null
+    set killer = null
 endfunction
 
 function Trig_Boss_Actions takes nothing returns nothing
@@ -624,6 +704,58 @@ function Trig_Boss_Actions takes nothing returns nothing
 endfunction
 
 //===========================================================================
+function Arena_BossNova takes real damage returns nothing
+    local integer i = 0
+    local unit hero
+    local effect fx = AddSpecialEffect("Abilities\\Spells\\Human\\ThunderClap\\ThunderClapCaster.mdl", GetUnitX(udg_Boss), GetUnitY(udg_Boss))
+    call DestroyEffect(fx)
+    loop
+        exitwhen i >= 4
+        set hero = udg_Heroes[i]
+        if hero != null and GetWidgetLife(hero) > 0.405 and IsUnitInRange(hero, udg_Boss, 600.0) then
+            call UnitDamageTarget(udg_Boss, hero, damage, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
+        endif
+        set i = i + 1
+    endloop
+    set hero = null
+    set fx = null
+endfunction
+
+function Trig_BossThink_Actions takes nothing returns nothing
+    local real health
+    if udg_GameOver or udg_Boss == null or GetWidgetLife(udg_Boss) <= 0.405 then
+        return
+    endif
+    set health = GetUnitLifePercent(udg_Boss)
+    if udg_BossPhase == 0 and health <= 65.0 then
+        set udg_BossPhase = 1
+        call Arena_Msg("|cffff8844Kaz'Rul summons his Bone Legion!|r")
+        call Arena_SpawnRing('uske', 4 + 2 * udg_HumanCount, 780.0)
+        call Arena_BossNova(75.0 + 20.0 * udg_HumanCount)
+    elseif udg_BossPhase == 1 and health <= 30.0 then
+        set udg_BossPhase = 2
+        call Arena_Msg("|cffff4444Kaz'Rul is enraged!|r")
+        call Arena_SpawnRing('ninf', 2 + udg_HumanCount, 850.0)
+        call UnitAddAbility(udg_Boss, 'ACro')
+        call IssueImmediateOrder(udg_Boss, "roar")
+        call Arena_BossNova(115.0 + 25.0 * udg_HumanCount)
+    endif
+endfunction
+
+function Trig_Leave_Actions takes nothing returns nothing
+    local integer pid = GetPlayerId(GetTriggerPlayer())
+    if pid < 0 or pid > 3 then
+        return
+    endif
+    if udg_Heroes[pid] != null then
+        call RemoveUnit(udg_Heroes[pid])
+        set udg_Heroes[pid] = null
+    endif
+    call Arena_RefreshBalance()
+    call Arena_Msg("Игрок вышел. Игроков на арене: " + I2S(udg_HumanCount))
+    call Arena_TryStartWaves()
+endfunction
+
 function Trig_Aura_Actions takes nothing returns nothing
     local integer i = 0
     local unit u
@@ -751,6 +883,19 @@ function Trig_Arena_Actions takes nothing returns nothing
     set gg_trg_Boss = CreateTrigger()
     call TriggerRegisterPlayerUnitEvent(gg_trg_Boss, Player(PLAYER_NEUTRAL_AGGRESSIVE), EVENT_PLAYER_UNIT_DEATH, null)
     call TriggerAddAction(gg_trg_Boss, function Trig_Boss_Actions)
+
+    set gg_trg_Leave = CreateTrigger()
+    set i = 0
+    loop
+        exitwhen i > 3
+        call TriggerRegisterPlayerEvent(gg_trg_Leave, Player(i), EVENT_PLAYER_LEAVE)
+        set i = i + 1
+    endloop
+    call TriggerAddAction(gg_trg_Leave, function Trig_Leave_Actions)
+
+    set gg_trg_BossThink = CreateTrigger()
+    call TriggerRegisterTimerEvent(gg_trg_BossThink, 1.00, true)
+    call TriggerAddAction(gg_trg_BossThink, function Trig_BossThink_Actions)
 
     set gg_trg_Aura = CreateTrigger()
     call TriggerRegisterTimerEvent(gg_trg_Aura, 1.00, true)
