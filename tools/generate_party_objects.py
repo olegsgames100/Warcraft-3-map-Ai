@@ -37,7 +37,7 @@ def parse(path: Path, levelled: bool):
                 rank=number() if levelled else None
                 data=number() if levelled else None
                 if typ==3:
-                    end=buf.find(b"\\0",at)
+                    end=buf.find(bytes((0,)),at)
                     if end<0: raise ValueError("Bad unterminated string")
                     val=buf[at:end].decode("utf-8")
                     at=end+1
@@ -67,7 +67,7 @@ def encode(path,version,groups,levelled):
                 if levelled:
                     u(mod["rank"])
                     u(mod["data"])
-                if mod["type"]==3: out.extend(mod["val"].encode("utf-8")+b"\\0")
+                if mod["type"]==3: out.extend(mod["val"].encode("utf-8")+bytes((0,)))
                 elif mod["type"]==0: out.extend(struct.pack("<i",int(mod["val"])))
                 else: out.extend(struct.pack("<f",float(mod["val"])))
                 out.extend(mod["original"].encode("ascii"))
