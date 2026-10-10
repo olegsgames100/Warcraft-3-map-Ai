@@ -56,6 +56,12 @@ globals
     trigger                 gg_trg_Signature = null
     trigger                 gg_trg_Craft = null
 
+    unit            array   udg_AuraCarrier
+    texttag         array   udg_HeroSubtitle
+    trigger                 gg_trg_HeroSpell = null
+    trigger                 gg_trg_ItemPickup = null
+    trigger                 gg_trg_ItemDrop = null
+    trigger                 gg_trg_ItemUse = null
     quest                   udg_QuestMain                  = null
     quest                   udg_QuestBoss                  = null
 endglobals
@@ -163,201 +169,154 @@ function Arena_Stock takes unit shop, integer itemId, integer stock returns noth
 endfunction
 
 function Arena_CreateShops takes nothing returns nothing
-    set udg_ShopWeapon = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'ngme', -640.0, -256.0, 270.0)
-    set udg_ShopArmor  = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'ngme', 640.0, -256.0, 270.0)
-    set udg_ShopMagic  = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'ngme', -640.0, 256.0, 270.0)
-    set udg_ShopRelic  = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'ngme', 640.0, 256.0, 270.0)
-
+    set udg_ShopWeapon = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'nS01', -640.0, -256.0, 270.0)
+    set udg_ShopArmor = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'nS02', 640.0, -256.0, 270.0)
+    set udg_ShopMagic = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'nS03', -640.0, 256.0, 270.0)
+    set udg_ShopRelic = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'nS04', 640.0, 256.0, 270.0)
     call SetUnitInvulnerable(udg_ShopWeapon, true)
     call SetUnitInvulnerable(udg_ShopArmor, true)
     call SetUnitInvulnerable(udg_ShopMagic, true)
     call SetUnitInvulnerable(udg_ShopRelic, true)
-    call SetUnitMoveSpeed(udg_ShopWeapon, 0.00)
-    call SetUnitMoveSpeed(udg_ShopArmor, 0.00)
-    call SetUnitMoveSpeed(udg_ShopMagic, 0.00)
-    call SetUnitMoveSpeed(udg_ShopRelic, 0.00)
     call RemoveGuardPosition(udg_ShopWeapon)
     call RemoveGuardPosition(udg_ShopArmor)
     call RemoveGuardPosition(udg_ShopMagic)
     call RemoveGuardPosition(udg_ShopRelic)
-
-    // Weapon stall
-    call Arena_Stock(udg_ShopWeapon, 'ratc', 8)
+    call Arena_Stock(udg_ShopWeapon, 'I001', 6)
+    call Arena_Stock(udg_ShopWeapon, 'I002', 6)
+    call Arena_Stock(udg_ShopWeapon, 'I003', 6)
     call Arena_Stock(udg_ShopWeapon, 'ratf', 6)
-    call Arena_Stock(udg_ShopWeapon, 'gcel', 6)
-    call Arena_Stock(udg_ShopWeapon, 'rst1', 6)
-    call Arena_Stock(udg_ShopWeapon, 'rag1', 4)
-    call Arena_Stock(udg_ShopWeapon, 'ofro', 3)
-    call Arena_Stock(udg_ShopWeapon, 'ocor', 3)
-    call Arena_Stock(udg_ShopWeapon, 'ofir', 3)
-    call Arena_Stock(udg_ShopWeapon, 'oli2', 3)
-
-    // Armor / lab
-    call Arena_Stock(udg_ShopArmor, 'rde2', 8)
-    call Arena_Stock(udg_ShopArmor, 'rde3', 6)
-    call Arena_Stock(udg_ShopArmor, 'rde4', 4)
-    call Arena_Stock(udg_ShopArmor, 'bspd', 6)
-    call Arena_Stock(udg_ShopArmor, 'belv', 4)
-    call Arena_Stock(udg_ShopArmor, 'clfm', 3)
-    call Arena_Stock(udg_ShopArmor, 'hval', 3)
-    call Arena_Stock(udg_ShopArmor, 'hcun', 3)
-    call Arena_Stock(udg_ShopArmor, 'brac', 4)
-    call Arena_Stock(udg_ShopArmor, 'evtl', 3)
-    call Arena_Stock(udg_ShopArmor, 'ciri', 8)
-    call Arena_Stock(udg_ShopArmor, 'tkno', 8)
-    call Arena_Stock(udg_ShopArmor, 'tstr', 10)
-    call Arena_Stock(udg_ShopArmor, 'tagi', 10)
-    call Arena_Stock(udg_ShopArmor, 'tint', 10)
-    call Arena_Stock(udg_ShopArmor, 'manh', 8)
-
-    // Magic
+    call Arena_Stock(udg_ShopArmor, 'I004', 6)
+    call Arena_Stock(udg_ShopArmor, 'I005', 6)
+    call Arena_Stock(udg_ShopArmor, 'I006', 6)
+    call Arena_Stock(udg_ShopArmor, 'rde2', 6)
+    call Arena_Stock(udg_ShopMagic, 'I007', 18)
+    call Arena_Stock(udg_ShopMagic, 'I008', 18)
+    call Arena_Stock(udg_ShopMagic, 'I009', 8)
     call Arena_Stock(udg_ShopMagic, 'phea', 20)
     call Arena_Stock(udg_ShopMagic, 'pman', 20)
-    call Arena_Stock(udg_ShopMagic, 'pghe', 12)
-    call Arena_Stock(udg_ShopMagic, 'pgma', 12)
-    call Arena_Stock(udg_ShopMagic, 'pnvu', 6)
-    call Arena_Stock(udg_ShopMagic, 'pnvl', 6)
-    call Arena_Stock(udg_ShopMagic, 'shrs', 10)
-    call Arena_Stock(udg_ShopMagic, 'sres', 4)
-    call Arena_Stock(udg_ShopMagic, 'ssan', 4)
-    call Arena_Stock(udg_ShopMagic, 'kpin', 3)
-    call Arena_Stock(udg_ShopMagic, 'penr', 4)
-    call Arena_Stock(udg_ShopMagic, 'pmys', 4)
-
-    // Relics
-    call Arena_Stock(udg_ShopRelic, 'ckng', 2)
-    call Arena_Stock(udg_ShopRelic, 'modt', 2)
-    call Arena_Stock(udg_ShopRelic, 'desc', 3)
-    call Arena_Stock(udg_ShopRelic, 'ajen', 2)
-    call Arena_Stock(udg_ShopRelic, 'mcou', 3)
-    call Arena_Stock(udg_ShopRelic, 'odef', 3)
-    call Arena_Stock(udg_ShopRelic, 'rwiz', 4)
-    call Arena_Stock(udg_ShopRelic, 'hlst', 3)
-    call Arena_Stock(udg_ShopRelic, 'afac', 3)
-    call Arena_Stock(udg_ShopRelic, 'fgsk', 4)
+    call Arena_Stock(udg_ShopRelic, 'I00A', 3)
+    call Arena_Stock(udg_ShopRelic, 'I00B', 3)
+    call Arena_Stock(udg_ShopRelic, 'I00C', 3)
 endfunction
 
 //===========================================================================
 function Arena_HeroType takes integer kind returns integer
     if kind == 1 then
-        return 'Hpal'
+        return 'H001'
     elseif kind == 2 then
-        return 'Obla'
+        return 'O001'
     elseif kind == 3 then
-        return 'Hamg'
+        return 'H002'
     elseif kind == 4 then
-        return 'Udea'
+        return 'U001'
     elseif kind == 5 then
-        return 'Edem'
+        return 'E001'
     endif
-    return 'Emoo'
+    return 'E002'
 endfunction
 
 function Arena_HeroTitle takes integer kind returns string
     if kind == 1 then
-        return "Арбитр Арены"
+        return "Рейнар Светокованный"
     elseif kind == 2 then
-        return "Клинок Пыли"
+        return "Зархан Быстрокрылый"
     elseif kind == 3 then
-        return "Хранитель Бури"
+        return "Мирелла Искророждённая"
     elseif kind == 4 then
-        return "Повелитель Праха"
+        return "Морвен Праховестник"
     elseif kind == 5 then
-        return "Охотник Бездны"
+        return "Вальтир Безликий"
     endif
-    return "Лунная Стражница"
+    return "Селена Звездочёт"
+endfunction
+
+function Arena_HeroEpithet takes integer kind returns string
+    if kind == 1 then
+        return "Хранитель последнего рассвета"
+    elseif kind == 2 then
+        return "Танцующий среди песков"
+    elseif kind == 3 then
+        return "Шепчущая бурям"
+    elseif kind == 4 then
+        return "Наследник забытого трона"
+    elseif kind == 5 then
+        return "Блуждающий между мирами"
+    endif
+    return "Последняя дочь ночи"
 endfunction
 
 function Arena_GiveSkills takes unit u, integer kind returns nothing
-    if kind == 1 then
-        call UnitAddAbility(u, 'ACtb')
-        call UnitAddAbility(u, 'ACae')
-        call UnitAddAbility(u, 'ACav')
-    elseif kind == 2 then
-        call UnitAddAbility(u, 'ACba')
-        call UnitAddAbility(u, 'ACev')
-        call UnitAddAbility(u, 'ACac')
+    local integer a = 'A101'
+    local integer b = 'A102'
+    if kind == 2 then
+        set a = 'A103'
+        set b = 'A104'
     elseif kind == 3 then
-        call UnitAddAbility(u, 'ACfb')
-        call UnitAddAbility(u, 'Alsh')
-        call UnitAddAbility(u, 'ACfl')
+        set a = 'A105'
+        set b = 'A106'
     elseif kind == 4 then
-        call UnitAddAbility(u, 'AUav')
-        call UnitAddAbility(u, 'ACrd')
-        call UnitAddAbility(u, 'ACua')
+        set a = 'A107'
+        set b = 'A108'
     elseif kind == 5 then
-        call UnitAddAbility(u, 'ACim')
-        call UnitAddAbility(u, 'ACah')
-        call UnitAddAbility(u, 'ACev')
-    else
-        call UnitAddAbility(u, 'ACev')
-        call UnitAddAbility(u, 'AInf')
-        call UnitAddAbility(u, 'AEar')
+        set a = 'A109'
+        set b = 'A10A'
+    elseif kind == 6 then
+        set a = 'A10B'
+        set b = 'A10C'
     endif
+    call UnitAddAbility(u, a)
+    call UnitAddAbility(u, b)
+    call SetUnitAbilityLevel(u, a, 1)
+    call SetUnitAbilityLevel(u, b, 1)
 endfunction
 
-function Arena_BonusAbility takes integer n returns integer
-    if n == 1 then
-        return 'ACua'
-    elseif n == 2 then
-        return 'ACae'
-    elseif n == 3 then
-        return 'ACav'
-    elseif n == 4 then
-        return 'ACac'
-    elseif n == 5 then
-        return 'ACah'
-    endif
-    return 'ACev'
-endfunction
-
-function Arena_GiveAuras takes unit u returns nothing
-    local integer pid = GetPlayerId(GetOwningPlayer(u))
-    local integer n = 1
-    local integer a
-    local boolean wanted
-    // Remember which bonuses were added, so hero's natural skills are never removed.
+function Arena_ClearAuras takes nothing returns nothing
+    local integer i = 0
     loop
-        exitwhen n > 6
-        set a = Arena_BonusAbility(n)
-        if udg_BonusAdded[pid * 8 + n] then
-            call UnitRemoveAbility(u, a)
-            set udg_BonusAdded[pid * 8 + n] = false
+        exitwhen i >= 4
+        if udg_AuraCarrier[i] != null then
+            call RemoveUnit(udg_AuraCarrier[i])
+            set udg_AuraCarrier[i] = null
         endif
-        set n = n + 1
+        set i = i + 1
     endloop
-    if udg_HumanCount >= 4 then
+endfunction
+
+function Arena_GiveAuras takes unit hero returns nothing
+    local integer pid = GetPlayerId(GetOwningPlayer(hero))
+    local unit carrier
+    if pid < 0 or pid > 3 or udg_HumanCount >= 4 then
         return
     endif
-    set n = 1
-    loop
-        exitwhen n > 6
+    set carrier = CreateUnit(Player(pid), 'hA01', 0.0, 0.0, 0.0)
+    set udg_AuraCarrier[pid] = carrier
+    if carrier != null then
+        call UnitAddAbility(carrier, 'Aloc')
+        call SetUnitInvulnerable(carrier, true)
+        call SetUnitPathing(carrier, false)
+        call UnitAddAbility(carrier, 'A201')
+        if udg_HumanCount <= 2 then
+            call UnitAddAbility(carrier, 'A202')
+        endif
         if udg_HumanCount == 1 then
-            set wanted = true
-        elseif udg_HumanCount == 2 then
-            set wanted = n == 2 or n == 3 or n == 6
-        else
-            set wanted = n == 2
+            call UnitAddAbility(carrier, 'A203')
+            call UnitAddAbility(carrier, 'A204')
         endif
-        set a = Arena_BonusAbility(n)
-        if wanted and GetUnitAbilityLevel(u, a) == 0 then
-            if UnitAddAbility(u, a) then
-                set udg_BonusAdded[pid * 8 + n] = true
-            endif
-        endif
-        set n = n + 1
-    endloop
+        call ShowUnit(carrier, false)
+    endif
+    set carrier = null
 endfunction
 
 function Arena_RefreshBalance takes nothing returns nothing
     local integer i = 0
+    call Arena_ClearAuras()
     set udg_HumanCount = Arena_CountHumans()
     if udg_HumanCount < 1 then
         set udg_HumanCount = 1
     endif
     call Arena_ApplyHandicap()
     loop
-        exitwhen i > 3
+        exitwhen i >= 4
         if Arena_IsHuman(i) and udg_Heroes[i] != null then
             call Arena_GiveAuras(udg_Heroes[i])
         endif
@@ -366,40 +325,171 @@ function Arena_RefreshBalance takes nothing returns nothing
 endfunction
 
 function Arena_SpawnHero takes integer pid, integer kind returns nothing
-    local real x
-    local real y
-    local unit u
-    if pid == 0 then
-        set x = -144.0
-        set y = -144.0
-    elseif pid == 1 then
+    local real x = -144.0
+    local real y = -144.0
+    local unit hero
+    local texttag tag
+    if pid == 1 then
         set x = 144.0
-        set y = -144.0
     elseif pid == 2 then
-        set x = -144.0
         set y = 144.0
-    else
+    elseif pid == 3 then
         set x = 144.0
         set y = 144.0
     endif
-    set u = CreateUnit(Player(pid), Arena_HeroType(kind), x, y, 270.0)
-    // Warcraft III 1.26a has no native for changing a hero's proper name.
-    // Display the arena identity in the UI instead (base unit name remains unchanged).
-    call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 12.0, "|cffffcc00" + Arena_HeroTitle(kind) + "|r - ваш герой")
-    call SetHeroLevel(u, 1, false)
-    call Arena_GiveSkills(u, kind)
-    call Arena_GiveAuras(u)
-    call UnitAddItemById(u, 'ciri')
-    call UnitAddItemById(u, 'phea')
-    call UnitAddItemById(u, 'pman')
-    call SelectUnitForPlayerSingle(u, Player(pid))
+    set hero = CreateUnit(Player(pid), Arena_HeroType(kind), x, y, 270.0)
+    if hero == null then
+        call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 12.0, "Нужно импортировать war3map.w3u.")
+        return
+    endif
+    call SetHeroLevel(hero, 1, false)
+    call Arena_GiveSkills(hero, kind)
+    call UnitAddItemById(hero, 'I007')
+    call UnitAddItemById(hero, 'I008')
+    call UnitAddItemById(hero, 'ciri')
+    set tag = CreateTextTag()
+    call SetTextTagText(tag, Arena_HeroEpithet(kind), 0.019)
+    call SetTextTagPosUnit(tag, hero, -70.0)
+    call SetTextTagColor(tag, 255, 218, 145, 255)
+    call SetTextTagPermanent(tag, true)
+    call SetTextTagVisibility(tag, true)
+    set udg_HeroSubtitle[pid] = tag
+    call SelectUnitForPlayerSingle(hero, Player(pid))
     call PanCameraToTimedForPlayer(Player(pid), x, y, 0.00)
-    set udg_Heroes[pid] = u
+    set udg_Heroes[pid] = hero
     set udg_HeroKind[pid] = kind
-    set u = null
+    call Arena_GiveAuras(hero)
+    set tag = null
+    set hero = null
 endfunction
 
 //===========================================================================
+
+function Arena_ItemStat takes integer id returns integer
+    if id == 'I001' or id == 'I00C' then
+        return 1
+    elseif id == 'I002' or id == 'I006' or id == 'I00B' then
+        return 2
+    elseif id == 'I003' or id == 'I004' or id == 'I005' or id == 'I00A' then
+        return 3
+    endif
+    return 0
+endfunction
+
+function Arena_ItemBonus takes integer id returns integer
+    if id == 'I001' or id == 'I005' then
+        return 5
+    elseif id == 'I002' then
+        return 4
+    elseif id == 'I003' then
+        return 3
+    elseif id == 'I004' then
+        return 8
+    elseif id == 'I006' then
+        return 6
+    elseif id == 'I00A' or id == 'I00B' then
+        return 9
+    elseif id == 'I00C' then
+        return 7
+    endif
+    return 0
+endfunction
+
+function Arena_UpdateItemStats takes unit hero, integer id, integer sign returns nothing
+    local integer bonus = Arena_ItemBonus(id) * sign
+    if not IsUnitType(hero, UNIT_TYPE_HERO) or bonus == 0 then
+        return
+    endif
+    if Arena_ItemStat(id) == 1 then
+        call SetHeroAgi(hero, GetHeroAgi(hero, false) + bonus, true)
+    elseif Arena_ItemStat(id) == 2 then
+        call SetHeroInt(hero, GetHeroInt(hero, false) + bonus, true)
+    elseif Arena_ItemStat(id) == 3 then
+        call SetHeroStr(hero, GetHeroStr(hero, false) + bonus, true)
+    endif
+endfunction
+
+function Trig_ItemPickup_Actions takes nothing returns nothing
+    call Arena_UpdateItemStats(GetTriggerUnit(), GetItemTypeId(GetManipulatedItem()), 1)
+endfunction
+
+function Trig_ItemDrop_Actions takes nothing returns nothing
+    call Arena_UpdateItemStats(GetTriggerUnit(), GetItemTypeId(GetManipulatedItem()), -1)
+endfunction
+
+function Arena_ItemPulses takes unit caster, real hp, real mp returns nothing
+    local integer i = 0
+    local unit hero
+    loop
+        exitwhen i >= 4
+        set hero = udg_Heroes[i]
+        if hero != null and GetWidgetLife(hero) > 0.405 and IsUnitAlly(hero, GetOwningPlayer(caster)) and IsUnitInRange(hero, caster, 650.0) then
+            call SetUnitState(hero, UNIT_STATE_LIFE, GetUnitState(hero, UNIT_STATE_LIFE) + hp)
+            call SetUnitState(hero, UNIT_STATE_MANA, GetUnitState(hero, UNIT_STATE_MANA) + mp)
+        endif
+        set i = i + 1
+    endloop
+    set hero = null
+endfunction
+
+function Trig_ItemUse_Actions takes nothing returns nothing
+    local unit caster = GetTriggerUnit()
+    local integer id = GetItemTypeId(GetManipulatedItem())
+    if id == 'I007' then
+        call Arena_ItemPulses(caster, 65.0, 0.0)
+    elseif id == 'I008' then
+        call Arena_ItemPulses(caster, 0.0, 45.0)
+    elseif id == 'I009' then
+        call Arena_ItemPulses(caster, 40.0, 0.0)
+    endif
+    set caster = null
+endfunction
+
+function Arena_DropLoot takes unit dying returns nothing
+    local integer danger = udg_Wave
+    local integer roll = GetRandomInt(1, 1000)
+    local integer chance = 9 + danger * 3
+    local integer itemId
+    if IsUnitType(dying, UNIT_TYPE_HERO) then
+        set chance = chance + 20
+    endif
+    if GetUnitLevel(dying) >= 6 then
+        set chance = chance + 15
+    endif
+    // 1.2%-7.4% rare drops, depending on enemy wave and elite rank.
+    if roll > chance then
+        return
+    endif
+    if danger <= 3 then
+        if GetRandomInt(0, 1) == 0 then
+            set itemId = 'I007'
+        else
+            set itemId = 'I008'
+        endif
+    elseif danger <= 6 then
+        if GetRandomInt(0, 1) == 0 then
+            set itemId = 'I003'
+        else
+            set itemId = 'I006'
+        endif
+    elseif danger <= 8 then
+        if GetRandomInt(0, 1) == 0 then
+            set itemId = 'I004'
+        else
+            set itemId = 'I002'
+        endif
+    else
+        if GetRandomInt(0, 2) == 0 then
+            set itemId = 'I00A'
+        elseif GetRandomInt(0, 1) == 0 then
+            set itemId = 'I00B'
+        else
+            set itemId = 'I00C'
+        endif
+    endif
+    call CreateItem(itemId, GetUnitX(dying), GetUnitY(dying))
+endfunction
+
 function Arena_CreateEnemy takes integer unitId, real x, real y returns nothing
     local unit u = CreateUnit(Player(PLAYER_NEUTRAL_AGGRESSIVE), unitId, x, y, 270.0)
     if u == null then
@@ -413,13 +503,13 @@ endfunction
 
 function Arena_SpawnRing takes integer unitId, integer count, real dist returns nothing
     local integer i = 0
-    local integer scaled = (count * (udg_HumanCount + 2) + 3) / 4
+    local integer scaled = (count * (udg_HumanCount + 2) + 5) / 8
     local real ang
     if scaled < 2 then
         set scaled = 2
     endif
     loop
-        exitwhen i >= scaled or udg_EnemiesAlive >= 130
+        exitwhen i >= scaled or udg_EnemiesAlive >= 65
         set ang = (3.14159 * 2.0) * I2R(i) / I2R(scaled)
         call Arena_CreateEnemy(unitId, dist * Cos(ang) + GetRandomReal(-70.0, 70.0), dist * Sin(ang) + GetRandomReal(-70.0, 70.0))
         set i = i + 1
@@ -731,7 +821,7 @@ function Trig_Wave_Actions takes nothing returns nothing
         call TimerDialogSetTitle(udg_WaveTD, "Каз'Рул")
         call Arena_Msg("|cffff8844Последняя минута перед боссом!|r")
     endif
-    call TimerStart(udg_WaveTimer, 60.00, false, function Arena_DoNothing)
+    call TimerStart(udg_WaveTimer, 75.00, false, function Arena_DoNothing)
 endfunction
 
 //===========================================================================
@@ -787,6 +877,7 @@ function Trig_Death_Actions takes nothing returns nothing
             set udg_EnemiesAlive = udg_EnemiesAlive - 1
         endif
         set udg_TotalKills = udg_TotalKills + 1
+        call Arena_DropLoot(u)
         if killer != null then
             set pid = GetPlayerId(GetOwningPlayer(killer))
             if pid >= 0 and pid < 4 and Arena_IsHuman(pid) then
@@ -1109,6 +1200,16 @@ function Trig_Arena_Actions takes nothing returns nothing
     set gg_trg_BossThink = CreateTrigger()
     call TriggerRegisterTimerEvent(gg_trg_BossThink, 1.00, true)
     call TriggerAddAction(gg_trg_BossThink, function Trig_BossThink_Actions)
+
+    set gg_trg_ItemPickup = CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(gg_trg_ItemPickup, EVENT_PLAYER_UNIT_PICKUP_ITEM)
+    call TriggerAddAction(gg_trg_ItemPickup, function Trig_ItemPickup_Actions)
+    set gg_trg_ItemDrop = CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(gg_trg_ItemDrop, EVENT_PLAYER_UNIT_DROP_ITEM)
+    call TriggerAddAction(gg_trg_ItemDrop, function Trig_ItemDrop_Actions)
+    set gg_trg_ItemUse = CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(gg_trg_ItemUse, EVENT_PLAYER_UNIT_USE_ITEM)
+    call TriggerAddAction(gg_trg_ItemUse, function Trig_ItemUse_Actions)
 
     set gg_trg_Aura = CreateTrigger()
     call TriggerRegisterTimerEvent(gg_trg_Aura, 1.00, true)
