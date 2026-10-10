@@ -57,8 +57,7 @@ jobs:
           for hero in roster:
               unit=units[hero["id"]]
               fields={m["field"]:m for m in unit["mods"]}
-              assert fields["ua1c"]["type"]==1
-              assert 2.35<=fields["ua1c"]["val"]<=3.35
+              assert "ua1c" not in fields, "Native attack interval must be inherited"
               assert fields["uaen"]["val"]==1
               if hero["kind"]>=11:
                   assert fields["ua1w"]["type"]==3
@@ -73,9 +72,11 @@ jobs:
                   obj=abilities[spell["id"]]
                   for level in range(1,6):
                       costs=[m for m in obj["mods"] if m["field"]=="amcs" and m["rank"]==level]
-                      assert costs and all(m["type"]==0 and m["val"]==spell["mana"] for m in costs),(spell["id"],level,costs)
+                      assert costs and all(m["type"]==0 and m["val"]==spell["mana"]+(level-1)*spell["manaGrowth"] for m in costs),(spell["id"],level,costs)
                       assert any(m["field"]=="aart" and m["rank"]==level and m["val"]==spell["icon"] for m in obj["mods"])
-                  assert spell["mana"]<1000
+                  assert spell["mana"]+4*spell["manaGrowth"]<1000
+                  range_mod=[m for m in obj["mods"] if m["field"]=="aran" and m["rank"]==level]
+                  assert range_mod and abs(range_mod[0]["val"]-spell["range"])<0.02
           target_ids={"instant":0,"unit":1,"point":2}
           for hero in roster:
               for index,spell in enumerate(hero["skills"]):
