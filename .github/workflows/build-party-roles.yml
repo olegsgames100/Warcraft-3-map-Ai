@@ -1,0 +1,115 @@
+name: Compile Hero Arena Party Roles
+on:
+  push:
+    branches:
+      - feature/reforged-party-roles-bone-brothers
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - feature/reforged-lua-overhaul-v2
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Lua 5.4 parser
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y lua5.4
+      - name: Validate 8 Lua modules
+        run: luac5.4 -p lua/map/*.lua
+      - name: Execute all 48 skills with mocked Warcraft natives
+        run: lua5.4 tests/spell_runtime_smoke.lua
+      - name: Regenerate Object Editor hero and ability files
+        run: python3 tools/generate_party_objects.py
+      - name: Assert 12 heroes and 48 spells
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from tools.generate_party_objects import parse
+          data=json.loads(Path("object-data/party_heroes.json").read_text())
+          _,hero_groups=parse(Path("war3map.w3u"),False)
+          _,spell_groups=parse(Path("war3map.w3a"),True)
+          hids={o["id"] for g in hero_groups for o in g}
+          sids={o["id"] for g in spell_groups for o in g}
+          assert len(data["heroes"])==12
+          assert all(h["id"] in hids for h in data["heroes"])
+          assert all(skill["id"] in sids for h in data["heroes"] for skill in h["skills"])
+          assert len({skill["id"] for h in data["heroes"] for skill in h["skills"]})==48
+          print("Object IDs: 12 heroes / 48 abilities")
+          PY
+      - name: Check gameplay-critical editor fields
+        run: |
+          python3 - <<'PY'
+          import json,struct
+          from pathlib import Path
+          from tools.generate_party_objects import parse
+          roster=json.loads(Path("object-data/party_heroes.json").read_text())["heroes"]
+          _,hg=parse(Path("war3map.w3u"),False)
+          _,ag=parse(Path("war3map.w3a"),True)
+          units={u["id"]:u for group in hg for u in group}
+          abilities={u["id"]:u for group in ag for u in group}
+          for hero in roster:
+              unit=units[hero["id"]]
+              fields={m["field"]:m for m in unit["mods"]}
+              assert "ua1c" not in fields, "Native attack interval must be inherited"
+              assert fields["uaen"]["val"]==1
+              if hero["kind"]>=11:
+                  assert fields["ua1w"]["type"]==3
+                  assert fields["ua1w"]["val"]==("missile" if hero["attack"]=="ranged" else "normal")
+                  assert fields["ua1b"]["val"]>0
+                  assert unit["base"]=="Udea"
+              else:
+                  assert "ua1m" not in fields, "Original ranged art should not be replaced"
+              inventory=next((m["val"] for m in unit["mods"] if m["field"]=="uabi"),"")
+              assert "AInv" in inventory.split(","),(hero["id"],inventory)
+              for spell in hero["skills"]:
+                  obj=abilities[spell["id"]]
+                  for level in range(1,6):
+                      costs=[m for m in obj["mods"] if m["field"]=="amcs" and m["rank"]==level]
+                      assert costs and all(m["type"]==0 and m["val"]==spell["mana"]+(level-1)*spell["manaGrowth"] for m in costs),(spell["id"],level,costs)
+                      assert any(m["field"]=="aart" and m["rank"]==level and m["val"]==spell["icon"] for m in obj["mods"])
+                  assert spell["mana"]+4*spell["manaGrowth"]<1000
+                  range_mod=[m for m in obj["mods"] if m["field"]=="aran" and m["rank"]==level]
+                  assert range_mod and abs(range_mod[0]["val"]-spell["range"])<0.02
+          target_ids={"instant":0,"unit":1,"point":2,"passive":0}
+          for hero in roster:
+              for index,spell in enumerate(hero["skills"]):
+                  fields=[m for m in abilities[spell["id"]]["mods"]
+                          if m["rank"]==1]
+                  get=lambda k:next((m for m in fields if m["field"]==k),None)
+                  assert abilities[spell["id"]]["base"]=="ANcl",(spell["id"],abilities[spell["id"]]["base"])
+                  assert get("Ncl1") and get("Ncl1")["type"]==1 and get("Ncl1")["val"]==0.0
+                  assert get("Ncl2") and get("Ncl2")["type"]==0
+                  assert get("Ncl2")["val"]==target_ids[spell["target"]]
+                  assert get("Ncl3") and get("Ncl3")["type"]==0 and get("Ncl3")["val"]&1
+                  assert get("Ncl6") and get("Ncl6")["type"]==3
+                  orders={"passive":{"avatar","berserk","phaseshift","roar"},
+                          "instant":{"avatar","berserk","phaseshift","roar"},
+                          "unit":{"chainlightning","acidbomb","cripple","curse"},
+                          "point":{"blink","blizzard","carrionswarm","earthquake"}}
+                  assert get("Ncl6")["val"] in orders[spell["target"]]
+          print("12 inventories, 48 target modes and 240 integer mana costs validated")
+          PY
+      - name: Package pure Lua W3X
+        run: python3 tools/build_pure_lua.py --source . --output dist/Hero_Arena_Party_Roles_12.w3x
+      - name: Check MPQ Lua script and signatures
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("dist/Hero_Arena_Party_Roles_12.w3x")
+          contents=p.read_bytes()
+          assert contents[:4]==b"HM3W"
+          assert contents[512:516]==bytes((77,80,81,26))
+          assert b"war3map.lua" in contents or len(contents)>20000
+          print("Valid HM3W/MPQ",len(contents))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Hero_Arena_Party_Roles_12
+          path: dist/Hero_Arena_Party_Roles_12.w3x

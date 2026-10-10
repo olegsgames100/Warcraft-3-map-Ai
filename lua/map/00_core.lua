@@ -257,11 +257,7 @@ function A.reduceDamage()
         TriggerRegisterPlayerUnitEvent(t, Player(pid), EVENT_PLAYER_UNIT_DAMAGING, nil)
     end
     TriggerAddAction(t, function()
-        local unit = GetTriggerUnit()
-        local till = A.guards[GetHandleId(unit)]
-        if till ~= nil and till > A.clock then
-            BlzSetEventDamage(GetEventDamage() * 0.35)
-        end
+        BlzSetEventDamage(A.modifyLastOath(GetTriggerUnit(),A.modifyIncoming(GetTriggerUnit(),GetEventDamage())))
     end)
 end
 
@@ -269,6 +265,7 @@ function A.gameTick()
     A.clock = A.clock + A.tickRate
     if A.phase == "selection" then A.pollSelections() end
     if A.tickItems then A.tickItems() end
+    if A.tickCombat then A.tickCombat() end
     A.checkBalance()
     if A.tickHeroes then A.tickHeroes() end
     if A.tickWaves then A.tickWaves() end
@@ -313,7 +310,7 @@ function A.start()
     for pid = 0, 3 do
         if A.active[pid] then
             PanCameraToTimedForPlayer(Player(pid), 0, 6400, 0)
-            A.playerText(pid, "Выбери профессию светлячком или напиши -pick 1..10")
+            A.playerText(pid, "Выбери профессию светлячком или напиши -pick 1..12")
         end
     end
     A.after(110, function()
@@ -325,12 +322,12 @@ function A.start()
             end
         end
     end)
-    A.say("|cff99ff99Hero Arena Lua|r: 10 профессий, 50 волн, Q/W/E/R.")
+    A.say("|cff99ff99Hero Arena Lua|r: 12 профессий, 50 волн, Q/W/E/R.")
 end
 
 function config()
     SetMapName("Hero Arena — Lua Reforged")
-    SetMapDescription("50 волн, 10 классов, 40 уникальных умений, 1–4 игрока")
+    SetMapDescription("50 волн, 12 классов, 48 уникальных умений, 1–4 игрока")
     SetPlayers(4)
     SetTeams(1)
     SetGamePlacement(MAP_PLACEMENT_TEAMS_TOGETHER)

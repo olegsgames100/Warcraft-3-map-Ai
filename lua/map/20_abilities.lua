@@ -256,12 +256,68 @@ function A.castHero(hero,ability)
     return true
 end
 
+-- Spell runtime diagnostics. Channel sometimes supplies CAST but not EFFECT
+-- when data fields or native target modes are inconsistent.
 function A.initAbilities()
-    local spellTrigger=CreateTrigger()
-    for pid=0,3 do
-        TriggerRegisterPlayerUnitEvent(spellTrigger,Player(pid),EVENT_PLAYER_UNIT_SPELL_EFFECT,nil)
+    local trigger=CreateTrigger()
+    A.spellEvents={}
+    A.spellDebug=false
+    local function identity(hero,ability)
+        return tostring(GetHandleId(hero))..":"..tostring(ability)
     end
-    TriggerAddAction(spellTrigger,function()
-        A.castHero(GetTriggerUnit(),GetSpellAbilityId())
+    local function execute(hero,ability,snapshot,eventType)
+        local pid=GetPlayerId(GetOwningPlayer(hero))
+        local ok,result=xpcall(function()
+            return A.castHero(hero,ability,snapshot)
+        end,function(err)
+            return tostring(err)..(debug and debug.traceback and debug.traceback("",2) or "")
+        end)
+        if not ok then
+            if pid>=0 and pid<=3 then
+                A.playerText(pid,"|cffff3333[LUA SPELL ERROR] "..tostring(result):sub(1,350).."|r")
+            end
+            A.say("|cffff3333Ошибка Lua способности: "..tostring(result):sub(1,140).."|r")
+        elseif A.spellDebug and pid>=0 and pid<=3 then
+            A.playerText(pid,"|cff66ff66"..eventType.." "..tostring(ability).." "..(result and "OK" or "SKIP").."|r")
+        end
+        return ok and result
+    end
+    for pid=0,3 do
+        TriggerRegisterPlayerUnitEvent(trigger,Player(pid),EVENT_PLAYER_UNIT_SPELL_CAST,nil)
+        TriggerRegisterPlayerUnitEvent(trigger,Player(pid),EVENT_PLAYER_UNIT_SPELL_EFFECT,nil)
+    end
+    TriggerAddAction(trigger,function()
+        local hero=GetTriggerUnit()
+        local ability=GetSpellAbilityId()
+        local pid=GetPlayerId(GetOwningPlayer(hero))
+        if pid<0 or pid>3 or A.heroUnits[pid]~=hero then return end
+        local index
+        for slot,id in ipairs(A.spells[A.heroKind[pid]]) do
+            if A.raw(id)==ability then index=slot;break end
+        end
+        if not index then return end
+        local which=GetTriggerEventId()
+        local k=identity(hero,ability)
+        if which==EVENT_PLAYER_UNIT_SPELL_CAST then
+            local marker={x=GetSpellTargetX(),y=GetSpellTargetY(),
+                target=GetSpellTargetUnit(),hero=hero,ability=ability,
+                processed=false}
+            A.spellEvents[k]=marker
+            if A.spellDebug then A.playerText(pid,"|cffffff66CAST "..index.."|r") end
+            A.after(.35,function()
+                if A.spellEvents[k]==marker and not marker.processed and A.alive(hero) then
+                    marker.processed=true
+                    execute(hero,ability,marker,"FALLBACK")
+                end
+                if A.spellEvents[k]==marker then A.spellEvents[k]=nil end
+            end)
+        elseif which==EVENT_PLAYER_UNIT_SPELL_EFFECT then
+            local marker=A.spellEvents[k]
+            if marker then
+                if marker.processed then return end
+                marker.processed=true
+            end
+            execute(hero,ability,nil,"EFFECT")
+        end
     end)
 end

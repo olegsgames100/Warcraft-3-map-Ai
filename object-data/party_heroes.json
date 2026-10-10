@@ -1,0 +1,943 @@
+{
+  "version": 8,
+  "title": "Hero Arena Party Roles - 12 heroes, 48 spells",
+  "scaling": {
+    "physical": {
+      "stat": "strength",
+      "perPoint": 0.015
+    },
+    "magic": {
+      "stat": "intelligence",
+      "perPoint": 0.02
+    },
+    "heal": {
+      "stat": "intelligence",
+      "perPoint": 0.02
+    },
+    "physicalAttackType": "ATTACK_TYPE_NORMAL",
+    "magicAttackType": "ATTACK_TYPE_MAGIC"
+  },
+  "synergy": {
+    "heroes": [
+      11,
+      12
+    ],
+    "name": "Смертельный союз",
+    "boneMarkDuration": 9,
+    "fractureDuration": 9,
+    "ultimateWindow": 12
+  },
+  "heroes": [
+    {
+      "kind": 1,
+      "id": "H001",
+      "base": "Hpal",
+      "name": "Арбитр Рассвета",
+      "proper": "Рейнар Светокованный",
+      "role": "Главный танк",
+      "roleId": "tank",
+      "attack": "melee",
+      "stats": {
+        "str": 27,
+        "agi": 11,
+        "int": 16,
+        "strGain": 3.05,
+        "agiGain": 1.4,
+        "intGain": 1.5,
+        "hp": 245,
+        "mana": 85
+      },
+      "skills": [
+        {
+          "id": "A101",
+          "key": "Q",
+          "name": "Клеймо Доблести",
+          "description": "Удар с провокацией накапливает Доблесть (+10 за применение и +7 за врага). Доблесть повышает физический урон паладина до +30% и снижает получаемый урон до 10%.",
+          "mana": 22,
+          "cooldown": 6,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
+          "target": "instant",
+          "manaGrowth": 4,
+          "range": 0,
+          "school": "physical"
+        },
+        {
+          "id": "A102",
+          "key": "W",
+          "name": "Клятвенный Бастион",
+          "description": "Защитный купол на 11 сек. Видимая граница постоянно обновляется. Щиты и сопротивление урону союзников внутри купола усиливаются текущей Доблестью (0–100).",
+          "mana": 38,
+          "cooldown": 20,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDivineShield.blp",
+          "target": "point",
+          "manaGrowth": 7,
+          "range": 800,
+          "school": "physical"
+        },
+        {
+          "id": "A10D",
+          "key": "E",
+          "name": "Перехват Стража",
+          "description": "Рывок ТОЛЬКО к другому союзному герою. Даёт щит от Силы, перехватывает урон, накапливает Доблесть (+12).",
+          "mana": 30,
+          "cooldown": 14,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDefend.blp",
+          "target": "unit",
+          "manaGrowth": 6,
+          "range": 825,
+          "school": "physical"
+        },
+        {
+          "id": "A10E",
+          "key": "R",
+          "name": "Несокрушимая Клятва",
+          "description": "Расходует всю Доблесть, превращая её в мощный щит от Силы. На 10 сек союзникам в радиусе нельзя опуститься ниже 10% HP; каждый получает 1 заряд воскрешения на 35 сек.",
+          "mana": 85,
+          "cooldown": 72,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNResurrection.blp",
+          "target": "instant",
+          "manaGrowth": 12,
+          "range": 0,
+          "school": "physical"
+        }
+      ]
+    },
+    {
+      "kind": 2,
+      "id": "O001",
+      "base": "Obla",
+      "name": "Клинок Барханов",
+      "proper": "Зархан Быстрокрылый",
+      "role": "Убийца ближнего боя",
+      "roleId": "melee_dps",
+      "attack": "melee",
+      "stats": {
+        "str": 23,
+        "agi": 29,
+        "int": 12,
+        "strGain": 2.8,
+        "agiGain": 3.5,
+        "intGain": 1.3,
+        "hp": 300,
+        "mana": 135
+      },
+      "skills": [
+        {
+          "id": "A103",
+          "key": "Q",
+          "name": "Режущий шаг",
+          "description": "Режущий рывок в точку; наносит физический урон конусом, накладывает 2 метки кровотечения и накапливает Комбо.",
+          "mana": 22,
+          "cooldown": 6,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNWindWalk.blp",
+          "target": "point",
+          "manaGrowth": 3,
+          "range": 925
+        },
+        {
+          "id": "A104",
+          "key": "W",
+          "name": "Кровавое мастерство",
+          "description": "ПАССИВНО: каждая обычная атака накладывает 1 метку кровотечения на 8 секунд (макс. 6). Каждая метка снижает броню врага на 1, наносит периодический физический урон. Q накладывает 2 метки, R поглощает все метки ради взрывного урона. Рост ранга увеличивает урон кровотечения.",
+          "mana": 0,
+          "cooldown": 0,
+          "type": "passive",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNPoisonSting.blp",
+          "target": "passive",
+          "manaGrowth": 0,
+          "range": 0,
+          "school": "physical",
+          "maxStacks": 6,
+          "armorPerStack": 1,
+          "dotBase": 12,
+          "dotPerRank": 5
+        },
+        {
+          "id": "A10F",
+          "key": "E",
+          "name": "Стойка миража",
+          "description": "Парирует следующую атаку в течение 5 сек. Успешное парирование снижает урон, отвечает контрударом и сокращает перезарядку R «Танец барханов» на 8/10/12/14/16 сек.",
+          "mana": 38,
+          "cooldown": 16,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNMirrorImage.blp",
+          "target": "instant",
+          "manaGrowth": 4,
+          "range": 0,
+          "parryDanceRefund": [
+            8,
+            10,
+            12,
+            14,
+            16
+          ]
+        },
+        {
+          "id": "A10G",
+          "key": "R",
+          "name": "Танец барханов",
+          "description": "Танец барханов: прыжок к врагу и двойной физический удар. Поглощает все метки кровотечения, взрывает их и расходует Комбо.",
+          "mana": 105,
+          "cooldown": 46,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBladestorm.blp",
+          "target": "unit",
+          "manaGrowth": 9,
+          "range": 850
+        }
+      ]
+    },
+    {
+      "kind": 3,
+      "id": "H002",
+      "base": "Hamg",
+      "name": "Проводник Гроз",
+      "proper": "Мирелла Искророждённая",
+      "role": "Маг дальнего боя",
+      "roleId": "ranged_mage",
+      "attack": "ranged",
+      "stats": {
+        "str": 15,
+        "agi": 17,
+        "int": 34,
+        "strGain": 1.5,
+        "agiGain": 1.8,
+        "intGain": 4.2,
+        "hp": 250,
+        "mana": 320
+      },
+      "skills": [
+        {
+          "id": "A105",
+          "key": "Q",
+          "name": "Проводящая молния",
+          "description": "Молния перескакивает между разными врагами, накладывает проводимость.",
+          "mana": 28,
+          "cooldown": 7,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNChainLightning.blp",
+          "target": "unit",
+          "manaGrowth": 3,
+          "range": 850
+        },
+        {
+          "id": "A106",
+          "key": "W",
+          "name": "Грозовой якорь",
+          "description": "Устанавливает грозовой якорь в выбранной точке; молнии бьют проводящие цели.",
+          "mana": 42,
+          "cooldown": 15,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNLightningShield.blp",
+          "target": "point",
+          "manaGrowth": 5,
+          "range": 925
+        },
+        {
+          "id": "A10H",
+          "key": "E",
+          "name": "Манасвязь",
+          "description": "Соединяет мага с союзником, питает маной и усиливает следующую магическую атаку.",
+          "mana": 36,
+          "cooldown": 17,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBrilliance.blp",
+          "target": "unit",
+          "manaGrowth": 4,
+          "range": 850
+        },
+        {
+          "id": "A10I",
+          "key": "R",
+          "name": "Перегрузка небес",
+          "description": "Разряды перескакивают между якорем и выбранной точкой, взрывая проводимость.",
+          "mana": 120,
+          "cooldown": 50,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp",
+          "target": "point",
+          "manaGrowth": 9,
+          "range": 925
+        }
+      ]
+    },
+    {
+      "kind": 4,
+      "id": "U001",
+      "base": "Udea",
+      "name": "Владыка Пепла",
+      "proper": "Морвен Праховестник",
+      "role": "Офф-танк / некромант",
+      "roleId": "offtank",
+      "attack": "melee",
+      "stats": {
+        "str": 29,
+        "agi": 16,
+        "int": 25,
+        "strGain": 3.3,
+        "agiGain": 1.5,
+        "intGain": 2.7,
+        "hp": 385,
+        "mana": 240
+      },
+      "skills": [
+        {
+          "id": "A107",
+          "key": "Q",
+          "name": "Печать погибели",
+          "description": "Смертельное проклятие наносит урон при смерти цели и даёт души.",
+          "mana": 25,
+          "cooldown": 8,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathCoil.blp",
+          "target": "unit",
+          "manaGrowth": 3,
+          "range": 850
+        },
+        {
+          "id": "A108",
+          "key": "W",
+          "name": "Костяная стража",
+          "description": "Скелеты окружают выбранного союзника и перехватывают нападение.",
+          "mana": 42,
+          "cooldown": 19,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
+          "target": "unit",
+          "manaGrowth": 5,
+          "range": 850
+        },
+        {
+          "id": "A10J",
+          "key": "E",
+          "name": "Нить жизни",
+          "description": "Перекачивает жизнь врага в здоровье выбранного слабого союзника.",
+          "mana": 38,
+          "cooldown": 13,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathPact.blp",
+          "target": "unit",
+          "manaGrowth": 4,
+          "range": 850
+        },
+        {
+          "id": "A10K",
+          "key": "R",
+          "name": "Чёрный легион",
+          "description": "Призывает эшелоны павших к точке и усиливает их собранными душами.",
+          "mana": 110,
+          "cooldown": 52,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
+          "target": "point",
+          "manaGrowth": 9,
+          "range": 925
+        }
+      ]
+    },
+    {
+      "kind": 5,
+      "id": "E001",
+      "base": "Edem",
+      "name": "Охотник Разлома",
+      "proper": "Вальтир Безликий",
+      "role": "Мобильный боец",
+      "roleId": "bruiser",
+      "attack": "melee",
+      "stats": {
+        "str": 25,
+        "agi": 29,
+        "int": 18,
+        "strGain": 3.1,
+        "agiGain": 3.2,
+        "intGain": 1.8,
+        "hp": 340,
+        "mana": 190
+      },
+      "skills": [
+        {
+          "id": "A109",
+          "key": "Q",
+          "name": "Разлом пространства",
+          "description": "Рывок по направлению оставляет опасный шрам разлома.",
+          "mana": 24,
+          "cooldown": 6,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp",
+          "target": "point",
+          "manaGrowth": 3,
+          "range": 925
+        },
+        {
+          "id": "A10A",
+          "key": "W",
+          "name": "Сжечь ману",
+          "description": "Сжигает ману выбранной цели и питается уничтоженной магией.",
+          "mana": 34,
+          "cooldown": 12,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp",
+          "target": "unit",
+          "manaGrowth": 5,
+          "range": 850
+        },
+        {
+          "id": "A10L",
+          "key": "E",
+          "name": "Охотничьи руны",
+          "description": "Ставит три близких руны, взрывающиеся при приближении врагов.",
+          "mana": 40,
+          "cooldown": 16,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNImmolation.blp",
+          "target": "point",
+          "manaGrowth": 4,
+          "range": 925
+        },
+        {
+          "id": "A10M",
+          "key": "R",
+          "name": "Демонический облик",
+          "description": "Превращается в демона: базовые атаки выпускают взрывы и подрывают руны.",
+          "mana": 105,
+          "cooldown": 49,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNMetamorphosis.blp",
+          "target": "instant",
+          "manaGrowth": 9,
+          "range": 0
+        }
+      ]
+    },
+    {
+      "kind": 6,
+      "id": "E002",
+      "base": "Emoo",
+      "name": "Лунная Провидица",
+      "proper": "Селена Звездочёт",
+      "role": "Основной лекарь",
+      "roleId": "healer",
+      "attack": "ranged",
+      "stats": {
+        "str": 19,
+        "agi": 21,
+        "int": 32,
+        "strGain": 1.9,
+        "agiGain": 2.1,
+        "intGain": 4,
+        "hp": 275,
+        "mana": 340
+      },
+      "skills": [
+        {
+          "id": "A10B",
+          "key": "Q",
+          "name": "Лунная милость",
+          "description": "Сильное точечное лечение, излишек превращается в защитный щит.",
+          "mana": 24,
+          "cooldown": 5,
+          "type": "heal",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNHeal.blp",
+          "target": "unit",
+          "manaGrowth": 3,
+          "range": 850
+        },
+        {
+          "id": "A10C",
+          "key": "W",
+          "name": "Роща спокойствия",
+          "description": "Высаживает лунную рощу в точке, собирающую энергию лечения.",
+          "mana": 44,
+          "cooldown": 17,
+          "type": "heal",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNTranquility.blp",
+          "target": "point",
+          "manaGrowth": 5,
+          "range": 925
+        },
+        {
+          "id": "A10N",
+          "key": "E",
+          "name": "Нить спасения",
+          "description": "Связывает выбранного союзника, спасая его от смертельного урона.",
+          "mana": 39,
+          "cooldown": 16,
+          "type": "heal",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDivineShield.blp",
+          "target": "unit",
+          "manaGrowth": 4,
+          "range": 850
+        },
+        {
+          "id": "A10O",
+          "key": "R",
+          "name": "Восход луны",
+          "description": "Волна лунного света воскрешает и цепочкой лечит самых раненых героев.",
+          "mana": 120,
+          "cooldown": 60,
+          "type": "heal",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNResurrection.blp",
+          "target": "instant",
+          "manaGrowth": 9,
+          "range": 0
+        }
+      ]
+    },
+    {
+      "kind": 7,
+      "id": "N001",
+      "base": "Nalc",
+      "name": "Фенн Медный Котёл",
+      "proper": "Фенн Медный Котёл",
+      "role": "Усилитель / алхимик",
+      "roleId": "buffer",
+      "attack": "ranged",
+      "stats": {
+        "str": 22,
+        "agi": 18,
+        "int": 30,
+        "strGain": 2.4,
+        "agiGain": 2.2,
+        "intGain": 3.4,
+        "hp": 330,
+        "mana": 300
+      },
+      "skills": [
+        {
+          "id": "A111",
+          "key": "Q",
+          "name": "Эликсир ярости",
+          "description": "Усиливает физический урон и скорость выбранного союзника.",
+          "mana": 28,
+          "cooldown": 12,
+          "type": "buff",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNHealingSpray.blp",
+          "target": "unit",
+          "manaGrowth": 3,
+          "range": 850
+        },
+        {
+          "id": "A112",
+          "key": "W",
+          "name": "Кислотный флакон",
+          "description": "Кидает кислотный снаряд в точку, снижает защиту и помечает врагов.",
+          "mana": 39,
+          "cooldown": 15,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp",
+          "target": "point",
+          "manaGrowth": 5,
+          "range": 925
+        },
+        {
+          "id": "A113",
+          "key": "E",
+          "name": "Катализатор",
+          "description": "Восстанавливает ману выбранного союзника и сокращает время до его ключевой способности.",
+          "mana": 36,
+          "cooldown": 18,
+          "type": "buff",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNTransmute.blp",
+          "target": "unit",
+          "manaGrowth": 4,
+          "range": 850
+        },
+        {
+          "id": "A114",
+          "key": "R",
+          "name": "Золотая трансмутация",
+          "description": "Превращает химические метки в золото, щиты и мощное усиление команды.",
+          "mana": 110,
+          "cooldown": 54,
+          "type": "buff",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNChemicalRage.blp",
+          "target": "instant",
+          "manaGrowth": 9,
+          "range": 0
+        }
+      ]
+    },
+    {
+      "kind": 8,
+      "id": "H003",
+      "base": "Hmkg",
+      "name": "Торвин Громовой Камень",
+      "proper": "Торвин Громовой Камень",
+      "role": "Контроль / танк",
+      "roleId": "tank",
+      "attack": "melee",
+      "stats": {
+        "str": 35,
+        "agi": 13,
+        "int": 18,
+        "strGain": 4,
+        "agiGain": 1.2,
+        "intGain": 1.9,
+        "hp": 465,
+        "mana": 150
+      },
+      "skills": [
+        {
+          "id": "A115",
+          "key": "Q",
+          "name": "Метательный молот",
+          "description": "Метает молот во врага, оглушает и возвращает его рикошетом.",
+          "mana": 26,
+          "cooldown": 7,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp",
+          "target": "unit",
+          "manaGrowth": 3,
+          "range": 850
+        },
+        {
+          "id": "A116",
+          "key": "W",
+          "name": "Гравитационный удар",
+          "description": "Удар притягивает врагов к указанной точке и прерывает их.",
+          "mana": 36,
+          "cooldown": 17,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
+          "target": "point",
+          "manaGrowth": 5,
+          "range": 925
+        },
+        {
+          "id": "A117",
+          "key": "E",
+          "name": "Гранитная стойка",
+          "description": "Стойка глыбы поглощает атаки и вызывает ответные ударные волны.",
+          "mana": 38,
+          "cooldown": 22,
+          "type": "buff",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAvatar.blp",
+          "target": "instant",
+          "manaGrowth": 4,
+          "range": 0
+        },
+        {
+          "id": "A118",
+          "key": "R",
+          "name": "Король гор",
+          "description": "Разделяет арену ударом, отбрасывает врагов и создаёт каменную стену.",
+          "mana": 115,
+          "cooldown": 55,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAvatar.blp",
+          "target": "instant",
+          "manaGrowth": 9,
+          "range": 0
+        }
+      ]
+    },
+    {
+      "kind": 9,
+      "id": "E003",
+      "base": "Ewar",
+      "name": "Лириса Сумеречная",
+      "proper": "Лириса Сумеречная",
+      "role": "Физический ассасин",
+      "roleId": "assassin",
+      "attack": "melee",
+      "stats": {
+        "str": 22,
+        "agi": 32,
+        "int": 16,
+        "strGain": 2.7,
+        "agiGain": 3.6,
+        "intGain": 1.8,
+        "hp": 305,
+        "mana": 170
+      },
+      "skills": [
+        {
+          "id": "A119",
+          "key": "Q",
+          "name": "Удар из тени",
+          "description": "Появляется за выбранным врагом и ранит его спину.",
+          "mana": 24,
+          "cooldown": 6,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp",
+          "target": "unit",
+          "manaGrowth": 3,
+          "range": 850
+        },
+        {
+          "id": "A11A",
+          "key": "W",
+          "name": "Клеймо казни",
+          "description": "Помечает врага клеймом казни и открывает уязвимость.",
+          "mana": 31,
+          "cooldown": 11,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp",
+          "target": "unit",
+          "manaGrowth": 5,
+          "range": 850
+        },
+        {
+          "id": "A11B",
+          "key": "E",
+          "name": "Прыжок в сумрак",
+          "description": "Возвращается к оставленной тени или прыгает к выбранной точке.",
+          "mana": 35,
+          "cooldown": 18,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFanOfKnives.blp",
+          "target": "point",
+          "manaGrowth": 4,
+          "range": 925
+        },
+        {
+          "id": "A11C",
+          "key": "R",
+          "name": "Последний приговор",
+          "description": "Добивает помеченную цель; казнь обновляет атакующий навык.",
+          "mana": 110,
+          "cooldown": 42,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp",
+          "target": "unit",
+          "manaGrowth": 9,
+          "range": 850
+        }
+      ]
+    },
+    {
+      "kind": 10,
+      "id": "U002",
+      "base": "Ulic",
+      "name": "Иссара Морозная",
+      "proper": "Иссара Морозная",
+      "role": "Контроль / маг дальнего боя",
+      "roleId": "controller",
+      "attack": "ranged",
+      "stats": {
+        "str": 17,
+        "agi": 17,
+        "int": 35,
+        "strGain": 1.7,
+        "agiGain": 1.8,
+        "intGain": 4,
+        "hp": 260,
+        "mana": 340
+      },
+      "skills": [
+        {
+          "id": "A11D",
+          "key": "Q",
+          "name": "Копьё инея",
+          "description": "Летящее копьё накапливает мороз и пронзает врагов.",
+          "mana": 26,
+          "cooldown": 7,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostNova.blp",
+          "target": "point",
+          "manaGrowth": 3,
+          "range": 925
+        },
+        {
+          "id": "A11E",
+          "key": "W",
+          "name": "Ледяная тюрьма",
+          "description": "Заковывает выбранную цель во лёд и заражает морозом соседей.",
+          "mana": 40,
+          "cooldown": 17,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostArmor.blp",
+          "target": "unit",
+          "manaGrowth": 5,
+          "range": 850
+        },
+        {
+          "id": "A11F",
+          "key": "E",
+          "name": "Стена вечной мерзлоты",
+          "description": "Создаёт ледяную стену, замедляющую и отталкивающую преследователей.",
+          "mana": 40,
+          "cooldown": 18,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlizzard.blp",
+          "target": "point",
+          "manaGrowth": 4,
+          "range": 925
+        },
+        {
+          "id": "A11G",
+          "key": "R",
+          "name": "Белая мгла",
+          "description": "Кольца метели замораживают, затем разбивают накопленные ледяные метки.",
+          "mana": 125,
+          "cooldown": 53,
+          "type": "magic",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFreezingBreath.blp",
+          "target": "instant",
+          "manaGrowth": 9,
+          "range": 0
+        }
+      ]
+    },
+    {
+      "kind": 11,
+      "id": "U003",
+      "base": "Udea",
+      "name": "Авалс, Костяной Снайпер",
+      "proper": "Авалс",
+      "role": "Лучник-скелет / физический дальний бой",
+      "roleId": "ranged_dps",
+      "attack": "ranged",
+      "stats": {
+        "str": 23,
+        "agi": 31,
+        "int": 16,
+        "strGain": 2.5,
+        "agiGain": 3.6,
+        "intGain": 1.8,
+        "hp": 300,
+        "mana": 185
+      },
+      "model": "units\\creeps\\SkeletonArcher\\SkeletonArcher.mdl",
+      "unitIcon": "ReplaceableTextures\\CommandButtons\\BTNSkeletonArcher.blp",
+      "skills": [
+        {
+          "id": "A121",
+          "key": "Q",
+          "name": "Костяной болт",
+          "description": "Дальнобойный костяной снаряд помечает врагов; Гело усиливает его.",
+          "mana": 25,
+          "cooldown": 6,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlackArrow.blp",
+          "target": "point",
+          "manaGrowth": 3,
+          "range": 925
+        },
+        {
+          "id": "A122",
+          "key": "W",
+          "name": "Залп семи могил",
+          "description": "Семь прицельных залпов стрел в выбранную область.",
+          "mana": 40,
+          "cooldown": 15,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNClusterRockets.blp",
+          "target": "point",
+          "manaGrowth": 5,
+          "range": 925
+        },
+        {
+          "id": "A123",
+          "key": "E",
+          "name": "Призрачная тетива",
+          "description": "Прицеливание усиливает следующий болт и выдаёт Гело защитный щит.",
+          "mana": 32,
+          "cooldown": 18,
+          "type": "buff",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNTrueshot.blp",
+          "target": "instant",
+          "manaGrowth": 4,
+          "range": 0
+        },
+        {
+          "id": "A124",
+          "key": "R",
+          "name": "Прицельная казнь",
+          "description": "Выстрел по выбранной цели запускает преследующие костяные стрелы; взаимодействует с ультой Гело.",
+          "mana": 115,
+          "cooldown": 49,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNStarfall.blp",
+          "target": "unit",
+          "manaGrowth": 9,
+          "range": 850
+        }
+      ]
+    },
+    {
+      "kind": 12,
+      "id": "U004",
+      "base": "Udea",
+      "name": "Гело, Костяной Авангард",
+      "proper": "Гело",
+      "role": "Воин-скелет / передовая",
+      "roleId": "melee_tank",
+      "attack": "melee",
+      "stats": {
+        "str": 33,
+        "agi": 17,
+        "int": 18,
+        "strGain": 3.9,
+        "agiGain": 1.7,
+        "intGain": 1.8,
+        "hp": 440,
+        "mana": 180
+      },
+      "model": "units\\undead\\Skeleton\\Skeleton.mdl",
+      "unitIcon": "ReplaceableTextures\\CommandButtons\\BTNSkeletonWarrior.blp",
+      "skills": [
+        {
+          "id": "A125",
+          "key": "Q",
+          "name": "Костолом",
+          "description": "Широкий удар детонирует костяные метки Авалса.",
+          "mana": 25,
+          "cooldown": 7,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNCriticalStrike.blp",
+          "target": "instant",
+          "manaGrowth": 3,
+          "range": 0
+        },
+        {
+          "id": "A126",
+          "key": "W",
+          "name": "Щит братства",
+          "description": "Выбирает союзника и перехватывает часть урона, защищая Авалса сильнее.",
+          "mana": 42,
+          "cooldown": 18,
+          "type": "buff",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDefend.blp",
+          "target": "unit",
+          "manaGrowth": 5,
+          "range": 850
+        },
+        {
+          "id": "A127",
+          "key": "E",
+          "name": "Могильный таран",
+          "description": "Рывок в точку стягивает противников и усиливает следующий болт Авалса.",
+          "mana": 35,
+          "cooldown": 13,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNCharge.blp",
+          "target": "point",
+          "manaGrowth": 4,
+          "range": 925
+        },
+        {
+          "id": "A128",
+          "key": "R",
+          "name": "Марш павших",
+          "description": "Стена скелетов и натиск; совместно с ультой Авалса вызывает Смертельный союз.",
+          "mana": 115,
+          "cooldown": 52,
+          "type": "physical",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
+          "target": "instant",
+          "manaGrowth": 9,
+          "range": 0
+        }
+      ]
+    }
+  ],
+  "rework": "Zarhan passive W + bleeding stacks, -1 armor per stack, visible status, timed E->R refund; Arbiter only Valor with real damage/defense/dome/ult modifiers",
+  "fixNotes": "Bone heroes both inherit from tested stock hero Udea. Explicit normal vs missile weapon types, correct attack cooldown, base damage and projectile art are generated.",
+  "balanceNote": "Native attacks use stock unit base attack intervals, without custom attack cooldown overrides. QWER mana escalates with rank."
+}
