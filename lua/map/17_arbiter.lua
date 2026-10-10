@@ -48,12 +48,13 @@ function A.showValor(pid,force)
     local u=A.heroUnits[pid]
     if not A.alive(u) or A.heroKind[pid]~=1 then return end
     local valor=A.resources[pid].valor or 0
-    local resolve=(A.role(pid).resolve or 0)
-    local msg=string.format("|cffffdb62ДОБЛЕСТЬ %d/100|r |cffbce8ffРЕШИМОСТЬ %d|r",valor,math.floor(resolve))
+    local power=math.floor(valor*.3+.5)
+    local protect=math.floor(valor*.1+.5)
+    local msg=string.format("|cffffdb62ДОБЛЕСТЬ %d/100|r  |cffffcc66Урон +%d%%|r  |cff99ddffЗащита +%d%%|r",valor,power,protect)
     if force or A.valorDisplay[pid]~=msg then
         A.valorDisplay[pid]=msg
         A.text(GetUnitX(u),GetUnitY(u),msg,.020,2.1)
-        if force then A.playerText(pid,msg.." — Доблесть от Q и защиты союзников.") end
+        if force then A.playerText(pid,msg.." — Q и защитные связи увеличивают урон и защиту. W и R усиливаются Доблестью.") end
     end
 end
 local previousTick=A.tickCombat
