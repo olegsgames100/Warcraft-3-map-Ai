@@ -193,19 +193,6 @@ function A.initItems()
  TriggerAddAction(damage,A.onItemDamage)
 end
 function A.initExperience()
- local t=CreateTrigger()
- TriggerRegisterAnyUnitEventBJ(t,EVENT_PLAYER_UNIT_DEATH)
- TriggerAddAction(t,function()
-    local dying=GetTriggerUnit()
-    local killer=GetKillingUnit()
-    local pid=killer and GetPlayerId(GetOwningPlayer(killer)) or -1
-    if pid<0 or pid>3 or not A.heroUnits[pid] then return end
-    local hero=A.heroUnits[pid]
-    if not A.alive(hero) then return end
-    local tracked=A.waveUnits[GetHandleId(dying)]
-    if not tracked then return end
-    -- Neutral-creep XP is disabled by war3mapMisc.txt; grant a controlled award.
-    local award=math.floor(4+A.wave*.65+(tracked.elite and 24 or 0))
-    AddHeroXP(hero,award,true)
- end)
+ -- XP is granted in Arena.enemyDied *before* tracked enemies are removed.
+ -- war3mapMisc.txt disables regular neutral-creep experience.
 end
