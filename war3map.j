@@ -138,20 +138,21 @@ endfunction
 
 function Arena_ApplyHandicap takes nothing returns nothing
     local integer i = 0
-    local real hp = 1.00
-    local real xp = 1.00
+    local real hp = 1.0
+    local real xp = 1.0
+    // Avoid exponential or excessive hero health from handicap and stat scaling.
     if udg_HumanCount <= 1 then
-        set hp = 1.85
-        set xp = 1.55
+        set hp = 1.20
+        set xp = 1.22
     elseif udg_HumanCount == 2 then
-        set hp = 1.40
-        set xp = 1.25
+        set hp = 1.12
+        set xp = 1.12
     elseif udg_HumanCount == 3 then
-        set hp = 1.18
-        set xp = 1.10
+        set hp = 1.06
+        set xp = 1.05
     endif
     loop
-        exitwhen i > 3
+        exitwhen i >= 4
         call SetPlayerHandicap(Player(i), hp)
         call SetPlayerHandicapXP(Player(i), xp)
         set i = i + 1
@@ -338,6 +339,19 @@ function Arena_RefreshBalance takes nothing returns nothing
     endloop
 endfunction
 
+function Arena_NormalizeHeroStats takes unit hero returns nothing
+    // Keep the old Object Editor hero's base growth only. Extreme values are capped.
+    if GetHeroStr(hero, false) > 60 then
+        call SetHeroStr(hero, 60, true)
+    endif
+    if GetHeroAgi(hero, false) > 60 then
+        call SetHeroAgi(hero, 60, true)
+    endif
+    if GetHeroInt(hero, false) > 60 then
+        call SetHeroInt(hero, 60, true)
+    endif
+endfunction
+
 function Arena_SpawnHero takes integer pid, integer kind returns nothing
     local real x = -144.0
     local real y = -144.0
@@ -380,6 +394,7 @@ function Arena_SpawnHero takes integer pid, integer kind returns nothing
         call SetHeroAgi(hero, 25, true)
         call SetHeroInt(hero, 24, true)
     endif
+    call Arena_NormalizeHeroStats(hero)
     call Arena_GiveSkills(hero, kind)
     call UnitAddItemById(hero, 'phea')
     call UnitAddItemById(hero, 'pman')
@@ -548,34 +563,55 @@ function Arena_HeroBurst takes unit caster, real radius, real damage, boolean he
     set u = null
 endfunction
 
+function Arena_SpellVFX takes unit caster, string path returns nothing
+    local effect fx = AddSpecialEffect(path, GetUnitX(caster), GetUnitY(caster))
+    call DestroyEffect(fx)
+    set fx = null
+endfunction
+
+function Arena_SpellAid takes unit caster, real heal, real mana returns nothing
+    call Arena_ItemPulses(caster, heal, mana)
+endfunction
+
 function Trig_HeroSpell_Actions takes nothing returns nothing
     local unit hero = GetTriggerUnit()
     local integer id = GetSpellAbilityId()
-    local real level = I2R(GetUnitAbilityLevel(hero, id))
-    if id == 'A101' then
-        call Arena_HeroBurst(hero, 260.0, 30.0 + level * 12.0, false)
-    elseif id == 'A102' then
-        call Arena_HeroBurst(hero, 420.0, 55.0 + level * 30.0, true)
+    local real lv = I2R(GetUnitAbilityLevel(hero, id))
+    local real amount = 30.0 + 20.0 * lv
+    if hero == null or lv < 1.0 then
+        return
+    endif
+    if id == 'A101' or id == 'A10B' then
+        call Arena_HeroBurst(hero, 260.0, amount, false)
+    elseif id == 'A102' or id == 'A10C' then
+        call Arena_SpellAid(hero, 35.0 + 25.0 * lv, 10.0 * lv)
     elseif id == 'A103' then
-        call Arena_HeroBurst(hero, 400.0, 45.0 + level * 25.0, false)
+        call Arena_HeroBurst(hero, 450.0, amount * 1.2, false)
     elseif id == 'A104' then
-        call SetUnitState(hero, UNIT_STATE_LIFE, GetUnitState(hero, UNIT_STATE_LIFE) + 40.0 + level * 28.0)
-    elseif id == 'A105' then
-        call Arena_HeroBurst(hero, 500.0, 45.0 + level * 32.0, false)
+        call SetUnitState(hero, UNIT_STATE_LIFE, GetUnitState(hero, UNIT_STATE_LIFE) + amount * 1.4)
+    elseif id == 'A105' or id == 'A108' then
+        call Arena_HeroBurst(hero, 490.0, amount * 1.4, false)
     elseif id == 'A106' then
-        call Arena_ItemPulses(hero, 0.0, 35.0 + level * 18.0)
+        call Arena_SpellAid(hero, 0.0, 30.0 + 15.0 * lv)
     elseif id == 'A107' then
-        call SetUnitState(hero, UNIT_STATE_LIFE, GetUnitState(hero, UNIT_STATE_LIFE) + 35.0 + level * 22.0)
-    elseif id == 'A108' then
-        call Arena_HeroBurst(hero, 300.0, 38.0 + level * 24.0, false)
+        call Arena_HeroBurst(hero, 250.0, amount, false)
+        call SetUnitState(hero, UNIT_STATE_LIFE, GetUnitState(hero, UNIT_STATE_LIFE) + amount)
     elseif id == 'A109' then
-        call Arena_HeroBurst(hero, 280.0, 42.0 + level * 28.0, false)
+        call Arena_HeroBurst(hero, 280.0, amount * 1.6, false)
     elseif id == 'A10A' then
-        call SetUnitState(hero, UNIT_STATE_LIFE, GetUnitState(hero, UNIT_STATE_LIFE) + 55.0 + level * 19.0)
-    elseif id == 'A10B' then
-        call Arena_HeroBurst(hero, 320.0, 35.0 + level * 22.0, false)
-    elseif id == 'A10C' then
-        call Arena_ItemPulses(hero, 45.0 + level * 20.0, 18.0 + level * 12.0)
+        call SetUnitState(hero, UNIT_STATE_LIFE, GetUnitState(hero, UNIT_STATE_LIFE) + amount * 1.3)
+    elseif id == 'A111' or id == 'A115' or id == 'A119' or id == 'A11D' then
+        call Arena_HeroBurst(hero, 325.0, amount * 1.15, false)
+        call Arena_SpellVFX(hero, "Abilities\\Spells\\Human\\ThunderClap\\ThunderClapCaster.mdl")
+    elseif id == 'A112' or id == 'A116' or id == 'A11A' or id == 'A11E' then
+        call Arena_SpellAid(hero, amount * 1.20, amount * 0.30)
+    elseif id == 'A113' or id == 'A117' or id == 'A11B' or id == 'A11F' then
+        call SetUnitState(hero, UNIT_STATE_LIFE, GetUnitState(hero, UNIT_STATE_LIFE) + amount * 1.50)
+        call Arena_SpellVFX(hero, "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl")
+    elseif id == 'A114' or id == 'A118' or id == 'A11C' or id == 'A11G' then
+        call Arena_HeroBurst(hero, 560.0, amount * 2.3, false)
+        call Arena_SpellAid(hero, amount, 0.0)
+        call Arena_SpellVFX(hero, "Abilities\\Spells\\Human\\ThunderClap\\ThunderClapCaster.mdl")
     endif
     set hero = null
 endfunction
