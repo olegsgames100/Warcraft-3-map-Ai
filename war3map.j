@@ -25,6 +25,7 @@ globals
 
     unit            array   udg_Heroes
     boolean         array   udg_Picked
+    integer         array   udg_PendingPick
     integer         array   udg_HeroKind
     integer         array   udg_ReviveWait
 
@@ -232,17 +233,17 @@ endfunction
 //===========================================================================
 function Arena_HeroType takes integer kind returns integer
     if kind == 1 then
-        return 'H001'
+        return 'Hpal'
     elseif kind == 2 then
-        return 'O001'
+        return 'Obla'
     elseif kind == 3 then
-        return 'H002'
+        return 'Hamg'
     elseif kind == 4 then
-        return 'U001'
+        return 'Udea'
     elseif kind == 5 then
-        return 'E001'
+        return 'Edem'
     endif
-    return 'E002'
+    return 'Emoo'
 endfunction
 
 function Arena_HeroTitle takes integer kind returns string
@@ -276,28 +277,26 @@ function Arena_HeroEpithet takes integer kind returns string
 endfunction
 
 function Arena_GiveSkills takes unit u, integer kind returns nothing
-    local integer a = 'A101'
-    local integer b = 'A102'
-    if kind == 2 then
-        set a = 'A103'
-        set b = 'A104'
+    // Stock abilities only; extra abilities still differ for all six archetypes.
+    if kind == 1 then
+        call UnitAddAbility(u, 'ACtb')
+        call UnitAddAbility(u, 'ACfb')
+    elseif kind == 2 then
+        call UnitAddAbility(u, 'ACba')
+        call UnitAddAbility(u, 'ACtb')
     elseif kind == 3 then
-        set a = 'A105'
-        set b = 'A106'
+        call UnitAddAbility(u, 'ACfb')
+        call UnitAddAbility(u, 'ACfl')
     elseif kind == 4 then
-        set a = 'A107'
-        set b = 'A108'
+        call UnitAddAbility(u, 'ACrd')
+        call UnitAddAbility(u, 'ACfb')
     elseif kind == 5 then
-        set a = 'A109'
-        set b = 'A10A'
-    elseif kind == 6 then
-        set a = 'A10B'
-        set b = 'A10C'
+        call UnitAddAbility(u, 'ACim')
+        call UnitAddAbility(u, 'ACtb')
+    else
+        call UnitAddAbility(u, 'Alsh')
+        call UnitAddAbility(u, 'ACfl')
     endif
-    call UnitAddAbility(u, a)
-    call UnitAddAbility(u, b)
-    call SetUnitAbilityLevel(u, a, 1)
-    call SetUnitAbilityLevel(u, b, 1)
 endfunction
 
 function Arena_ClearAuras takes nothing returns nothing
@@ -318,21 +317,21 @@ function Arena_GiveAuras takes unit hero returns nothing
     if pid < 0 or pid > 3 or udg_HumanCount >= 4 then
         return
     endif
-    set carrier = CreateUnit(Player(pid), 'hA01', 0.0, 0.0, 0.0)
+    // Invisible 1.26a stock unit avoids malformed custom dummy model.
+    set carrier = CreateUnit(Player(pid), 'hfoo', GetUnitX(hero), GetUnitY(hero), 0.0)
     set udg_AuraCarrier[pid] = carrier
     if carrier != null then
         call UnitAddAbility(carrier, 'Aloc')
         call SetUnitInvulnerable(carrier, true)
         call SetUnitPathing(carrier, false)
-        call UnitAddAbility(carrier, 'A201')
+        call UnitAddAbility(carrier, 'ACae')
         if udg_HumanCount <= 2 then
-            call UnitAddAbility(carrier, 'A202')
+            call UnitAddAbility(carrier, 'ACua')
         endif
         if udg_HumanCount == 1 then
-            call UnitAddAbility(carrier, 'A203')
-            call UnitAddAbility(carrier, 'A204')
+            call UnitAddAbility(carrier, 'ACav')
+            call UnitAddAbility(carrier, 'ACac')
         endif
-        // Transparency preserves aura updates; ShowUnit(false) may suppress them.
         call SetUnitVertexColor(carrier, 255, 255, 255, 0)
     endif
     set carrier = null
@@ -370,26 +369,50 @@ function Arena_SpawnHero takes integer pid, integer kind returns nothing
     endif
     set hero = CreateUnit(Player(pid), Arena_HeroType(kind), x, y, 270.0)
     if hero == null then
-        call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 12.0, "Нужно импортировать war3map.w3u.")
+        call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 10.0, "Ошибка создания героя.")
         return
     endif
-    call SetHeroLevel(hero, 1, false)
+    if kind == 1 then
+        call SetHeroStr(hero, 28, true)
+        call SetHeroAgi(hero, 14, true)
+        call SetHeroInt(hero, 20, true)
+    elseif kind == 2 then
+        call SetHeroStr(hero, 19, true)
+        call SetHeroAgi(hero, 29, true)
+        call SetHeroInt(hero, 13, true)
+    elseif kind == 3 then
+        call SetHeroStr(hero, 16, true)
+        call SetHeroAgi(hero, 15, true)
+        call SetHeroInt(hero, 29, true)
+    elseif kind == 4 then
+        call SetHeroStr(hero, 26, true)
+        call SetHeroAgi(hero, 16, true)
+        call SetHeroInt(hero, 22, true)
+    elseif kind == 5 then
+        call SetHeroStr(hero, 20, true)
+        call SetHeroAgi(hero, 28, true)
+        call SetHeroInt(hero, 17, true)
+    else
+        call SetHeroStr(hero, 18, true)
+        call SetHeroAgi(hero, 25, true)
+        call SetHeroInt(hero, 24, true)
+    endif
     call Arena_GiveSkills(hero, kind)
-    call UnitAddItemById(hero, 'I007')
-    call UnitAddItemById(hero, 'I008')
+    call UnitAddItemById(hero, 'phea')
+    call UnitAddItemById(hero, 'pman')
     call UnitAddItemById(hero, 'ciri')
     set tag = CreateTextTag()
-    call SetTextTagText(tag, Arena_HeroEpithet(kind), 0.019)
-    call SetTextTagPosUnit(tag, hero, -70.0)
+    call SetTextTagText(tag, Arena_HeroTitle(kind) + " - " + Arena_HeroEpithet(kind), 0.019)
+    call SetTextTagPosUnit(tag, hero, -65.0)
     call SetTextTagColor(tag, 255, 218, 145, 255)
     call SetTextTagPermanent(tag, true)
     call SetTextTagVisibility(tag, true)
     set udg_HeroSubtitle[pid] = tag
-    call SelectUnitForPlayerSingle(hero, Player(pid))
-    call PanCameraToTimedForPlayer(Player(pid), x, y, 0.00)
     set udg_Heroes[pid] = hero
     set udg_HeroKind[pid] = kind
     call Arena_GiveAuras(hero)
+    call SelectUnitForPlayerSingle(hero, Player(pid))
+    call PanCameraToTimedForPlayer(Player(pid), x, y, 0.00)
     set tag = null
     set hero = null
 endfunction
@@ -784,15 +807,15 @@ function Arena_SelectHero takes integer pid, integer k returns nothing
     if udg_GameOver or udg_Picked[pid] or not Arena_IsHuman(pid) then
         return
     endif
-    // Set the guard first; a region and a polling tick may fire together.
+    // Hero selection occurs in timer callback, never directly in region event.
     set udg_Picked[pid] = true
+    set udg_PendingPick[pid] = 0
     set udg_PickCount = udg_PickCount + 1
     if udg_SelectWisp[pid] != null then
-        call RemoveUnit(udg_SelectWisp[pid])
-        set udg_SelectWisp[pid] = null
+        call ShowUnit(udg_SelectWisp[pid], false)
     endif
     call Arena_SpawnHero(pid, k)
-    call Arena_Msg(GetPlayerName(Player(pid)) + " выбрал: |cffffcc00" + Arena_HeroTitle(k) + "|r")
+    call Arena_Msg(GetPlayerName(Player(pid)) + " выбрал: " + Arena_HeroTitle(k))
     call Arena_TryStartWaves()
 endfunction
 
@@ -808,7 +831,7 @@ function Trig_Pick_Actions takes nothing returns nothing
         loop
             exitwhen k > 6
             if GetTriggeringRegion() == udg_SelectRegion[k] then
-                call Arena_SelectHero(pid, k)
+                set udg_PendingPick[pid] = k
                 exitwhen true
             endif
             set k = k + 1
@@ -827,16 +850,21 @@ function Trig_SelectPoll_Actions takes nothing returns nothing
         exitwhen pid >= 4
         set u = udg_SelectWisp[pid]
         if u != null and Arena_IsHuman(pid) and not udg_Picked[pid] then
-            set k = 1
-            loop
-                exitwhen k > 6 or udg_Picked[pid]
-                set dx = GetUnitX(u) - Arena_SelectX(k)
-                set dy = GetUnitY(u) - Arena_SelectY(k)
-                if dx * dx + dy * dy <= 52900.0 then
-                    call Arena_SelectHero(pid, k)
-                endif
-                set k = k + 1
-            endloop
+            if udg_PendingPick[pid] != 0 then
+                call Arena_SelectHero(pid, udg_PendingPick[pid])
+            else
+                set k = 1
+                loop
+                    exitwhen k > 6
+                    set dx = GetUnitX(u) - Arena_SelectX(k)
+                    set dy = GetUnitY(u) - Arena_SelectY(k)
+                    if dx * dx + dy * dy <= 52900.0 then
+                        set udg_PendingPick[pid] = k
+                        exitwhen true
+                    endif
+                    set k = k + 1
+                endloop
+            endif
         endif
         set pid = pid + 1
     endloop
@@ -1106,6 +1134,17 @@ function Trig_Aura_Actions takes nothing returns nothing
     local real addHp
     local real addMp
     call Arena_UpdateHeroLabels()
+    set i = 0
+    loop
+        exitwhen i >= 4
+        if udg_AuraCarrier[i] != null and udg_Heroes[i] != null then
+            if GetWidgetLife(udg_Heroes[i]) > 0.405 then
+                call SetUnitX(udg_AuraCarrier[i], GetUnitX(udg_Heroes[i]))
+                call SetUnitY(udg_AuraCarrier[i], GetUnitY(udg_Heroes[i]))
+            endif
+        endif
+        set i = i + 1
+    endloop
     if udg_HumanCount >= 4 then
         return
     endif
