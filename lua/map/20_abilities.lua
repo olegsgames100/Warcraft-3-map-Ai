@@ -1,5 +1,37 @@
 -- 40 custom ability mechanics, 10 truly different class kits.
 local A=Arena
+
+local VFX={
+    {[[Abilities\Spells\Human\HolyBolt\HolyBoltSpecialArt.mdl]],[[Abilities\Spells\Human\Resurrect\ResurrectTarget.mdl]]},
+    {[[Abilities\Spells\Orc\MirrorImage\MirrorImageCaster.mdl]],[[Abilities\Spells\Orc\Bladestorm\BladestormTarget.mdl]]},
+    {[[Abilities\Spells\Orc\LightningShield\LightningShieldTarget.mdl]],[[Abilities\Spells\Orc\Farseer\FarSeerMissile.mdl]]},
+    {[[Abilities\Spells\Undead\DeathCoil\DeathCoilSpecialArt.mdl]],[[Abilities\Spells\Undead\AnimateDead\AnimateDeadTarget.mdl]]},
+    {[[Abilities\Spells\NightElf\Blink\BlinkTarget.mdl]],[[Abilities\Spells\Other\Doom\DoomDeath.mdl]]},
+    {[[Abilities\Spells\NightElf\Starfall\StarfallTarget.mdl]],[[Abilities\Spells\NightElf\Tranquility\TranquilityTarget.mdl]]},
+    {[[Abilities\Spells\Other\AcidBomb\BottleMissile.mdl]],[[Abilities\Spells\Other\AcidBomb\AcidBombTarget.mdl]]},
+    {[[Abilities\Spells\Human\ThunderClap\ThunderClapCaster.mdl]],[[Abilities\Spells\Human\Avatar\AvatarCaster.mdl]]},
+    {[[Abilities\Spells\NightElf\Blink\BlinkTarget.mdl]],[[Abilities\Spells\NightElf\FanOfKnives\FanOfKnivesCaster.mdl]]},
+    {[[Abilities\Spells\Undead\FrostNova\FrostNovaTarget.mdl]],[[Abilities\Spells\Undead\FreezingBreath\FreezingBreathMissile.mdl]]}
+}
+A.visualCatalog=VFX
+function A.cooldownSeconds(kind,slot,rank)
+    local base=({7,14,17,52})[slot]
+    if slot==4 and kind==1 then base=64 end
+    if slot==4 and kind==9 then base=56 end
+    if slot==2 and (kind==3 or kind==7 or kind==10) then base=16 end
+    return math.max(3,base-(rank-1)*(slot==4 and .7 or .35))
+end
+function A.castVFX(kind,slot,caster,x,y)
+    local style=VFX[kind]
+    A.visual(style[1],GetUnitX(caster),GetUnitY(caster),1.25)
+    local visual=style[slot==4 and 2 or 1]
+    if slot==2 or slot==4 then
+        A.visualRing(visual,x,y,slot==4 and 380 or 200,slot==4 and 10 or 6,slot==4 and 2.4 or 1.5)
+    else
+        A.visual(visual,x,y,1.4)
+    end
+    if slot==4 then A.text(x,y,"|cffffcc33УЛЬТИМЕЙТ!|r",.026,2.3) end
+end
 local function spend(pid,key,amount)
     local r=A.resources[pid]
     if (r[key] or 0)<amount then return false end
@@ -28,11 +60,21 @@ function A.castHero(hero,ability)
     end
     if not slot then return false end
     local level=rank(hero,ability)
+    local key=GetHandleId(hero)..":"..ability
+    local untilTime=A.cooldowns[key] or 0
+    if untilTime>A.clock then
+        A.playerText(pid,"Перезарядка: "..string.format("%.1f",untilTime-A.clock).." сек.")
+        if BlzEndUnitAbilityCooldown then BlzEndUnitAbilityCooldown(hero,ability) end
+        return true
+    end
+    A.cooldowns[key]=A.clock+A.cooldownSeconds(kind,slot,level)
+    if BlzStartUnitAbilityCooldown then BlzStartUnitAbilityCooldown(hero,ability,A.cooldownSeconds(kind,slot,level)) end
     local p=power(level)
     local hx,hy=GetUnitX(hero),GetUnitY(hero)
     local target=GetSpellTargetUnit()
     local x,y=GetSpellTargetX(),GetSpellTargetY()
     if x==0 and y==0 then x,y=hx,hy end
+    A.castVFX(kind,slot,hero,x,y)
     local vfx=[[Abilities\Spells\Human\ThunderClap\ThunderClapCaster.mdl]]
     if kind==1 then -- PALADIN: valor drives defensive ultimates
         if slot==1 then
