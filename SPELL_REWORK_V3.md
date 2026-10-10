@@ -17,7 +17,7 @@ Legacy files `20_abilities.lua`, `25_role_spells.lua` and `26_unique_kits.lua` r
 
 `object-data/party_heroes.json` explicitly declares a target mode (`unit`, `point`, `instant`) for every skill.
 
-`tools/generate_party_objects.py` now writes *Channel* (`Ncl1`) as **integer** 0=instant, 1=unit, 2=point for all 5 ranks, as well as dedicated base orders (`Ncl6`). It writes targeting range and native costs/cooldowns.
+`tools/generate_party_objects.py` now writes Channel **Ncl2 as integer** (0=instant, 1=unit, 2=point), **Ncl3 as Visible options flag**, Ncl1 as a real follow-through duration, plus **target-compatible, distinct base orders (Ncl6)** for all five ranks. It writes targeting range and native costs/cooldowns.
 
 Normal attacks: original 10 heroes preserve their own inherited weapon missiles and weapon kinds. Two skeletons receive their own attack field settings. The attack cooldown (`ua1c`) varies per character from 1.7 to 2.5 seconds. There is no forced generic arrow for every ranged hero.
 
@@ -42,7 +42,7 @@ All 48 skills use bespoke implementation rather than being aliases for `area`, `
 
 ## Validation and known limitations
 
-GitHub Actions checks Lua syntax, invokes **all 48 spell handlers** in a mocked Warcraft Lua environment, parses the generated Object Editor files, verifies **48 target modes**, **240 mana costs** and inventory abilities, and assembles the MPQ-backed `.w3x`.
+GitHub Actions checks Lua syntax, invokes **all 48 spell handlers** in a mocked Warcraft Lua environment, parses the generated Object Editor files, verifies **48 target modes and their native compatible orders**, **240 mana costs** and inventory abilities, and assembles the MPQ-backed `.w3x`.
 
 **In-game Reforged validation is still needed.** In particular: actual Channel target selection / spell order collisions, graphics, native projectile inheritance and hero attack cadence cannot be conclusively verified by the mocked runtime.
 
