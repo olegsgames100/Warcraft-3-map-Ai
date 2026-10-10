@@ -218,5 +218,9 @@ function A.initWaves()
     SetPlayerHandicapXP(Player(PLAYER_NEUTRAL_AGGRESSIVE),1.0)
     local deathTrigger=CreateTrigger()
     TriggerRegisterAnyUnitEventBJ(deathTrigger,EVENT_PLAYER_UNIT_DEATH)
-    TriggerAddAction(deathTrigger,function()A.enemyDied(GetTriggerUnit())end)
+    TriggerAddAction(deathTrigger,function()
+      local dead=GetTriggerUnit()
+      if A.reviveLastOath and A.reviveLastOath(dead) then return end
+      A.enemyDied(dead)
+    end)
 end
