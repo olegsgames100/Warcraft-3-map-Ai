@@ -1,0 +1,568 @@
+{
+  "format": "1.26a-channel-v1",
+  "description": "40 channel-based castable skills: 10 careers x 4 unique mechanics; five automatic ranks at hero levels 1,5,9,13,17. Original Hero skill lists are suppressed at runtime. The hero base units stay stock for crash safety.",
+  "orderIds": [
+    "thunderclap",
+    "roar",
+    "fanofknives",
+    "berserk"
+  ],
+  "hotkeys": [
+    "Q",
+    "W",
+    "E",
+    "R"
+  ],
+  "heroes": [
+    {
+      "kind": 1,
+      "role": "Паладин-защитник",
+      "style": "Защита территории, перехват и спасение союзников",
+      "skills": [
+        {
+          "raw": "A101",
+          "slot": 1,
+          "key": "Q",
+          "order": "thunderclap",
+          "name": "Клеймо света",
+          "description": "Луч по направлению взгляда отмечает врагов; попадания накапливают доблесть.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp",
+          "mana": 22,
+          "cooldown": 6,
+          "ranks": 5
+        },
+        {
+          "raw": "A102",
+          "slot": 2,
+          "key": "W",
+          "order": "roar",
+          "name": "Купол клятвы",
+          "description": "Создаёт святилище на 7 секунд: каждые полсекунды лечит союзников и помогает удерживать позицию.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDivineShield.blp",
+          "mana": 42,
+          "cooldown": 16,
+          "ranks": 5
+        },
+        {
+          "raw": "A10D",
+          "slot": 3,
+          "key": "E",
+          "order": "fanofknives",
+          "name": "Перехват",
+          "description": "Рывок к противникам, стягивание врагов и кратковременный личный щит.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDefend.blp",
+          "mana": 35,
+          "cooldown": 14,
+          "ranks": 5
+        },
+        {
+          "raw": "A10E",
+          "slot": 4,
+          "key": "R",
+          "order": "berserk",
+          "name": "Последний рассвет",
+          "description": "Массовое исцеление, воскрешение погибших союзников и мощная волна святого урона.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNResurrection.blp",
+          "mana": 110,
+          "cooldown": 55,
+          "ranks": 5
+        }
+      ]
+    },
+    {
+      "kind": 2,
+      "role": "Мастер клинка",
+      "style": "Мобильный дуэлянт, кровотечение, копии и комбо",
+      "skills": [
+        {
+          "raw": "A103",
+          "slot": 1,
+          "key": "Q",
+          "order": "thunderclap",
+          "name": "Песчаный рывок",
+          "description": "Пронзает врагов серией ударов при стремительном рывке.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNWindWalkOn.blp",
+          "mana": 20,
+          "cooldown": 6,
+          "ranks": 5
+        },
+        {
+          "raw": "A104",
+          "slot": 2,
+          "key": "W",
+          "order": "roar",
+          "name": "Рваные клинки",
+          "description": "Оставляет смертоносные следы: враги в вихре получают периодический урон.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNCriticalStrike.blp",
+          "mana": 30,
+          "cooldown": 13,
+          "ranks": 5
+        },
+        {
+          "raw": "A10F",
+          "slot": 3,
+          "key": "E",
+          "order": "fanofknives",
+          "name": "Миражи барханов",
+          "description": "Призывает двух временных теневых бойцов, атакующих вместе с героем.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNMirrorImage.blp",
+          "mana": 40,
+          "cooldown": 20,
+          "ranks": 5
+        },
+        {
+          "raw": "A10G",
+          "slot": 4,
+          "key": "R",
+          "order": "berserk",
+          "name": "Буря тысячи лезвий",
+          "description": "Запускает многократный вихрь вокруг героя; накопленные комбо усиливают урон.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBladestorm.blp",
+          "mana": 100,
+          "cooldown": 45,
+          "ranks": 5
+        }
+      ]
+    },
+    {
+      "kind": 3,
+      "role": "Боевой архимаг",
+      "style": "Накопление электрических зарядов и управление зонами",
+      "skills": [
+        {
+          "raw": "A105",
+          "slot": 1,
+          "key": "Q",
+          "order": "thunderclap",
+          "name": "Цепной разряд",
+          "description": "Молния перепрыгивает между группами врагов и накапливает заряды шторма.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNChainLightning.blp",
+          "mana": 24,
+          "cooldown": 7,
+          "ranks": 5
+        },
+        {
+          "raw": "A106",
+          "slot": 2,
+          "key": "W",
+          "order": "roar",
+          "name": "Грозовой столб",
+          "description": "Длительное электрическое поле наносит урон стоящим в нём врагам.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp",
+          "mana": 38,
+          "cooldown": 16,
+          "ranks": 5
+        },
+        {
+          "raw": "A10H",
+          "slot": 3,
+          "key": "E",
+          "order": "fanofknives",
+          "name": "Магический контур",
+          "description": "Превращает накопленные заряды в ману союзникам и локальный разряд.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBrilliance.blp",
+          "mana": 28,
+          "cooldown": 13,
+          "ranks": 5
+        },
+        {
+          "raw": "A10I",
+          "slot": 4,
+          "key": "R",
+          "order": "berserk",
+          "name": "Штормовой катаклизм",
+          "description": "Вызывает три последовательных грозовых удара по всей арене вокруг героя.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlizzard.blp",
+          "mana": 110,
+          "cooldown": 48,
+          "ranks": 5
+        }
+      ]
+    },
+    {
+      "kind": 4,
+      "role": "Рыцарь смерти",
+      "style": "Сбор душ, призыв нежити, массовое вытягивание жизни",
+      "skills": [
+        {
+          "raw": "A107",
+          "slot": 1,
+          "key": "Q",
+          "order": "thunderclap",
+          "name": "Печать погибели",
+          "description": "Помечает ближайшего врага проклятием. Добивание метки приносит душу.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathCoil.blp",
+          "mana": 24,
+          "cooldown": 7,
+          "ranks": 5
+        },
+        {
+          "raw": "A108",
+          "slot": 2,
+          "key": "W",
+          "order": "roar",
+          "name": "Костяной дозор",
+          "description": "Призывает скелетов, временно защищающих своего господина.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNRaiseDead.blp",
+          "mana": 36,
+          "cooldown": 18,
+          "ranks": 5
+        },
+        {
+          "raw": "A10J",
+          "slot": 3,
+          "key": "E",
+          "order": "fanofknives",
+          "name": "Жатва эссенции",
+          "description": "Высасывает здоровье у окружающих врагов и накапливает души.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathPact.blp",
+          "mana": 38,
+          "cooldown": 13,
+          "ranks": 5
+        },
+        {
+          "raw": "A10K",
+          "slot": 4,
+          "key": "R",
+          "order": "berserk",
+          "name": "Чёрный легион",
+          "description": "Тратит накопленные души, поднимая армию нежити с боевыми усилениями.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp",
+          "mana": 105,
+          "cooldown": 50,
+          "ranks": 5
+        }
+      ]
+    },
+    {
+      "kind": 5,
+      "role": "Охотник на демонов",
+      "style": "Рывки, сжигание маны, руны-ловушки и форма бездны",
+      "skills": [
+        {
+          "raw": "A109",
+          "slot": 1,
+          "key": "Q",
+          "order": "thunderclap",
+          "name": "Разрез реальности",
+          "description": "Телепортационный рывок оставляет позади огненную полосу.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp",
+          "mana": 23,
+          "cooldown": 6,
+          "ranks": 5
+        },
+        {
+          "raw": "A10A",
+          "slot": 2,
+          "key": "W",
+          "order": "roar",
+          "name": "Выжечь разум",
+          "description": "Сжигает ману врагов и восстанавливает здоровье и ярость героя.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp",
+          "mana": 34,
+          "cooldown": 12,
+          "ranks": 5
+        },
+        {
+          "raw": "A10L",
+          "slot": 3,
+          "key": "E",
+          "order": "fanofknives",
+          "name": "Фел-ловушка",
+          "description": "Размещает руну, которая взрывается через несколько секунд.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNImmolationOn.blp",
+          "mana": 38,
+          "cooldown": 15,
+          "ranks": 5
+        },
+        {
+          "raw": "A10M",
+          "slot": 4,
+          "key": "R",
+          "order": "berserk",
+          "name": "Владыка бездны",
+          "description": "На 10 секунд превращает героя в живой источник периодических огненных взрывов.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNMetamorphosis.blp",
+          "mana": 100,
+          "cooldown": 48,
+          "ranks": 5
+        }
+      ]
+    },
+    {
+      "kind": 6,
+      "role": "Лунная жрица",
+      "style": "Дальнобойные выстрелы, исцеляющие круги и укрытие",
+      "skills": [
+        {
+          "raw": "A10B",
+          "slot": 1,
+          "key": "Q",
+          "order": "thunderclap",
+          "name": "Серебряная стрела",
+          "description": "Пронзающая стрела поражает врагов на линии и лечит ближайшего союзника.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNSearingArrowsOn.blp",
+          "mana": 20,
+          "cooldown": 6,
+          "ranks": 5
+        },
+        {
+          "raw": "A10C",
+          "slot": 2,
+          "key": "W",
+          "order": "roar",
+          "name": "Священная роща",
+          "description": "Разворачивает зону постоянного лечения и восстановления маны.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNTranquility.blp",
+          "mana": 42,
+          "cooldown": 18,
+          "ranks": 5
+        },
+        {
+          "raw": "A10N",
+          "slot": 3,
+          "key": "E",
+          "order": "fanofknives",
+          "name": "Плащ затмения",
+          "description": "Краткая неуязвимость и скрытный уход из-под удара с поддержкой союзников.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNHide.blp",
+          "mana": 35,
+          "cooldown": 20,
+          "ranks": 5
+        },
+        {
+          "raw": "A10O",
+          "slot": 4,
+          "key": "R",
+          "order": "berserk",
+          "name": "Падение созвездий",
+          "description": "Многократный звёздный дождь обрушивается на врагов вокруг жрицы.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNStarfall.blp",
+          "mana": 110,
+          "cooldown": 50,
+          "ranks": 5
+        }
+      ]
+    },
+    {
+      "kind": 7,
+      "role": "Алхимик-боевик",
+      "style": "Смешивание взрывчатки, кислотные поля и трансмутация",
+      "skills": [
+        {
+          "raw": "A111",
+          "slot": 1,
+          "key": "Q",
+          "order": "thunderclap",
+          "name": "Гремучий флакон",
+          "description": "Бросает нестабильную смесь: через 2 секунды она взрывается.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp",
+          "mana": 24,
+          "cooldown": 7,
+          "ranks": 5
+        },
+        {
+          "raw": "A112",
+          "slot": 2,
+          "key": "W",
+          "order": "roar",
+          "name": "Кислотная воронка",
+          "description": "Заливает землю кислотой и постоянно повреждает врагов.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp",
+          "mana": 38,
+          "cooldown": 17,
+          "ranks": 5
+        },
+        {
+          "raw": "A113",
+          "slot": 3,
+          "key": "E",
+          "order": "fanofknives",
+          "name": "Жадная трансмутация",
+          "description": "Перерабатывает жизненную силу противника в золото и лечение.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNTransmute.blp",
+          "mana": 30,
+          "cooldown": 13,
+          "ranks": 5
+        },
+        {
+          "raw": "A114",
+          "slot": 4,
+          "key": "R",
+          "order": "berserk",
+          "name": "Философский эликсир",
+          "description": "Активирует алхимический реактор, периодически лечащий союзников и поджигающий врагов.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNHealingSpray.blp",
+          "mana": 105,
+          "cooldown": 48,
+          "ranks": 5
+        }
+      ]
+    },
+    {
+      "kind": 8,
+      "role": "Горный король",
+      "style": "Контроль территории, притяжение врагов и ударные волны",
+      "skills": [
+        {
+          "raw": "A115",
+          "slot": 1,
+          "key": "Q",
+          "order": "thunderclap",
+          "name": "Раскол земной коры",
+          "description": "Продольная ударная волна пробивает строй врагов.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNShockWave.blp",
+          "mana": 24,
+          "cooldown": 7,
+          "ranks": 5
+        },
+        {
+          "raw": "A116",
+          "slot": 2,
+          "key": "W",
+          "order": "roar",
+          "name": "Магнитный кулак",
+          "description": "Притягивает врагов с большого радиуса к своей позиции.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
+          "mana": 35,
+          "cooldown": 16,
+          "ranks": 5
+        },
+        {
+          "raw": "A117",
+          "slot": 3,
+          "key": "E",
+          "order": "fanofknives",
+          "name": "Гранитная твердыня",
+          "description": "Краткая каменная неуязвимость и ответный урон в ближнем бою.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNAvatar.blp",
+          "mana": 40,
+          "cooldown": 22,
+          "ranks": 5
+        },
+        {
+          "raw": "A118",
+          "slot": 4,
+          "key": "R",
+          "order": "berserk",
+          "name": "Гнев исполина",
+          "description": "Серия разрушительных землетрясений с призывом горных стражей.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNThunderClap.blp",
+          "mana": 110,
+          "cooldown": 50,
+          "ranks": 5
+        }
+      ]
+    },
+    {
+      "kind": 9,
+      "role": "Сумрачная охотница",
+      "style": "Метки, телепортация и точечные казни",
+      "skills": [
+        {
+          "raw": "A119",
+          "slot": 1,
+          "key": "Q",
+          "order": "thunderclap",
+          "name": "Шаг за грань",
+          "description": "Скачок к ближайшему противнику с мощным ударом из тени.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNBlink.blp",
+          "mana": 24,
+          "cooldown": 7,
+          "ranks": 5
+        },
+        {
+          "raw": "A11A",
+          "slot": 2,
+          "key": "W",
+          "order": "roar",
+          "name": "Клеймо охотницы",
+          "description": "Накладывает метку приоритета; повторное применение усиливает урон по цели.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp",
+          "mana": 28,
+          "cooldown": 10,
+          "ranks": 5
+        },
+        {
+          "raw": "A11B",
+          "slot": 3,
+          "key": "E",
+          "order": "fanofknives",
+          "name": "Дымовая завеса",
+          "description": "На мгновение делает героя неуязвимым и создаёт повреждающий дым.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp",
+          "mana": 35,
+          "cooldown": 18,
+          "ranks": 5
+        },
+        {
+          "raw": "A11C",
+          "slot": 4,
+          "key": "R",
+          "order": "berserk",
+          "name": "Приговор ночи",
+          "description": "Казнит раненую цель; если цель выживает, получает крупный урон и взрыв вокруг.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFanOfKnives.blp",
+          "mana": 100,
+          "cooldown": 40,
+          "ranks": 5
+        }
+      ]
+    },
+    {
+      "kind": 10,
+      "role": "Ледяной лич",
+      "style": "Заморозка, контроль перемещения и периодические бури",
+      "skills": [
+        {
+          "raw": "A11D",
+          "slot": 1,
+          "key": "Q",
+          "order": "thunderclap",
+          "name": "Копьё вечного льда",
+          "description": "Ледяной снаряд режет врагов по прямой линии.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostNova.blp",
+          "mana": 24,
+          "cooldown": 7,
+          "ranks": 5
+        },
+        {
+          "raw": "A11E",
+          "slot": 2,
+          "key": "W",
+          "order": "roar",
+          "name": "Ледяные цепи",
+          "description": "Ненадолго сковывает ближайших врагов и замедляет их.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFreezingBreath.blp",
+          "mana": 38,
+          "cooldown": 17,
+          "ranks": 5
+        },
+        {
+          "raw": "A11F",
+          "slot": 3,
+          "key": "E",
+          "order": "fanofknives",
+          "name": "Орбита холода",
+          "description": "Создаёт постоянную морозную область, которая движется вместе с целью только при активации.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNFrostArmor.blp",
+          "mana": 42,
+          "cooldown": 18,
+          "ranks": 5
+        },
+        {
+          "raw": "A11G",
+          "slot": 4,
+          "key": "R",
+          "order": "berserk",
+          "name": "Вечная зима",
+          "description": "Большая снежная буря замедляет врагов и подпитывает жизнью героя.",
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDeathAndDecay.blp",
+          "mana": 115,
+          "cooldown": 52,
+          "ranks": 5
+        }
+      ]
+    }
+  ]
+}
