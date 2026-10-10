@@ -117,7 +117,12 @@ def generate(root):
         field(existing,"upro",hero["proper"])
         field(existing,"utip",hero["role"])
         field(existing,"utub",hero["role"]+" / "+hero["attack"]+" / QWER class")
-        field(existing,"uabi",",".join(s["id"] for s in hero["skills"]))
+        # Preserve inventory ability and only give QWER through Lua.
+        existing_list=next((m["val"] for m in existing["mods"] if m["field"]=="uabi" and isinstance(m["val"],str)),"")
+        all_qwer={entry["id"] for h in heroes for entry in h["skills"]}
+        innate=[a.strip() for a in existing_list.split(",") if a.strip() and a.strip() not in all_qwer]
+        if "AInv" not in innate: innate.append("AInv")
+        field(existing,"uabi",",".join(innate))
         values=hero["stats"]
         for key,val in (
             ("ustr",values["str"]),("uagi",values["agi"]),("uint",values["int"]),
@@ -157,9 +162,9 @@ def generate(root):
                 for key,val,typ in (
                     ("anam",skill["name"],3),
                     ("atp1",tag,3),("aub1",body,3),
-                    ("aret",skill["icon"],3),("aart",skill["icon"],3),
+                    ("aart",skill["icon"],3),
                     ("ahky",skill["key"],3),
-                    ("amcs",float(skill["mana"]),1),
+                    ("amcs",int(skill["mana"]),0),
                     ("acdn",float(skill["cooldown"]),1),
                     ("Ncl1",0.0,1),
                     ("Ncl4",0.0,1)
@@ -168,7 +173,8 @@ def generate(root):
                 field(obj,"alev",5,typ=0)
                 field(obj,"abpx",k,typ=0)
                 field(obj,"abpy",2,typ=0)
-                field(obj,"aord",commands[k],typ=3)
+                # Set Channel order ID for each of the four separate orders.
+                field(obj,"Ncl6",commands[k],rank,typ=3)
             # Keep rank-dependent editor data, but overwrite all cooldowns and costs.
     encode(root/"war3map.w3a",av,ability_groups,True)
     return len(custom),len(custom_spells)
