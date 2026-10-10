@@ -225,7 +225,7 @@ def build(root, destination):
                 raise FileNotFoundError(file)
             continue
         content = file.read_bytes()
-        elif name in ("war3map.w3u", "war3map.w3a", "war3map.w3t"):
+        if name in ("war3map.w3u", "war3map.w3a", "war3map.w3t"):
             content = content
         files[name] = content
     files["(listfile)"] = ("\r\n".join((*files, "(listfile)")) + "\r\n").encode("ascii")
