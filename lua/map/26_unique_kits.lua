@@ -454,7 +454,7 @@ local function cast(h,pid,kind,slot,rank,target,x,y,b)
   end
 end
 
-function A.castHero(hero,ability)
+function A.castHero(hero,ability,snapshot)
   local pid=GetPlayerId(GetOwningPlayer(hero))
   if pid<0 or pid>3 or A.heroUnits[pid]~=hero then return false end
   local kind=A.heroKind[pid]
@@ -475,8 +475,8 @@ function A.castHero(hero,ability)
   if BlzStartUnitAbilityCooldown then
     BlzStartUnitAbilityCooldown(hero,ability,record.cooldown)
   end
-  local x,y=GetSpellTargetX(),GetSpellTargetY()
-  local target=GetSpellTargetUnit()
+  local x,y=snapshot and snapshot.x or GetSpellTargetX(),snapshot and snapshot.y or GetSpellTargetY()
+  local target=snapshot and snapshot.target or GetSpellTargetUnit()
   if x==0 and y==0 then
     if target then x,y=GetUnitX(target),GetUnitY(target)
     else x,y=GetUnitX(hero),GetUnitY(hero) end
