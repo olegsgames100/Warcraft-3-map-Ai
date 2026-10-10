@@ -1,65 +1,66 @@
-# Hero Arena — Kaz'Rul's Last Stand
+# Hero Arena — custom co-op map (Warcraft III 1.26a)
 
-Cooperative **Warcraft III (classic 1.26a) JASS** arena for **1–4 human players**. The source files in this repository are *unpacked map contents*, not a playable `.w3x` by themselves. Import these files into an existing map archive / use a Warcraft III map editor; keep binary assets and Object Editor data intact.
+Source branch: `govno`. Work branch: `feature/hero-arena-expanded`.
 
-## Core game loop
+**IMPORTANT:** This repository contains unpacked Warcraft III map contents. It is not itself a playable `.w3x`. Pack all `war3map.*` files (including the newly added `war3map.w3u`, `war3map.w3a`, and `war3map.w3t`) inside one classic Warcraft III map archive. Replacing only `war3map.j` will not load any custom heroes, shops, abilities or items.
 
-1. A Wisp spawns for each human at the northern selection hall. Move it onto any of six hero statues (the selection region accepts the Wisp), or type `-pick 1` ... `-pick 6`. An automatic random choice occurs after 90 seconds.
-2. Each hero receives a starter inventory and abilities on top of their standard Warcraft III hero toolkit.
-3. Four neutral shops stand around the centre (weapons, armour, consumables, relics).
-4. First wave arrives **15 seconds after everyone chooses**, followed by **one wave every 60 seconds**.
-5. There are ten progressively stronger enemy compositions, followed **60 seconds after wave 10** by the final boss **Kaz'Rul**.
-6. Defeat Kaz'Rul for victory. Dead heroes revive after 12 seconds.
+## Hero selection
+Move your Wisp to one of the six statue platforms in the north; alternatively type `-pick 1` through `-pick 6`. After 90 seconds unpicked heroes are randomized. Waves begin 15 seconds after selection completes.
 
-## Physical map layout
+## Six unique heroes
 
-- A **stone fighting circle** with a central paved dais and decorative perimeter trees.
-- A separate **northern selection plaza** with six stone hero platforms (3 x 2), hero previews, floating name labels and walk-in trigger regions.
-- A paved north-to-centre walkway.
-- All layout terrain and decorations are created dynamically from `war3map.j`, using `SetTerrainType` and destructable placement. The existing `war3map.w3e` binary remains untouched.
-- Start initialization occurs after 0.5 seconds of game time to allow the client interface to come up before selection. The selection timer is 90 seconds.
+| Hero name | Epithet | Class | Signature abilities |
+|---|---|---|---|
+| Reynar Lightforged | Guardian of the Last Dawn | Strength tank/support | Spear of Judgment (A101), Oath of Dawn (A102) |
+| Zarkhan Swiftwing | Dancer Among the Sands | Agility melee | Sand Rift (A103), Shadow Dance (A104) |
+| Mirella Sparkborn | Whisperer to the Storms | Intellect mage | Needle Storm (A105), Storm Guardian (A106) |
+| Morven Ashbringer | Heir to a Forgotten Throne | Strength bruiser | Touch of Ash (A107), Grave Winter (A108) |
+| Valtir Faceless | Wanderer Between Worlds | Agility assassin | Rift Step (A109), Void Fire (A10A) |
+| Selena Stargazer | Last Daughter of the Night | Ranged intellect-support hybrid | Moon Judgment (A10B), Starfall (A10C) |
 
-## Heroes
+Each has a custom Object Editor unit (`H001`, `O001`, `H002`, `U001`, `E001`, `E002`) with different STR, AGI, INT, growth, HP, mana and movement speed. Native proper names and tooltips are custom. Floating epithets follow them during play. The 12 custom Object Editor abilities inherit working Warcraft III spell templates and have additional scripted cast effects; they are not 12 wholly new spell engines.
 
-| Choice | Warcraft III base hero | Theme |
+## Invisible aura support
+
+Each player (up to three) receives a **different invisible, invulnerable, Locust-enabled allied carrier** of type `hA01` at the map centre. Auras are placed exclusively on those carriers, not on playable heroes. Carrier appearance is made fully transparent instead of `ShowUnit(false)` so aura processing continues.
+
+| Players | Carrier abilities | Additional global regeneration |
 |---|---|---|
-| Arbiter of the Arena | Paladin | Support / frontline tank |
-| Dustblade | Blademaster | Mobile melee damage |
-| Stormkeeper | Archmage | Spellcasting / crowd control |
-| Ash Lord | Death Knight | Undead bruiser |
-| Void Hunter | Demon Hunter | Agile skirmisher |
-| Moon Sentinel | Priestess of the Moon | Ranged support |
+| 1 | A201 move/attack speed + A202 regen + A203 armor + A204 attack | +18 HP/s, +10 mana/s |
+| 2 | A201 speed + A202 regen | +10 HP/s, +5 mana/s |
+| 3 | A201 speed | +5 HP/s, +2.5 mana/s |
+| 4 | None | None |
 
-Signature add-on abilities use stock Warcraft III ability rawcodes defined in `Arena_GiveSkills`; hero-native spell progression remains available through normal level-ups. These are predefined *loadouts*, not fully custom Object Editor abilities.
+On player exit carriers are deleted and recreated for the remaining players, preventing stale bonuses. The aura area is set to 30,000 game units in `war3map.w3a`, sufficient to cover the arena.
 
-## Adaptive co-op difficulty
+## Four differentiated shops and twelve new items
 
-| Human players | Enemy wave count multiplier (approx.) | Global hero bonuses |
-|---|---:|---|
-| 1 | 0.75× | 6 extra aura/passive abilities; +18 HP/+10 mana per second; increased handicap/XP |
-| 2 | 1.00× | 3 extra abilities; +10 HP/+5 mana per second; increased handicap/XP |
-| 3 | 1.25× | 1 extra ability; +5 HP/+2.5 mana per second; modest handicap/XP |
-| 4 | 1.50× | **No solo/team catch-up buffs** |
+Four unique shop units (`nS01` to `nS04`), each in its own location with an independent Object Editor name, model choice, and inventory:
 
-The actual spawn amount is rounded up and capped at 130 living wave enemies to limit runaway accumulation. If a player leaves, surviving players' catch-up buffs are refreshed and the opening hero-selection gate can advance.
+| Shop | Unique stock |
+|---|---|
+| Shard Forge | Comet Blade, Frost Fang, Oathblade |
+| Stone Guardian's Hold | Titan Bastion, Oath Helm, Silence Mantle |
+| Crossroads Alchemist | First Dawn Elixir, Ether Condensate, Hourglass of Peace |
+| Vault of Forbidden Relics | Heart of the Fallen Star, Clockmaker's Eye, Blood Moon Sigil |
 
-## Boss — Kaz'Rul
+Twelve custom items (`I001` through `I00C`) inherit reliable base-item effects, have custom names, descriptions and prices. Equipment also grants **scripted bonus hero stats on pickup** and removes them on drop. Some consumables also heal or restore mana to nearby allied heroes when used.
 
-Kaz'Rul grows with the number of active humans (level and hero stats), has an undead aura loadout, and enters two phases:
+## Waves, loot and boss
 
-- **65% HP:** summons skeleton reinforcements and releases a short-range magic nova.
-- **30% HP:** summons infernals, gains a roar ability and uses a stronger magic nova.
+10 waves, with a **75-second interval** instead of 60 seconds and fewer enemies than the previous build. Base wave population uses `(count * (humanPlayers + 2) + 5) / 8` rounded by integer division, minimum two per ring, and maximum **65** living wave enemies. The first wave remains 15 seconds after hero selection. Following wave 10 Kaz'Rul arrives after the interval.
 
-Boss reinforcements use the same adaptive wave multiplier. The boss is identified separately from wave creeps for victory tracking.
+Normal creeps have a low chance to drop unique items. Probability begins at **1.2%** in wave 1 and rises by 0.3 percentage points per wave; stronger enemy heroes add +2 percentage points and units of level 6+ add +1.5 percentage points. Early-wave drops favor consumables; mid-wave drops armor and weapons; late waves can drop rare relics. Gold is also earned via kills and wave completion.
 
-## Progression and shops
+Kaz'Rul scales its stats with player count, summons reinforcements and releases area magic at 65% and 30% HP; killing him wins.
 
-Players start with 450 gold, a circlet and healing/mana potions. Each wave gives **40 + 15 × wave number** gold to all active humans. The killer of an ordinary wave enemy earns another **4 + 2 × current wave** gold. Shops stock existing Warcraft III items, with fixed in-game stock levels.
+## Build and validation
 
-## Technical notes / testing
+- `war3map.j`: runtime triggers, hero selection, custom spell effects, shop stock, aura carriers, loot/expedition pacing.
+- `war3map.w3u`: custom unit data, names, stats, shops and carrier.
+- `war3map.w3a`: custom ability data.
+- `war3map.w3t`: custom item data.
+- `object-data/hero_arena_objects.json`: readable source manifest of new objects.
+- Existing terrain/pathing and map assets are unchanged.
 
-- Main gameplay script: `war3map.j`, JASS for Warcraft III 1.26a.
-- Source branch: `govno`; feature branch: `feature/hero-arena-expanded`.
-- Basic structural checks can validate function boundaries and game-event wiring; **actual gameplay and object rawcode availability must be verified in Warcraft III**.
-- Recommended test matrix: 1, 2, 3, 4 connected players; buying items; deaths and revives; one player leaving before hero pick; all 10 waves; both boss phases; boss death victory; pathing/spawn locations.
-- Map terrain bounds and shop placements are inherited from the source map. Adjust wave spawn radius or arena geometry in `war3map.j` if terrain blocks enemy pathing.
+Structural checks: JASS functions are balanced and native call names were compared to an older `common.j`/`blizzard.j` reference; custom binary Object Editor records were checked for structure and sizes. **These checks are not equivalent to compiling in the World Editor or testing gameplay in Warcraft III 1.26a.** If imports fail, verify archive paths and object-editor rawcodes. Test with 1–4 clients and check spell hotkeys, skill progression, shop purchasing, loot rarity, aura effect radius, and victory flow.
