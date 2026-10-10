@@ -1069,13 +1069,13 @@ function Trig_Leave_Actions takes nothing returns nothing
 endfunction
 
 function Trig_Aura_Actions takes nothing returns nothing
-    call Arena_UpdateHeroLabels()
     local integer i = 0
     local unit u
     local real life
     local real mana
     local real addHp
     local real addMp
+    call Arena_UpdateHeroLabels()
     if udg_HumanCount >= 4 then
         return
     endif
