@@ -137,7 +137,7 @@ def generate(root):
         # ua1c = attack cooldown in seconds; ua1w = weapon type.
         is_ranged=hero["attack"]=="ranged"
         field(existing,"uaen",1,typ=0)
-        field(existing,"ua1c",float(hero["attackCooldown"]),typ=1)
+        existing["mods"]=[m for m in existing["mods"] if m["field"]!="ua1c"]
         if hero["kind"]>=11:
             field(existing,"ua1w","missile" if is_ranged else "normal",typ=3)
             field(existing,"ua1t","pierce" if is_ranged else "hero",typ=3)
@@ -187,7 +187,7 @@ def generate(root):
                     ("anam",skill["name"],3),
                     ("atp1",tooltip,3),("aub1",body,3),
                     ("aart",skill["icon"],3),("ahky",skill["key"],3),
-                    ("amcs",int(skill["mana"]),0),
+                    ("amcs",int(skill["mana"]+(level-1)*skill["manaGrowth"]),0),
                     ("acdn",float(skill["cooldown"]),1),
                     ("Ncl1",0.0,1),("Ncl2",target_types[skill["target"]],0),
                     ("Ncl3",1,0),("Ncl4",0.0,1),
@@ -197,8 +197,8 @@ def generate(root):
                 field(obj,"alev",5,typ=0)
                 field(obj,"abpx",k,typ=0)
                 field(obj,"abpy",2,typ=0)
-                field(obj,"aran",800 if skill["target"]!="instant" else 0,level,typ=1)
-                field(obj,"atar","air,ground,enemy,friend,self",level,typ=3)
+                field(obj,"aran",float(skill["range"]),level,typ=1)
+                field(obj,"atar","air,ground,friend" if hero["kind"]==1 and k==2 else "air,ground,enemy,friend,self",level,typ=3)
     encode(root/"war3map.w3a",av,ability_groups,True)
     return len(custom),len(custom_spells)
 
