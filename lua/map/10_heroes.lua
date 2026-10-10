@@ -204,7 +204,7 @@ function A.tickHeroes()
 end
 
 function A.initInputs()
- local commands={"-kill","-next","-revive","-maxlvl","-stats","-roles"}
+ local commands={"-kill","-next","-revive","-maxlvl","-stats","-roles","-debugspells"}
  local trig=CreateTrigger()
  for pid=0,3 do
     TriggerRegisterPlayerChatEvent(trig,Player(pid),"-pick ",false)
@@ -226,6 +226,9 @@ function A.initInputs()
             A.playerText(pid,string.format("Уровень %d | Сила %d | Ловкость %d | Интеллект %d",
                 GetHeroLevel(hero),GetHeroStr(hero,false),GetHeroAgi(hero,false),GetHeroInt(hero,false)))
         end
+    elseif cmd=="-debugspells" then
+        A.spellDebug=not A.spellDebug
+        A.say("Spell debug: "..(A.spellDebug and "ON" or "OFF").." | CAST / EFFECT / FALLBACK / LUA ERROR")
     elseif cmd=="-roles" then
         for i=1,#A.roles do A.playerText(pid,i..". "..A.roles[i].." — "..A.roleTypes[i]) end
     elseif cmd=="-kill" and pid==0 then A.clearEnemies()
