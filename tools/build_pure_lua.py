@@ -9,6 +9,7 @@ import argparse
 from pathlib import Path
 import re
 import struct
+import sys
 
 FILES = (
     "war3map.lua", "war3map.w3i", "war3map.w3e", "war3map.wpm",
@@ -161,7 +162,7 @@ def create_reforged_w3i():
     put("7I", 28, 3, 6059, 1, 31, 1, 0)
     text("Hero Arena Lua — Reforged")
     text("Hero Arena")
-    text("50 тематических волн. 10 уникальных героев на Lua. 1–4 игрока.")
+    text("50 тематических волн. 12 уникальных героев на Lua. 1–4 игрока.")
     text("1–4 игрока")
     # Four corners of original 148×148 tile playfield, in world units.
     put("8f", -9472, -9728, 9472, 9216, -9472, 9216, 9472, -9728)
@@ -200,7 +201,7 @@ def create_reforged_w3i():
 
 
 def assemble_lua(root):
-    names = ["00_core.lua", "10_heroes.lua", "20_abilities.lua", "30_waves.lua", "40_items.lua", "50_world.lua"]
+    names = ["00_core.lua", "10_heroes.lua", "15_combat.lua", "20_abilities.lua", "25_role_spells.lua", "30_waves.lua", "40_items.lua", "50_world.lua"]
     parts = ["-- Hero Arena - pure Lua edition (generated from lua/map).".encode("utf-8")]
     for name in names:
         source = root / "lua" / "map" / name
@@ -215,6 +216,12 @@ def assemble_lua(root):
 
 
 def build(root, destination):
+    import importlib.util
+    module = root / "tools" / "generate_party_objects.py"
+    spec = importlib.util.spec_from_file_location("party_objects", module)
+    generator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(generator)
+    generator.generate(root)
     files = {"war3map.lua": assemble_lua(root), "war3map.w3i": create_reforged_w3i()}
     for name in FILES:
         if name in files:
