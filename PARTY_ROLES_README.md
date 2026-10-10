@@ -65,3 +65,36 @@ python3 tools/build_pure_lua.py --source . --output dist/Hero_Arena_Party_Roles_
 The validated GitHub Actions run [#38070097828](https://github.com/olegsgames100/Warcraft-3-map-Ai/actions/runs/38070097828) **succeeded**: Lua syntax, all 12 object-based hero definitions, all 48 custom abilities and HM3W/MPQ packaging checks passed. Warcraft III Reforged runtime, hero creation, native Object Editor custom records, sound paths, visuals, combat balance and multiplayer performance **must still be tested inside the game**. This is an experimental overhaul branch, not an in-game-tested release. Existing map terrain, wave, item and shop systems are inherited from V2.
 
 Recommended smoke test: select both skeletons in a two-player game; confirm their models and QWER hotkeys, rank 1–5 cooldowns, mark/consume/empowered arrow/paired ult. Then run tank+healer and mage+buffer groups through waves 1–10 before extended balancing.
+
+
+## Tactical kit overhaul (update)
+
+This is a second major gameplay pass beyond the initial 48 QWER implementation.
+The active `Arena.castHero` handler is now `lua/map/26_unique_kits.lua`, loaded
+after the original role handlers. New tools in `lua/map/16_role_mechanics.lua`
+manage tactical arrow travel, bleed stacks, parrying, attack haste, temporary
+barriers, protector damage transfer, hostile corpse-triggered effects, frost
+stacking and contextual cooldown refunds.
+
+| Hero | Signature player decision |
+| --- | --- |
+| Reynar | Link to endangered allies, absorb hits, spend stored Resolve on a counterwave |
+| Zarhan | Stack bleed, parry a real attack, then cash bleed and Combo on a target |
+| Mirella | Place a conductor to control where lightning chains and ultimate strikes |
+| Morven | Curse future kills to cause soul harvest and a delayed corpse explosion |
+| Valtir | Lay persistent proximity mines and transform to detonate them |
+| Selena | Choose between emergency direct heal, stationary healing grove and overheal shielding |
+| Fenn | Maintain true movement/attack haste, physical/spell buffs and cooldown recovery |
+| Torvin | Pull and interrupt enemies, then turn incoming strikes into counterquakes |
+| Lyrisa | Backstab a target, mark it, escape to a stored position, execute |
+| Issara | Accumulate 3 frost stacks for stuns, use a directional frost wall, shatter in ultimate |
+| Avals | Precision-empowered traveling arrow, targeted volley, bones marked for Gelo |
+| Gelo | Crush Avals's marks, protect Avals, empower arrow and time paired ultimate |
+
+At build time, `tools/generate_party_objects.py` synchronizes Object Editor
+tooltips with `object-data/party_heroes.json`.
+
+**Implementation note:** Advanced combat registers against the existing 
+`A.modifyIncoming` hook and every timed effect is driven by the shared
+`Arena.clock`. A separate game-client smoke test remains necessary. Reforged
+model/effect behavior, hotkeys and combat balance are not verified by CI.
