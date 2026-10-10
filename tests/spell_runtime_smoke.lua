@@ -86,9 +86,9 @@ dofile("lua/map/00_core.lua")
 dofile("lua/map/10_heroes.lua")
 dofile("lua/map/15_combat.lua")
 dofile("lua/map/16_role_mechanics.lua")
-dofile("lua/map/20_abilities.lua")
-dofile("lua/map/25_role_spells.lua")
-dofile("lua/map/26_unique_kits.lua")
+dofile("lua/map/21_spell_meta.lua")
+dofile("lua/map/22_spell_events.lua")
+dofile("lua/map/27_rebuilt_spells.lua")
 damageCount=0
 for kind=1,12 do
   units={}
