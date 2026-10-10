@@ -1,6 +1,9 @@
 -- Distinct 12-class ability kits. Overrides first-pass generic QWER handlers.
 local A=Arena
 local function power(rank) return 32+rank*22 end
+local function hpFraction(u)
+  return GetWidgetLife(u)/math.max(1,GetUnitState(u,UNIT_STATE_MAX_LIFE))
+end
 local function state(pid) return A.role(pid) end
 local function resource(pid,key,change)
   local previous=A.resources[pid][key] or 0
