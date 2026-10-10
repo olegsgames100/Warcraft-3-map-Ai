@@ -306,162 +306,9 @@ function Arena_HeroEpithet takes integer k returns string
     return "Повелительница льда"
 endfunction
 
-function Arena_CustomSpell takes integer kind, integer slot returns integer
-    if kind == 1 then
-        if slot == 1 then
-            return 'A101'
-        elseif slot == 2 then
-            return 'A102'
-        elseif slot == 3 then
-            return 'A10D'
-        elseif slot == 4 then
-            return 'A10E'
-        endif
-    elseif kind == 2 then
-        if slot == 1 then
-            return 'A103'
-        elseif slot == 2 then
-            return 'A104'
-        elseif slot == 3 then
-            return 'A10F'
-        elseif slot == 4 then
-            return 'A10G'
-        endif
-    elseif kind == 3 then
-        if slot == 1 then
-            return 'A105'
-        elseif slot == 2 then
-            return 'A106'
-        elseif slot == 3 then
-            return 'A10H'
-        elseif slot == 4 then
-            return 'A10I'
-        endif
-    elseif kind == 4 then
-        if slot == 1 then
-            return 'A107'
-        elseif slot == 2 then
-            return 'A108'
-        elseif slot == 3 then
-            return 'A10J'
-        elseif slot == 4 then
-            return 'A10K'
-        endif
-    elseif kind == 5 then
-        if slot == 1 then
-            return 'A109'
-        elseif slot == 2 then
-            return 'A10A'
-        elseif slot == 3 then
-            return 'A10L'
-        elseif slot == 4 then
-            return 'A10M'
-        endif
-    elseif kind == 6 then
-        if slot == 1 then
-            return 'A10B'
-        elseif slot == 2 then
-            return 'A10C'
-        elseif slot == 3 then
-            return 'A10N'
-        elseif slot == 4 then
-            return 'A10O'
-        endif
-    elseif kind == 7 then
-        if slot == 1 then
-            return 'A111'
-        elseif slot == 2 then
-            return 'A112'
-        elseif slot == 3 then
-            return 'A113'
-        elseif slot == 4 then
-            return 'A114'
-        endif
-    elseif kind == 8 then
-        if slot == 1 then
-            return 'A115'
-        elseif slot == 2 then
-            return 'A116'
-        elseif slot == 3 then
-            return 'A117'
-        elseif slot == 4 then
-            return 'A118'
-        endif
-    elseif kind == 9 then
-        if slot == 1 then
-            return 'A119'
-        elseif slot == 2 then
-            return 'A11A'
-        elseif slot == 3 then
-            return 'A11B'
-        elseif slot == 4 then
-            return 'A11C'
-        endif
-    elseif kind == 10 then
-        if slot == 1 then
-            return 'A11D'
-        elseif slot == 2 then
-            return 'A11E'
-        elseif slot == 3 then
-            return 'A11F'
-        elseif slot == 4 then
-            return 'A11G'
-        endif
-    endif
-    return 0
-endfunction
-
 function Arena_GiveSkills takes unit u, integer kind returns nothing
-    local integer slot = 1
-    local integer id
-    local integer pid = GetPlayerId(GetOwningPlayer(u))
-    // Hide classic skill-tree buttons. New QWER unit spells auto-rank with hero levels.
-    if pid >= 0 and pid < 4 then
-        call SetPlayerAbilityAvailable(Player(pid), 'AHer', false)
-    endif
-    loop
-        exitwhen slot > 4
-        set id = Arena_CustomSpell(kind, slot)
-        if id != 0 then
-            if not UnitAddAbility(u, id) then
-                call DisplayTimedTextToPlayer(GetOwningPlayer(u), 0.0, 0.0, 15.0, "|cffff5555Не загружено умение " + I2S(slot) + ". Проверьте war3map.w3a.|r")
-            endif
-        endif
-        set slot = slot + 1
-    endloop
-    call UnitModifySkillPoints(u, -GetHeroSkillPoints(u))
-endfunction
-
-function Arena_UpdateCustomRanks takes nothing returns nothing
-    local integer pid = 0
-    local integer slot
-    local integer id
-    local integer rank
-    local unit hero
-    loop
-        exitwhen pid >= 4
-        set hero = udg_Heroes[pid]
-        if hero != null and udg_HeroKind[pid] >= 1 and GetWidgetLife(hero) > 0.405 then
-            set rank = 1 + (GetHeroLevel(hero) - 1) / 4
-            if rank > 5 then
-                set rank = 5
-            endif
-            set slot = 1
-            loop
-                exitwhen slot > 4
-                set id = Arena_CustomSpell(udg_HeroKind[pid], slot)
-                if GetUnitAbilityLevel(hero, id) > 0 and GetUnitAbilityLevel(hero, id) != rank then
-                    call SetUnitAbilityLevel(hero, id, rank)
-                endif
-                set slot = slot + 1
-            endloop
-            if GetHeroSkillPoints(hero) > 0 then
-                call UnitModifySkillPoints(hero, -GetHeroSkillPoints(hero))
-            endif
-        endif
-        set pid = pid + 1
-    endloop
-    set hero = null
+    // Hero skills are learned only through the Warcraft III level-up menu.
+    // Never pre-add or pre-level these custom hero abilities here.
 endfunction
 
 function Arena_ClearAuras takes nothing returns nothing
@@ -597,10 +444,10 @@ function Arena_SpawnHero takes integer pid, integer kind returns boolean
         call SetHeroInt(hero, 30, true)
     endif
     call Arena_NormalizeHeroStats(hero)
-    call Arena_GiveSkills(hero, kind)
     set udg_Heroes[pid] = hero
     set udg_HeroKind[pid] = kind
-    // Stock model is crash-safe; four unique Channel spells replace original hero gameplay.
+    // Hero learnable skills come from a verified built-in hero in this stability test.
+    // Do not use custom W3A spells until custom object validation is completed.
     call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 7.0, "[Выбор 2/3] Герой создан. Выдаём снаряжение...")
     call UnitAddItemById(hero, 'phea')
     call UnitAddItemById(hero, 'pman')
@@ -835,190 +682,12 @@ function Arena_ProfessionSpell takes unit caster, integer pid returns nothing
     set target = null
 endfunction
 
-function Arena_CustomArea takes unit caster, real radius, real amount, boolean healing returns nothing
-    local group g = CreateGroup()
-    local unit u
-    call GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), radius, null)
-    loop
-        set u = FirstOfGroup(g)
-        exitwhen u == null
-        call GroupRemoveUnit(g, u)
-        if GetWidgetLife(u) > 0.405 then
-            if healing and IsUnitAlly(u, GetOwningPlayer(caster)) and IsUnitType(u, UNIT_TYPE_HERO) then
-                call SetUnitState(u, UNIT_STATE_LIFE, GetUnitState(u, UNIT_STATE_LIFE) + amount)
-            elseif not healing and IsUnitEnemy(u, GetOwningPlayer(caster)) then
-                call UnitDamageTarget(caster, u, amount, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
-            endif
-        endif
-    endloop
-    call DestroyGroup(g)
-    set u = null
-    set g = null
-endfunction
-
-function Arena_CustomSummon takes unit caster, integer rawId, integer count, real duration returns nothing
-    local unit u
-    local integer i = 0
-    loop
-        exitwhen i >= count
-        set u = CreateUnit(GetOwningPlayer(caster), rawId, GetUnitX(caster) + GetRandomReal(-130.0, 130.0), GetUnitY(caster) + GetRandomReal(-130.0, 130.0), 270.0)
-        if u != null then
-            call UnitApplyTimedLife(u, 'BTLF', duration)
-            call IssuePointOrder(u, "attack", GetUnitX(caster) + 500.0, GetUnitY(caster))
-        endif
-        set i = i + 1
-    endloop
-    set u = null
-endfunction
-
-function Arena_CustomMove takes unit caster, real distance returns nothing
-    local real a = GetUnitFacing(caster) * bj_DEGTORAD
-    call SetUnitPosition(caster, GetUnitX(caster) + distance * Cos(a), GetUnitY(caster) + distance * Sin(a))
-endfunction
-
-function Arena_CustomFinisher takes unit caster, real damage returns nothing
-    local group g = CreateGroup()
-    local unit target
-    call GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), 450.0, null)
-    loop
-        set target = FirstOfGroup(g)
-        exitwhen target == null
-        call GroupRemoveUnit(g, target)
-        if IsUnitEnemy(target, GetOwningPlayer(caster)) and GetWidgetLife(target) > 0.405 then
-            if GetWidgetLife(target) < GetUnitState(target, UNIT_STATE_MAX_LIFE) * 0.25 then
-                call UnitDamageTarget(caster, target, damage * 2.4, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
-            else
-                call UnitDamageTarget(caster, target, damage, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
-            endif
-            exitwhen true
-        endif
-    endloop
-    call DestroyGroup(g)
-    set target = null
-    set g = null
-endfunction
-
-function Arena_CustomCast takes unit caster, integer id returns boolean
-    local integer pid = GetPlayerId(GetOwningPlayer(caster))
-    local integer role
-    local integer slot = 1
-    local integer rank
-    local integer i = 0
-    local real amount
-    if pid < 0 or pid > 3 or udg_Heroes[pid] != caster then
-        return false
-    endif
-    set role = udg_HeroKind[pid]
-    loop
-        exitwhen slot > 4 or Arena_CustomSpell(role, slot) == id
-        set slot = slot + 1
-    endloop
-    if slot > 4 then
-        return false
-    endif
-    set rank = GetUnitAbilityLevel(caster, id)
-    set amount = 32.0 + 21.0 * I2R(rank)
-    if slot == 1 then
-        // Q is the offensive identity: execution, pierce, leap, or magic blast.
-        if role == 2 or role == 5 or role == 9 then
-            call Arena_CustomMove(caster, 200.0 + 30.0 * I2R(rank))
-            call Arena_CustomArea(caster, 310.0, amount * 1.3, false)
-        elseif role == 1 or role == 4 or role == 9 then
-            call Arena_CustomFinisher(caster, amount * 2.5)
-        else
-            call Arena_CustomArea(caster, 390.0 + 22.0 * I2R(rank), amount * 1.8, false)
-        endif
-        if role == 6 then
-            call Arena_CustomArea(caster, 450.0, amount * 0.65, true)
-        elseif role == 7 then
-            call Arena_CustomArea(caster, 260.0, amount, false)
-        endif
-    elseif slot == 2 then
-        // W: persistent-feeling area patterns, regeneration or resource manipulation.
-        if role == 1 or role == 6 then
-            call Arena_CustomArea(caster, 600.0, amount * 2.1, true)
-        elseif role == 4 then
-            call Arena_CustomSummon(caster, 'uske', 1 + rank / 2, 14.0)
-        elseif role == 8 then
-            call Arena_CustomArea(caster, 300.0, amount * 1.5, false)
-        elseif role == 5 or role == 3 then
-            call Arena_CustomArea(caster, 520.0, amount * 1.1, false)
-            call SetUnitState(caster, UNIT_STATE_MANA, GetUnitState(caster, UNIT_STATE_MANA) + amount)
-        else
-            set i = 0
-            loop
-                exitwhen i >= 4
-                call Arena_CustomArea(caster, 260.0 + I2R(i) * 65.0, amount * 0.50, false)
-                set i = i + 1
-            endloop
-        endif
-    elseif slot == 3 then
-        // E: defensive stance, minions, energy conversion or retreat.
-        if role == 2 or role == 4 or role == 10 then
-            call Arena_CustomSummon(caster, 'uske', 1 + rank / 2, 12.0 + I2R(rank))
-        elseif role == 9 then
-            call Arena_CustomMove(caster, 230.0 + 20.0 * I2R(rank))
-            call SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount)
-        elseif role == 3 or role == 6 or role == 7 then
-            call Arena_ItemPulses(caster, amount, amount * 0.7)
-        else
-            call SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 2.4)
-            call Arena_CustomArea(caster, 240.0, amount * 0.4, false)
-        endif
-    else
-        // R: class-defining ultimates; each scales with its own signature support.
-        if role == 1 then
-            set i = 0
-            loop
-                exitwhen i >= 4
-                if udg_Heroes[i] != null and GetWidgetLife(udg_Heroes[i]) <= 0.405 and IsUnitAlly(udg_Heroes[i], GetOwningPlayer(caster)) then
-                    call ReviveHero(udg_Heroes[i], GetUnitX(caster), GetUnitY(caster), true)
-                endif
-                set i = i + 1
-            endloop
-            call Arena_CustomArea(caster, 900.0, amount * 3.1, true)
-        elseif role == 2 then
-            call Arena_CustomSummon(caster, 'uske', 2, 16.0)
-            call Arena_CustomArea(caster, 550.0, amount * 4.4, false)
-        elseif role == 3 or role == 10 then
-            set i = 0
-            loop
-                exitwhen i >= 8
-                call Arena_CustomArea(caster, 600.0 + I2R(i) * 25.0, amount * 0.58, false)
-                set i = i + 1
-            endloop
-        elseif role == 4 then
-            call Arena_CustomSummon(caster, 'uske', 3 + rank, 25.0)
-        elseif role == 5 then
-            call Arena_CustomSummon(caster, 'nfel', 2, 16.0)
-            call Arena_CustomArea(caster, 550.0, amount * 2.4, false)
-        elseif role == 6 then
-            call Arena_CustomArea(caster, 850.0, amount * 2.7, true)
-            call Arena_CustomArea(caster, 850.0, amount * 1.9, false)
-        elseif role == 7 then
-            call Arena_CustomArea(caster, 720.0, amount * 2.0, true)
-            call Arena_CustomArea(caster, 720.0, amount * 2.0, false)
-            call SetPlayerState(GetOwningPlayer(caster), PLAYER_STATE_RESOURCE_GOLD, GetPlayerState(GetOwningPlayer(caster), PLAYER_STATE_RESOURCE_GOLD) + rank * 35)
-        elseif role == 8 then
-            call Arena_CustomSummon(caster, 'hfoo', 2 + rank / 2, 18.0)
-            call Arena_CustomArea(caster, 740.0, amount * 3.0, false)
-        else
-            call Arena_CustomFinisher(caster, amount * 6.0)
-            call Arena_CustomArea(caster, 400.0, amount * 1.9, false)
-        endif
-    endif
-    return true
-endfunction
-
 function Trig_HeroSpell_Actions takes nothing returns nothing
     local unit hero = GetTriggerUnit()
     local integer id = GetSpellAbilityId()
     local real lv = I2R(GetUnitAbilityLevel(hero, id))
     local real amount = 30.0 + 20.0 * lv
     if hero == null or lv < 1.0 then
-        return
-    endif
-    if Arena_CustomCast(hero, id) then
         return
     endif
     if GetPlayerId(GetOwningPlayer(hero)) >= 0 and GetPlayerId(GetOwningPlayer(hero)) < 4 then
@@ -1823,7 +1492,6 @@ function Trig_Aura_Actions takes nothing returns nothing
     local real mana
     local real addHp
     local real addMp
-    call Arena_UpdateCustomRanks()
     // Aura carriers remain at (0,0), inside the central monument.
     if udg_HumanCount >= 4 then
         return
