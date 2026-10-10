@@ -54,6 +54,15 @@ jobs:
           abilities={u["id"]:u for group in ag for u in group}
           for hero in roster:
               unit=units[hero["id"]]
+              fields={m["field"]:m for m in unit["mods"]}
+              assert fields["ua1w"]["type"]==3
+              assert fields["ua1w"]["val"]==("missile" if hero["attack"]=="ranged" else "normal")
+              assert fields["ua1c"]["type"]==1
+              assert 0.5<=fields["ua1c"]["val"]<=3.0
+              assert fields["uaen"]["val"]==1
+              assert fields["ua1b"]["val"]>0
+              if hero["kind"]>=11:
+                  assert unit["base"]=="Udea"
               inventory=next((m["val"] for m in unit["mods"] if m["field"]=="uabi"),"")
               assert "AInv" in inventory.split(","),(hero["id"],inventory)
               for spell in hero["skills"]:
