@@ -201,7 +201,7 @@ def create_reforged_w3i():
 
 
 def assemble_lua(root):
-    names = ["00_core.lua", "10_heroes.lua", "15_combat.lua", "16_role_mechanics.lua", "20_abilities.lua", "25_role_spells.lua", "26_unique_kits.lua", "30_waves.lua", "40_items.lua", "50_world.lua"]
+    names = ["00_core.lua", "10_heroes.lua", "15_combat.lua", "16_role_mechanics.lua", "21_spell_meta.lua", "22_spell_events.lua", "27_rebuilt_spells.lua", "30_waves.lua", "40_items.lua", "50_world.lua"]
     parts = ["-- Hero Arena - pure Lua edition (generated from lua/map).".encode("utf-8")]
     for name in names:
         source = root / "lua" / "map" / name
