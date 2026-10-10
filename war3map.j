@@ -697,9 +697,9 @@ endfunction
 
 function Arena_SelectY takes integer k returns real
     if k <= 3 then
-        return 4100.0
+        return 6500.0
     endif
-    return 4800.0
+    return 7200.0
 endfunction
 
 function Arena_CreateSelectionPlaza takes nothing returns nothing
@@ -884,13 +884,13 @@ function Arena_ShowPicks takes nothing returns nothing
         exitwhen pid >= 4
         call TriggerRegisterPlayerChatEvent(gg_trg_SelectChat, Player(pid), "-pick ", false)
         if Arena_IsHuman(pid) then
-            set wisp = CreateUnit(Player(pid), 'ewsp', -225.0 + 150.0 * I2R(pid), 3350.0, 90.0)
+            set wisp = CreateUnit(Player(pid), 'ewsp', -225.0 + 150.0 * I2R(pid), 5700.0, 90.0)
             set udg_SelectWisp[pid] = wisp
             if wisp != null then
                 call SetUnitInvulnerable(wisp, true)
                 call SetUnitMoveSpeed(wisp, 310.0)
                 call SelectUnitForPlayerSingle(wisp, Player(pid))
-                call PanCameraToTimedForPlayer(Player(pid), 0.0, 4190.0, 0.00)
+                call PanCameraToTimedForPlayer(Player(pid), 0.0, 6790.0, 0.00)
                 call SetCameraFieldForPlayer(Player(pid), CAMERA_FIELD_TARGET_DISTANCE, 2300.0, 0.00)
                 call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 18.0, "|cffffcc00ВЫБОР ГЕРОЯ|r: подведите светлячка к герою. Запасной способ: -pick 1 ... -pick 6. Автовыбор через 90 сек.")
             else
@@ -1241,10 +1241,10 @@ function Arena_CreateGeometry takes nothing returns nothing
     call Arena_PaintDisc(0.0, 0.0, 1840.0, 'Lrok')
     call Arena_PaintDisc(0.0, 0.0, 760.0, 'Ldro')
     // A northern, six-pad paved selection hall with a central stone walkway.
-    call Arena_PaintDisc(0.0, 4380.0, 1900.0, 'Lgrs')
-    set y = 2304.0
+    call Arena_PaintDisc(0.0, 6860.0, 1900.0, 'Lgrs')
+    set y = 2368.0
     loop
-        exitwhen y > 3800.0
+        exitwhen y > 6210.0
         set x = -192.0
         loop
             exitwhen x > 192.0
@@ -1294,6 +1294,7 @@ function Trig_Arena_Actions takes nothing returns nothing
     call Arena_ApplyHandicap()
     call Arena_CreateGeometry()
     call Arena_CreateShops()
+    call AddSpecialEffect("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl", 0.0, 0.0)
     call Arena_CreateQuests()
     call Arena_ExplainBalance()
 
