@@ -123,3 +123,14 @@ Known follow-up: the 20-level skill curve, stage difficulty, item pricing and cu
 - The last four heroes' active spells now trigger extra radius damage, party healing, self-healing/defensive effects, and area burst/support effects, scaled by learned ability level. Those spells still inherit Warcraft III base-spell animations, targeting rules and orders.
 - Solo/duo/trio unit-health handicaps were reduced to 1.20x/1.12x/1.06x; hero STR/AGI/INT are limited to 60 at creation. **A reported ~10,000 HP gain per level has not been reproduced in the game client**, so this is not a verified root-cause fix.
 - **MPQ Editor:** replace `war3map.j`, `war3map.w3a`, and `war3map.w3t` together. Keep current `war3map.w3u` and `war3mapMisc.txt` too. Verify changes in Warcraft III 1.26a directly; static checks are not equivalent to gameplay testing.
+
+
+## October 10: level 20, fixed aura monument, victory screen and miniboss voices
+
+- Corrected the likely level-5 plateau for neutral creep experience by adding `HeroFactorXP` with 20 nonzero entries to the root-level **`war3mapMisc.txt`**. `MaxHeroLevel=20` remains present. **You must replace this file inside the MPQ**; JASS cannot apply map gameplay constants once the map is loaded.
+- `-maxlvl` sets the sending player's hero to level **20**, with level-up skill points available. Any of the four human players may use it.
+- The hidden catch-up aura carriers are now created at **(0, 0)**, stay there and are never moved behind the hero. A noninteractive, invulnerable decorative guard with a permanent aura effect stands at that point. Aura coverage comes from custom full-range abilities `A201`–`A204` in `war3map.w3a`; keep it up to date.
+- Defeating Kaz'Rul gives rewards, a quest completion and a chat message **without opening Warcraft III's victory screen or ending the session**.
+- Every fifth-wave miniboss now sends a **unique written taunt**, plays a themed stock Warcraft III voice response based on creature family and still marks the elite on the map. Voice paths were not verified against a live Warcraft III 1.26a installation; if any stock sound path is absent, the written taunt remains.
+- For MPQ Editor replace at minimum `war3map.j` and **`war3mapMisc.txt`** at the archive root. Keep the recent `war3map.w3a` for the custom aura abilities and all other object files. `object-data` is not imported into the map.
+- The JASS source passed static structural/native-name checks, but the map was **not tested inside Warcraft III 1.26a**.
