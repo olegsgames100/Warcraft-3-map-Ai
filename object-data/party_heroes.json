@@ -667,7 +667,7 @@
         "hp": 300,
         "mana": 185
       },
-      "model": "units\\undead\\SkeletonArcher\\SkeletonArcher.mdl",
+      "model": "units\\creeps\\SkeletonArcher\\SkeletonArcher.mdl",
       "unitIcon": "ReplaceableTextures\\CommandButtons\\BTNSkeletonArcher.blp",
       "skills": [
         {
@@ -752,7 +752,7 @@
           "mana": 42,
           "cooldown": 18,
           "type": "buff",
-          "icon": "ReplaceableTextures\\CommandButtons\\BTNDefend.blp"
+          "icon": "ReplaceableTextures\\CommandButtons\\BTNDivineShield.blp"
         },
         {
           "id": "A127",
