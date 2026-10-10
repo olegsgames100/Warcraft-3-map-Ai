@@ -1,6 +1,10 @@
 [Misc]
+; Warcraft III 1.26a Hero Arena gameplay constants.
+; This file MUST be at MPQ archive root, not war3mapImported/.
 MaxHeroLevel=20
+MaxUnitLevel=20
 HeroAbilityLevelSkip=1
+HeroFactorXP=100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100
 NeedHeroXP=180
 NeedHeroXPFormulaA=1
 NeedHeroXPFormulaB=40
