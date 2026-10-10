@@ -379,7 +379,9 @@ function Arena_SpawnHero takes integer pid, integer kind returns nothing
         set y = 144.0
     endif
     set u = CreateUnit(Player(pid), Arena_HeroType(kind), x, y, 270.0)
-    call SetHeroProperName(u, Arena_HeroTitle(kind))
+    // Warcraft III 1.26a has no native for changing a hero's proper name.
+    // Display the arena identity in the UI instead (base unit name remains unchanged).
+    call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 12.0, "|cffffcc00" + Arena_HeroTitle(kind) + "|r - ваш герой")
     call SetHeroLevel(u, 1, false)
     call Arena_GiveSkills(u, kind)
     call Arena_GiveAuras(u)
@@ -476,7 +478,7 @@ function Arena_SpawnBoss takes nothing returns nothing
         call Arena_Msg("Boss creation failed: check Nplh in Object Editor.")
         return
     endif
-    call SetHeroProperName(udg_Boss, "Kaz'Rul, Devourer of Waves")
+    // SetHeroProperName is unavailable on 1.26a; name is announced via messages/quest.
     call SetHeroLevel(udg_Boss, 9 + 2 * udg_HumanCount, false)
     call SetHeroStr(udg_Boss, 70 + 25 * udg_HumanCount, true)
     call SetHeroAgi(udg_Boss, 20 + 7 * udg_HumanCount, true)
