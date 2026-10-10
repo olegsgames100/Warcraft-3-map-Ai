@@ -132,28 +132,34 @@ def generate(root):
             field(existing,key,val,typ=1 if key in ("ustp","uagp","uinp") else 0)
         if hero.get("model"): field(existing,"umdl",hero["model"])
         if hero.get("unitIcon"): field(existing,"uico",hero["unitIcon"])
-        # ua1w is a STRING weapon kind (normal/missile), NOT attack speed.
-        # The incorrect former float wrote 1.9 into a weapon enum field and
-        # caused broken basic attacks on Gelo and potentially other heroes.
+        # Keep each ORIGINAL hero's native damage dice and weapon visual.
+        # Only patch the two new skeletons, which inherit the Death Knight.
+        # ua1c = attack cooldown in seconds; ua1w = weapon type.
         is_ranged=hero["attack"]=="ranged"
-        field(existing,"uaen",1,typ=0)  # Attack 1 is enabled.
-        field(existing,"ua1w","missile" if is_ranged else "normal",typ=3)
-        field(existing,"ua1t","pierce" if is_ranged else "hero",typ=3)
-        field(existing,"ua1c",1.85 if is_ranged else 1.75,typ=1)
-        field(existing,"ua1r",650 if is_ranged else 128,typ=0)
-        field(existing,"ua1b",19 if is_ranged else 24,typ=0)
-        field(existing,"ua1d",2,typ=0)
-        field(existing,"ua1s",6,typ=0)
-        if is_ranged:
-            field(existing,"ua1m",r"Abilities\Weapons\Arrow\ArrowMissile.mdl",typ=3)
-            field(existing,"ua1z",1200,typ=0)  # Missile speed in units/sec.
+        field(existing,"uaen",1,typ=0)
+        field(existing,"ua1c",float(hero["attackCooldown"]),typ=1)
+        if hero["kind"]>=11:
+            field(existing,"ua1w","missile" if is_ranged else "normal",typ=3)
+            field(existing,"ua1t","pierce" if is_ranged else "hero",typ=3)
+            field(existing,"ua1r",650 if is_ranged else 128,typ=0)
+            field(existing,"ua1b",24,typ=0)
+            field(existing,"ua1d",2,typ=0)
+            field(existing,"ua1s",6,typ=0)
+            if is_ranged:
+                field(existing,"ua1m",r"Abilities\Weapons\Arrow\ArrowMissile.mdl",typ=3)
+                field(existing,"ua1z",1100,typ=0)
+        # Not every caster is an archer: preserve mage-specific missiles.
     encode(root/"war3map.w3u",v,groups,False)
 
     av,ability_groups=parse(root/"war3map.w3a",True)
     custom_spells=ability_groups[1]
     spell_by_id={e["id"]:e for e in custom_spells}
     spell_template=spell_by_id.get("A11D") or custom_spells[0]
-    commands=["thunderclap","roar","fanofknives","berserk"]
+    # Warcraft Channel: Ncl1=target kind, Ncl2=options,
+    # Ncl3=follow-through, Ncl4=art duration, Ncl5=disable other abilities,
+    # Ncl6=base order. The four DIFFERENT order IDs are essential.
+    orders=("thunderclap","roar","fanofknives","berserk")
+    target_types={"instant":0,"unit":1,"point":2}
     for hero in heroes:
         for k,skill in enumerate(hero["skills"]):
             ident=skill["id"]
@@ -164,27 +170,24 @@ def generate(root):
                 custom_spells.append(obj)
                 spell_by_id[ident]=obj
             for rank in range(1,6):
-                tag=f"{skill['name']} |cffc0c0c0[ур. {rank}]|r"
-                body=(f"{skill['description']} |n|nУрон физических навыков: +1.5% за Силу."
-                      if skill["type"]=="physical" else
-                      f"{skill['description']} |n|nМагия и лечение: +2% за Интеллект.")
-                for key,val,typ in (
+                tooltip=f"{skill['name']} |cffc0c0c0[ур. {rank}]|r"
+                body=f"{skill['description']} |n|nСтоимость: {skill['mana']} маны | Перезарядка: {skill['cooldown']} сек."
+                for code,value,typ in (
                     ("anam",skill["name"],3),
-                    ("atp1",tag,3),("aub1",body,3),
-                    ("aart",skill["icon"],3),
-                    ("ahky",skill["key"],3),
+                    ("atp1",tooltip,3),("aub1",body,3),
+                    ("aart",skill["icon"],3),("ahky",skill["key"],3),
                     ("amcs",int(skill["mana"]),0),
                     ("acdn",float(skill["cooldown"]),1),
-                    ("Ncl1",0.0,1),
-                    ("Ncl4",0.0,1)
+                    ("Ncl1",target_types[skill["target"]],0),
+                    ("Ncl2",0,0),("Ncl3",0.0,1),("Ncl4",0.0,1),
+                    ("Ncl5",0,0),("Ncl6",orders[k],3),
                 ):
-                    field(obj,key,val,rank,typ=typ)
+                    field(obj,code,value,rank,typ=typ)
                 field(obj,"alev",5,typ=0)
                 field(obj,"abpx",k,typ=0)
                 field(obj,"abpy",2,typ=0)
-                # Set Channel order ID for each of the four separate orders.
-                field(obj,"Ncl6",commands[k],rank,typ=3)
-            # Keep rank-dependent editor data, but overwrite all cooldowns and costs.
+                field(obj,"aran",800 if skill["target"]!="instant" else 0,rank,typ=1)
+                field(obj,"atar","air,ground,enemy,friend,self",rank,typ=3)
     encode(root/"war3map.w3a",av,ability_groups,True)
     return len(custom),len(custom_spells)
 
