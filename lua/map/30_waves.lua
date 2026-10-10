@@ -46,7 +46,6 @@ function A.spawnEnemy(raw,rank,elite)
     local id=GetHandleId(u)
     A.waveUnits[id]={unit=u,wave=A.wave,elite=elite and true or false}
     A.waveAlive=A.waveAlive+1
-    BlzSetUnitRealField(u, UNIT_RF_PRIORITY, 1.0)
     SetUnitCreepGuard(u,false)
     UnitWakeUp(u)
     SetUnitAcquireRange(u,4100)
@@ -130,6 +129,7 @@ function A.enemyDied(unit)
         A.waveAlive=math.max(0,A.waveAlive-1)
         A.kills=A.kills+1
         A.dropLoot(unit,tracked.elite)
+        if A.onEnemyKill then A.onEnemyKill(unit,tracked.elite) end
         A.rewardGold(2+math.floor(A.wave*.45))
         if tracked.elite then
             A.rewardGold(45+A.wave*3)
