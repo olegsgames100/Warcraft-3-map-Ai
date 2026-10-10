@@ -1,22 +1,49 @@
--- Hero creation, professions, progression, guardian and shop/selection.
+-- Generated roster snapshot from object-data/party_heroes.json.
 local A = Arena
-A.heroIds = {"H001","O001","H002","U001","E001","E002","N001","H003","E003","U002"}
-A.roles = {"Паладин-защитник","Мастер клинка","Боевой архимаг","Рыцарь смерти",
-"Охотник на демонов","Лунная жрица","Алхимик-боевик","Горный король",
-"Сумрачная охотница","Ледяной лич"}
+A.heroIds = {"H001","O001","H002","U001","E001","E002","N001","H003","E003","U002","U003","U004"}
+A.roles = {"Арбитр Рассвета","Клинок Барханов","Проводник Гроз","Владыка Пепла","Охотник Разлома","Лунная Провидица","Фенн Медный Котёл","Торвин Громовой Камень","Лириса Сумеречная","Иссара Морозная","Авалс, Костяной Снайпер","Гело, Костяной Авангард"}
+A.roleTypes = {"tank","melee_dps","ranged_mage","offtank","bruiser","healer","buffer","tank","assassin","controller","ranged_dps","melee_tank"}
 A.growth = {
- {3.6,1.6,2.2},{2.0,3.7,1.6},{1.8,1.7,3.8},{3.3,1.7,2.8},
- {2.2,3.4,2.0},{2.0,3.1,3.0},{2.1,2.2,3.1},{3.4,1.5,1.9},
- {1.9,3.5,2.0},{1.6,1.9,3.7}
+ {3.9,1.4,2},
+ {2.8,3.5,1.3},
+ {1.5,1.8,4.2},
+ {3.3,1.5,2.7},
+ {3.1,3.2,1.8},
+ {1.9,2.1,4},
+ {2.4,2.2,3.4},
+ {4,1.2,1.9},
+ {2.7,3.6,1.8},
+ {1.7,1.8,4},
+ {2.5,3.6,1.8},
+ {3.9,1.7,1.8}
 }
-A.startStats={{28,14,20},{19,29,13},{16,15,29},{26,16,22},{20,28,17},
-{18,25,24},{19,16,29},{30,15,17},{20,27,20},{17,18,30}}
+A.startStats={
+ {32,13,18},
+ {23,29,12},
+ {15,17,34},
+ {29,16,25},
+ {25,29,18},
+ {19,21,32},
+ {22,18,30},
+ {35,13,18},
+ {22,32,16},
+ {17,17,35},
+ {23,31,16},
+ {33,17,18}
+}
 A.spells={
- {"A101","A102","A10D","A10E"},{"A103","A104","A10F","A10G"},
- {"A105","A106","A10H","A10I"},{"A107","A108","A10J","A10K"},
- {"A109","A10A","A10L","A10M"},{"A10B","A10C","A10N","A10O"},
- {"A111","A112","A113","A114"},{"A115","A116","A117","A118"},
- {"A119","A11A","A11B","A11C"},{"A11D","A11E","A11F","A11G"}
+ {"A101","A102","A10D","A10E"},
+ {"A103","A104","A10F","A10G"},
+ {"A105","A106","A10H","A10I"},
+ {"A107","A108","A10J","A10K"},
+ {"A109","A10A","A10L","A10M"},
+ {"A10B","A10C","A10N","A10O"},
+ {"A111","A112","A113","A114"},
+ {"A115","A116","A117","A118"},
+ {"A119","A11A","A11B","A11C"},
+ {"A11D","A11E","A11F","A11G"},
+ {"A121","A122","A123","A124"},
+ {"A125","A126","A127","A128"}
 }
 
 function A.assignStats(pid)
@@ -84,14 +111,14 @@ function A.createShops()
 end
 
 function A.selectorPos(kind)
- local column=(kind-1)%5
- local row=math.floor((kind-1)/5)
- return -1600+column*800,6500+row*700
+ local column=(kind-1)%6
+ local row=math.floor((kind-1)/6)
+ return -2250+column*900,6500+row*700
 end
 
 function A.prepareSelections()
- local stock={"Hpal","Obla","Hamg","Udea","Edem","Emoo","Nalc","Hmkg","Ewar","Ulic"}
- for kind=1,10 do
+ local stock={"Hpal","Obla","Hamg","Udea","Edem","Emoo","Nalc","Hmkg","Ewar","Ulic","Ndrk","Udea"}
+ for kind=1,12 do
    local x,y=A.selectorPos(kind)
    A.markers[kind]={x=x,y=y}
    local preview=CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE),A.raw(stock[kind]),x,y,270)
@@ -114,7 +141,7 @@ function A.prepareSelections()
 end
 
 function A.pick(pid,kind)
- if not A.active[pid] or A.picked[pid] or kind<1 or kind>10 then return end
+ if not A.active[pid] or A.picked[pid] or kind<1 or kind>12 then return end
  local x=-140+(pid%2)*280
  local y=-140+math.floor(pid/2)*280
  local hero=CreateUnit(Player(pid),A.raw(A.heroIds[kind]),x,y,270)
@@ -142,7 +169,7 @@ function A.pollSelections()
  for pid=0,3 do
     local w=A.wisp[pid]
     if A.active[pid] and not A.picked[pid] and A.alive(w) then
-        for kind=1,10 do
+        for kind=1,12 do
           local pos=A.markers[kind]
           if (GetUnitX(w)-pos.x)^2+(GetUnitY(w)-pos.y)^2<220^2 then
              A.pick(pid,kind)
@@ -175,7 +202,7 @@ function A.tickHeroes()
 end
 
 function A.initInputs()
- local commands={"-kill","-next","-revive","-maxlvl","-stats"}
+ local commands={"-kill","-next","-revive","-maxlvl","-stats","-roles"}
  local trig=CreateTrigger()
  for pid=0,3 do
     TriggerRegisterPlayerChatEvent(trig,Player(pid),"-pick ",false)
@@ -187,7 +214,7 @@ function A.initInputs()
     local hero=A.heroUnits[pid]
     if cmd:sub(1,6)=="-pick " then
         local kind=tonumber(cmd:match("^%-pick%s+(%d+)$") or "")
-        if kind and kind>=1 and kind<=10 then A.pick(pid,kind) end
+        if kind and kind>=1 and kind<=12 then A.pick(pid,kind) end
     elseif cmd=="-revive" then
         if hero and not A.alive(hero) then ReviveHero(hero,0,0,true); A.assignStats(pid) end
     elseif cmd=="-maxlvl" then
@@ -197,6 +224,8 @@ function A.initInputs()
             A.playerText(pid,string.format("Уровень %d | Сила %d | Ловкость %d | Интеллект %d",
                 GetHeroLevel(hero),GetHeroStr(hero,false),GetHeroAgi(hero,false),GetHeroInt(hero,false)))
         end
+    elseif cmd=="-roles" then
+        for i=1,#A.roles do A.playerText(pid,i..". "..A.roles[i].." — "..A.roleTypes[i]) end
     elseif cmd=="-kill" and pid==0 then A.clearEnemies()
     elseif cmd=="-next" and pid==0 then A.forceNextWave()
     end
