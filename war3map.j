@@ -209,50 +209,73 @@ function Arena_CreateShops takes nothing returns nothing
 endfunction
 
 //===========================================================================
-function Arena_HeroType takes integer kind returns integer
-    // Custom heroes have individual learnable skill lists in war3map.w3u.
-    if kind == 1 then
+function Arena_HeroType takes integer k returns integer
+    if k == 1 then
         return 'H001'
-    elseif kind == 2 then
+    elseif k == 2 then
         return 'O001'
-    elseif kind == 3 then
+    elseif k == 3 then
         return 'H002'
-    elseif kind == 4 then
+    elseif k == 4 then
         return 'U001'
-    elseif kind == 5 then
+    elseif k == 5 then
         return 'E001'
+    elseif k == 6 then
+        return 'E002'
+    elseif k == 7 then
+        return 'N001'
+    elseif k == 8 then
+        return 'H003'
+    elseif k == 9 then
+        return 'E003'
     endif
-    return 'E002'
+    return 'U002'
 endfunction
 
-function Arena_HeroTitle takes integer kind returns string
-    if kind == 1 then
+function Arena_HeroTitle takes integer k returns string
+    if k == 1 then
         return "Рейнар Светокованный"
-    elseif kind == 2 then
+    elseif k == 2 then
         return "Зархан Быстрокрылый"
-    elseif kind == 3 then
+    elseif k == 3 then
         return "Мирелла Искророждённая"
-    elseif kind == 4 then
+    elseif k == 4 then
         return "Морвен Праховестник"
-    elseif kind == 5 then
+    elseif k == 5 then
         return "Вальтир Безликий"
+    elseif k == 6 then
+        return "Селена Звездочёт"
+    elseif k == 7 then
+        return "Фенн Медный Котёл"
+    elseif k == 8 then
+        return "Торвин Громовой Камень"
+    elseif k == 9 then
+        return "Лириса Сумеречная"
     endif
-    return "Селена Звездочёт"
+    return "Иссара Морозная"
 endfunction
 
-function Arena_HeroEpithet takes integer kind returns string
-    if kind == 1 then
-        return "Хранитель последнего рассвета"
-    elseif kind == 2 then
+function Arena_HeroEpithet takes integer k returns string
+    if k == 1 then
+        return "Хранитель рассвета"
+    elseif k == 2 then
         return "Танцующий среди песков"
-    elseif kind == 3 then
+    elseif k == 3 then
         return "Шепчущая бурям"
-    elseif kind == 4 then
+    elseif k == 4 then
         return "Наследник забытого трона"
-    elseif kind == 5 then
+    elseif k == 5 then
         return "Блуждающий между мирами"
+    elseif k == 6 then
+        return "Последняя дочь ночи"
+    elseif k == 7 then
+        return "Алхимик семи эликсиров"
+    elseif k == 8 then
+        return "Молот северных твердынь"
+    elseif k == 9 then
+        return "Клинок тихой охоты"
     endif
-    return "Последняя дочь ночи"
+    return "Повелительница льда"
 endfunction
 
 function Arena_GiveSkills takes unit u, integer kind returns nothing
@@ -687,16 +710,11 @@ endfunction
 
 
 function Arena_SelectX takes integer k returns real
-    if k == 1 or k == 4 then
-        return -1000.0
-    elseif k == 2 or k == 5 then
-        return 0.0
-    endif
-    return 1000.0
+    return -1600.0 + 800.0 * I2R(ModuloInteger(k - 1, 5))
 endfunction
 
 function Arena_SelectY takes integer k returns real
-    if k <= 3 then
+    if k <= 5 then
         return 6500.0
     endif
     return 7200.0
@@ -710,7 +728,7 @@ function Arena_CreateSelectionPlaza takes nothing returns nothing
     local texttag label
     local unit preview
     loop
-        exitwhen k > 6
+        exitwhen k > 10
         set x = Arena_SelectX(k)
         set y = Arena_SelectY(k)
         set zone = Rect(x - 235.0, y - 235.0, x + 235.0, y + 235.0)
@@ -740,7 +758,7 @@ function Arena_CreateSelectionPlaza takes nothing returns nothing
 endfunction
 
 function Arena_SelectHero takes integer pid, integer k returns nothing
-    if pid < 0 or pid >= 4 or k < 1 or k > 6 then
+    if pid < 0 or pid >= 4 or k < 1 or k > 10 then
         return
     endif
     if udg_GameOver or udg_Picked[pid] or not Arena_IsHuman(pid) then
@@ -768,7 +786,7 @@ function Trig_Pick_Actions takes nothing returns nothing
     set pid = GetPlayerId(GetOwningPlayer(u))
     if pid >= 0 and pid < 4 and u == udg_SelectWisp[pid] and not udg_Picked[pid] then
         loop
-            exitwhen k > 6
+            exitwhen k > 10
             if GetTriggeringRegion() == udg_SelectRegion[k] then
                 set udg_PendingPick[pid] = k
                 exitwhen true
@@ -794,7 +812,7 @@ function Trig_SelectPoll_Actions takes nothing returns nothing
             else
                 set k = 1
                 loop
-                    exitwhen k > 6
+                    exitwhen k > 10
                     set dx = GetUnitX(u) - Arena_SelectX(k)
                     set dy = GetUnitY(u) - Arena_SelectY(k)
                     if dx * dx + dy * dy <= 52900.0 then
@@ -852,10 +870,10 @@ function Trig_SelectChat_Actions takes nothing returns nothing
     endif
     if SubString(msg, 0, 6) == "-pick " then
         set k = S2I(SubString(msg, 6, 8))
-        if k >= 1 and k <= 6 then
+        if k >= 1 and k <= 10 then
             call Arena_SelectHero(pid, k)
         else
-            call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 8.0, "Команда: -pick 1 ... -pick 6")
+            call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 8.0, "Команда: -pick 1 ... -pick 10")
         endif
     endif
 endfunction
@@ -866,7 +884,7 @@ function Arena_AutoPick takes nothing returns nothing
         exitwhen pid >= 4
         if Arena_IsHuman(pid) and not udg_Picked[pid] then
             call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 8.0, "Время вышло: случайный герой.")
-            call Arena_SelectHero(pid, GetRandomInt(1, 6))
+            call Arena_SelectHero(pid, GetRandomInt(1, 10))
         endif
         set pid = pid + 1
     endloop
@@ -892,9 +910,9 @@ function Arena_ShowPicks takes nothing returns nothing
                 call SelectUnitForPlayerSingle(wisp, Player(pid))
                 call PanCameraToTimedForPlayer(Player(pid), 0.0, 6790.0, 0.00)
                 call SetCameraFieldForPlayer(Player(pid), CAMERA_FIELD_TARGET_DISTANCE, 2300.0, 0.00)
-                call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 18.0, "|cffffcc00ВЫБОР ГЕРОЯ|r: подведите светлячка к герою. Запасной способ: -pick 1 ... -pick 6. Автовыбор через 90 сек.")
+                call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 18.0, "|cffffcc00ВЫБОР ГЕРОЯ|r: подведите светлячка к герою. Запасной способ: -pick 1 ... -pick 10. Автовыбор через 90 сек.")
             else
-                call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 15.0, "Светлячок не создан: используйте -pick 1 ... -pick 6.")
+                call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 15.0, "Светлячок не создан: используйте -pick 1 ... -pick 10.")
             endif
         endif
         set pid = pid + 1
@@ -1241,7 +1259,7 @@ function Arena_CreateGeometry takes nothing returns nothing
     call Arena_PaintDisc(0.0, 0.0, 1840.0, 'Lrok')
     call Arena_PaintDisc(0.0, 0.0, 760.0, 'Ldro')
     // A northern, six-pad paved selection hall with a central stone walkway.
-    call Arena_PaintDisc(0.0, 6860.0, 1900.0, 'Lgrs')
+    call Arena_PaintDisc(0.0, 6860.0, 2450.0, 'Lgrs')
     set y = 2368.0
     loop
         exitwhen y > 6210.0
@@ -1254,7 +1272,7 @@ function Arena_CreateGeometry takes nothing returns nothing
         set y = y + 128.0
     endloop
     loop
-        exitwhen k > 6
+        exitwhen k > 10
         set x = Arena_SelectX(k)
         set y = Arena_SelectY(k)
         call Arena_PaintDisc(x, y, 385.0, 'Lrok')
