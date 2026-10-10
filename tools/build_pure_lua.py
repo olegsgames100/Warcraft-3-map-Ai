@@ -201,7 +201,7 @@ def create_reforged_w3i():
 
 def assemble_lua(root):
     names = ["00_core.lua", "10_heroes.lua", "20_abilities.lua", "30_waves.lua"]
-    parts = [b"-- Hero Arena — pure Lua edition (generated from lua/map)."]
+    parts = ["-- Hero Arena - pure Lua edition (generated from lua/map).".encode("utf-8")]
     for name in names:
         source = root / "lua" / "map" / name
         if not source.is_file():
