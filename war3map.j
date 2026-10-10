@@ -302,20 +302,19 @@ function Arena_GiveAuras takes unit hero returns nothing
     if pid < 0 or pid > 3 or udg_HumanCount >= 4 then
         return
     endif
-    // Invisible 1.26a stock unit avoids malformed custom dummy model.
-    set carrier = CreateUnit(Player(pid), 'hfoo', GetUnitX(hero), GetUnitY(hero), 0.0)
+    set carrier = CreateUnit(Player(pid), 'hfoo', 0.0, 0.0, 0.0)
     set udg_AuraCarrier[pid] = carrier
     if carrier != null then
         call UnitAddAbility(carrier, 'Aloc')
         call SetUnitInvulnerable(carrier, true)
         call SetUnitPathing(carrier, false)
-        call UnitAddAbility(carrier, 'ACae')
+        call UnitAddAbility(carrier, 'A201')
         if udg_HumanCount <= 2 then
-            call UnitAddAbility(carrier, 'ACua')
+            call UnitAddAbility(carrier, 'A202')
         endif
         if udg_HumanCount == 1 then
-            call UnitAddAbility(carrier, 'ACav')
-            call UnitAddAbility(carrier, 'ACac')
+            call UnitAddAbility(carrier, 'A203')
+            call UnitAddAbility(carrier, 'A204')
         endif
         call SetUnitVertexColor(carrier, 255, 255, 255, 0)
     endif
@@ -1004,6 +1003,11 @@ function Trig_TestChat_Actions takes nothing returns nothing
         else
             call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 6.0, "Команда -next доступна после выбора героев и до появления босса.")
         endif
+    elseif cmd == "-maxlvl" then
+        if pid >= 0 and pid < 4 and udg_Heroes[pid] != null then
+            call SetHeroLevel(udg_Heroes[pid], 20, true)
+            call DisplayTimedTextToPlayer(Player(pid), 0.0, 0.0, 8.0, "Герой повышен до 20 уровня. Очки умений доступны для распределения.")
+        endif
     elseif cmd == "-revive" then
         if udg_Heroes[pid] != null and GetWidgetLife(udg_Heroes[pid]) <= 0.405 then
             call ReviveHero(udg_Heroes[pid], 0.0, 0.0, true)
@@ -1209,11 +1213,7 @@ function Trig_Death_Actions takes nothing returns nothing
 endfunction
 
 function Trig_Boss_Actions takes nothing returns nothing
-    local integer i
-    if udg_GameOver then
-        return
-    endif
-    if GetDyingUnit() != udg_Boss then
+    if udg_GameOver or GetDyingUnit() != udg_Boss then
         return
     endif
     set udg_GameOver = true
@@ -1221,16 +1221,9 @@ function Trig_Boss_Actions takes nothing returns nothing
     call TimerDialogDisplay(udg_WaveTD, false)
     call QuestSetCompleted(udg_QuestMain, true)
     call QuestSetCompleted(udg_QuestBoss, true)
-    call Arena_Msg("|cff00ff00Каз'Рул пал. Арена ваша!|r")
+    call Arena_Msg("|cff00ff00Победа! Каз'Рул повержен. Арена остается открытой для свободной игры.|r")
     call Arena_PayWaveGold(800)
-    set i = 0
-    loop
-        exitwhen i > 3
-        if Arena_IsHuman(i) then
-            call CustomVictoryBJ(Player(i), true, true)
-        endif
-        set i = i + 1
-    endloop
+    // No CustomVictoryBJ or other forced victory/dialog/end-game call.
 endfunction
 
 //===========================================================================
@@ -1293,20 +1286,11 @@ function Trig_Aura_Actions takes nothing returns nothing
     local real mana
     local real addHp
     local real addMp
-    set i = 0
-    loop
-        exitwhen i >= 4
-        if udg_AuraCarrier[i] != null and udg_Heroes[i] != null then
-            if GetWidgetLife(udg_Heroes[i]) > 0.405 then
-                call SetUnitX(udg_AuraCarrier[i], GetUnitX(udg_Heroes[i]))
-                call SetUnitY(udg_AuraCarrier[i], GetUnitY(udg_Heroes[i]))
-            endif
-        endif
-        set i = i + 1
-    endloop
+    // Aura carriers remain at (0,0), inside the central monument.
     if udg_HumanCount >= 4 then
         return
     endif
+    set i = 0
     if udg_HumanCount <= 1 then
         set addHp = 18.00
         set addMp = 10.00
@@ -1451,6 +1435,26 @@ function Arena_CreateGeometry takes nothing returns nothing
     set d = null
 endfunction
 
+function Arena_CreateAuraMonument takes nothing returns nothing
+    local unit statue = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'hfoo', 0.0, 0.0, 270.0)
+    local texttag title = CreateTextTag()
+    if statue != null then
+        call SetUnitPathing(statue, false)
+        call SetUnitInvulnerable(statue, true)
+        call PauseUnit(statue, true)
+        call SetUnitScale(statue, 0.80, 0.80, 0.80)
+        call SetUnitVertexColor(statue, 165, 185, 255, 220)
+        call UnitAddAbility(statue, 'Aloc')
+    endif
+    call AddSpecialEffect("Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl", 0.0, 0.0)
+    call SetTextTagText(title, "ХРАНИТЕЛЬ АРЕНЫ", 0.022)
+    call SetTextTagPos(title, -170.0, 0.0, 220.0)
+    call SetTextTagPermanent(title, true)
+    call SetTextTagColor(title, 165, 205, 255, 255)
+    set title = null
+    set statue = null
+endfunction
+
 function Trig_Arena_Actions takes nothing returns nothing
     local integer i
     call FogEnableOff()
@@ -1525,6 +1529,10 @@ function Trig_Arena_Actions takes nothing returns nothing
     set gg_trg_Cheat = CreateTrigger()
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-kill", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-next", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-maxlvl", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(1), "-maxlvl", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(2), "-maxlvl", true)
+    call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(3), "-maxlvl", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(0), "-revive", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(1), "-revive", true)
     call TriggerRegisterPlayerChatEvent(gg_trg_Cheat, Player(2), "-revive", true)
@@ -1537,6 +1545,7 @@ function Trig_Arena_Actions takes nothing returns nothing
     call Arena_ShowPicks()
     call Arena_Msg("|cff88ff88[Арена 3/4]|r Выбор героев готов.")
     call Arena_CreateShops()
+    call Arena_CreateAuraMonument()
     call Arena_CreateQuests()
     call Arena_ExplainBalance()
     call Arena_Msg("|cff88ff88[Арена 4/4]|r Магазины и события готовы. Используйте -pick 1 ... -pick 10.")
