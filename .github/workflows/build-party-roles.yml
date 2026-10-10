@@ -4,6 +4,9 @@ on:
     branches:
       - feature/reforged-party-roles-bone-brothers
   workflow_dispatch:
+  pull_request:
+    branches:
+      - feature/reforged-lua-overhaul-v2
 
 permissions:
   contents: read
