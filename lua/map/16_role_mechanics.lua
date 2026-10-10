@@ -177,7 +177,7 @@ end
 function A.popBleed(caster,target,base)
   local stacks=A.bleedCount(target)
   if stacks>0 then
-    A.bleeds[key(target)]=nil
+    if A.removeBleed then A.removeBleed(target) else A.bleeds[key(target)]=nil end
     A.spellDamage(caster,target,base*stacks,"physical")
     A.visual([[Abilities\Spells\Other\Stampede\StampedeMissileDeath.mdl]],
         GetUnitX(target),GetUnitY(target),.6)
@@ -300,7 +300,6 @@ function A.modifyIncoming(victim,amount)
         local playerId=GetPlayerId(GetOwningPlayer(protector))
         if playerId>=0 and playerId<=3 and A.heroKind[playerId]==1 then
           local state=A.role(playerId)
-          state.resolve=math.min(700,(state.resolve or 0)+absorbed)
           A.resources[playerId].valor=math.min(100,(A.resources[playerId].valor or 0)+3)
         end
       end
@@ -320,7 +319,8 @@ function A.modifyIncoming(victim,amount)
           if A.heroKind[attackedHero]==2 then
             A.resources[attackedHero].combo=math.min(100,
               (A.resources[attackedHero].combo or 0)+25)
-            A.refundCooldown(victim,1,4)
+            A.refundCooldown(victim,4,6+2*math.max(1,GetUnitAbilityLevel(victim,A.raw("A10F"))))
+            A.playerText(attackedHero,"|cffffaa55Парирование! Танец барханов: -"..(6+2*math.max(1,GetUnitAbilityLevel(victim,A.raw("A10F")))).." сек.|r")
           end
         end
       end)
@@ -339,7 +339,6 @@ function A.modifyIncoming(victim,amount)
       end
     end
     if A.heroKind[attackedHero]==1 and output>0 then
-      state.resolve=math.min(700,(state.resolve or 0)+output*.17)
     end
   end
   return output
@@ -364,7 +363,7 @@ function A.onRoleEnemyDeath(unit,killer,elite)
       A.refundCooldown(bleed.caster,1,2)
     end
   end
-  A.bleeds[id]=nil
+  if A.removeBleed then A.removeBleed(unit) else A.bleeds[id]=nil end
   A.frostStacks[id]=nil
   A.boneMarks[id]=nil
   A.fractures[id]=nil
@@ -393,10 +392,10 @@ local function roleTick()
   end
   for id,bleed in pairs(A.bleeds) do
     if not alive(bleed.unit) or not alive(bleed.caster) or bleed.expiry<=A.clock then
-      A.bleeds[id]=nil
+      if A.removeBleed then A.removeBleed(bleed.unit) else A.bleeds[id]=nil end
     elseif bleed.nextPulse<=A.clock then
       bleed.nextPulse=A.clock+1
-      A.spellDamage(bleed.caster,bleed.unit,9+bleed.stacks*8,"physical")
+      A.spellDamage(bleed.caster,bleed.unit,(12+5*(bleed.rank or 1))*bleed.stacks,"physical")
     end
   end
   for id,frost in pairs(A.frostStacks) do
