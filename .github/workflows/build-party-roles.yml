@@ -47,7 +47,7 @@ jobs:
           p=Path("dist/Hero_Arena_Party_Roles_12.w3x")
           contents=p.read_bytes()
           assert contents[:4]==b"HM3W"
-          assert contents[512:516]==b"MPQ\\x1a"
+          assert contents[512:516]==bytes((77,80,81,26))
           assert b"war3map.lua" in contents or len(contents)>20000
           print("Valid HM3W/MPQ",len(contents))
           PY
