@@ -268,6 +268,7 @@ end
 function A.gameTick()
     A.clock = A.clock + A.tickRate
     if A.phase == "selection" then A.pollSelections() end
+    if A.tickItems then A.tickItems() end
     A.checkBalance()
     if A.tickHeroes then A.tickHeroes() end
     if A.tickWaves then A.tickWaves() end
@@ -296,6 +297,7 @@ function A.start()
         end
     end
 
+    if A.createWorld then A.createWorld() end
     A.createMonument()
     A.createShops()
     A.prepareSelections()
