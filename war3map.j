@@ -685,11 +685,47 @@ function Arena_EliteType takes integer wave returns integer
     return 'uabo'
 endfunction
 
+function Arena_EliteVoicePath takes integer wave returns string
+    if wave <= 10 then
+        return "Units\\Creeps\\Bandit\\BanditPissed1.wav"
+    elseif wave <= 20 then
+        return "Units\\Creeps\\Ogre\\OgrePissed1.wav"
+    elseif wave <= 30 then
+        return "Units\\Undead\\CryptFiend\\CryptFiendPissed1.wav"
+    elseif wave <= 40 then
+        return "Units\\Demon\\Felgaurd\\FelgaurdPissed1.wav"
+    endif
+    return "Units\\Undead\\Abomination\\AbominationPissed1.wav"
+endfunction
+
+function Arena_EliteTaunt takes integer wave returns string
+    if wave == 5 then
+        return "Слабаков не щадить! Моя арена!"
+    elseif wave == 10 then
+        return "Все ваши сокровища теперь мои!"
+    elseif wave == 15 then
+        return "Духи жаждут ваших душ!"
+    elseif wave == 20 then
+        return "Я сотру вас в пыль!"
+    elseif wave == 25 then
+        return "Мертвые восстанут по моему слову!"
+    elseif wave == 30 then
+        return "Земля поглотит живых!"
+    elseif wave == 35 then
+        return "Скверна сильнее вашей воли!"
+    elseif wave == 40 then
+        return "Пусть ваши клинки сломаются!"
+    elseif wave == 45 then
+        return "Ваши души принадлежат тьме!"
+    endif
+    return "Ваш конец станет началом Каз'Рула!"
+endfunction
+
 function Arena_EliteAnnouncement takes integer wave, real x, real y returns nothing
     local texttag tag = CreateTextTag()
-    local sound alert = CreateSound("Sound\\Interface\\Warning.wav", false, false, false, 10, 10, "")
+    local sound alert = CreateSound(Arena_EliteVoicePath(wave), false, false, false, 10, 10, "")
     local string title = Arena_EliteName(wave)
-    call Arena_Msg("|cffff8844[ОСОБАЯ ВОЛНА " + I2S(wave) + "]|r На арене появился " + title + "!|r")
+    call Arena_Msg("|cffff8844[ОСОБАЯ ВОЛНА " + I2S(wave) + "]|r " + title + ": |cffffcc77" + Arena_EliteTaunt(wave) + "|r")
     call SetTextTagText(tag, "|cffff6622" + title + "|r", 0.035)
     call SetTextTagPos(tag, x - 180.0, y, 140.0)
     call SetTextTagColor(tag, 255, 150, 65, 255)
@@ -697,9 +733,11 @@ function Arena_EliteAnnouncement takes integer wave, real x, real y returns noth
     call SetTextTagLifespan(tag, 7.0)
     call SetTextTagFadepoint(tag, 5.0)
     call PingMinimap(x, y, 5.0)
-    call SetSoundVolume(alert, 95)
-    call StartSound(alert)
-    call KillSoundWhenDone(alert)
+    if alert != null then
+        call SetSoundVolume(alert, 105)
+        call StartSound(alert)
+        call KillSoundWhenDone(alert)
+    endif
     set tag = null
     set alert = null
 endfunction
