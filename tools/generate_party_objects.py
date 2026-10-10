@@ -132,12 +132,21 @@ def generate(root):
             field(existing,key,val,typ=1 if key in ("ustp","uagp","uinp") else 0)
         if hero.get("model"): field(existing,"umdl",hero["model"])
         if hero.get("unitIcon"): field(existing,"uico",hero["unitIcon"])
-        if hero["attack"]=="ranged":
-            field(existing,"ua1r",650,typ=0)
-            field(existing,"ua1w",1.65,typ=1)
-        else:
-            field(existing,"ua1r",128,typ=0)
-            field(existing,"ua1w",1.9,typ=1)
+        # ua1w is a STRING weapon kind (normal/missile), NOT attack speed.
+        # The incorrect former float wrote 1.9 into a weapon enum field and
+        # caused broken basic attacks on Gelo and potentially other heroes.
+        is_ranged=hero["attack"]=="ranged"
+        field(existing,"uaen",1,typ=0)  # Attack 1 is enabled.
+        field(existing,"ua1w","missile" if is_ranged else "normal",typ=3)
+        field(existing,"ua1t","pierce" if is_ranged else "hero",typ=3)
+        field(existing,"ua1c",1.85 if is_ranged else 1.75,typ=1)
+        field(existing,"ua1r",650 if is_ranged else 128,typ=0)
+        field(existing,"ua1b",19 if is_ranged else 24,typ=0)
+        field(existing,"ua1d",2,typ=0)
+        field(existing,"ua1s",6,typ=0)
+        if is_ranged:
+            field(existing,"ua1m",r"Abilities\Weapons\Arrow\ArrowMissile.mdl",typ=3)
+            field(existing,"ua1z",1200,typ=0)  # Missile speed in units/sec.
     encode(root/"war3map.w3u",v,groups,False)
 
     av,ability_groups=parse(root/"war3map.w3a",True)
