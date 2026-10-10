@@ -1,0 +1,8 @@
+[Misc]
+MaxHeroLevel=20
+HeroAbilityLevelSkip=1
+NeedHeroXP=180
+NeedHeroXPFormulaA=1
+NeedHeroXPFormulaB=40
+NeedHeroXPFormulaC=0
+MaxLevelHeroesDrainExp=0
