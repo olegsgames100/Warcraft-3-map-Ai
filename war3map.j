@@ -168,35 +168,65 @@ function Arena_Stock takes unit shop, integer itemId, integer stock returns noth
     call AddItemToStock(shop, itemId, stock, stock)
 endfunction
 
+function Arena_ShopLabel takes real x, real y, string name, integer r, integer g, integer b returns nothing
+    local texttag t = CreateTextTag()
+    call SetTextTagText(t, name, 0.027)
+    call SetTextTagPos(t, x - 200.0, y, 220.0)
+    call SetTextTagColor(t, r, g, b, 255)
+    call SetTextTagPermanent(t, true)
+    call SetTextTagVisibility(t, true)
+    set t = null
+endfunction
+
+function Arena_PrepareShop takes unit shop, integer r, integer g, integer b returns nothing
+    if shop == null then
+        return
+    endif
+    call SetUnitInvulnerable(shop, true)
+    call SetUnitVertexColor(shop, r, g, b, 255)
+    call SetUnitScale(shop, 1.15, 1.15, 1.15)
+    call RemoveGuardPosition(shop)
+endfunction
+
 function Arena_CreateShops takes nothing returns nothing
-    set udg_ShopWeapon = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'nS01', -640.0, -256.0, 270.0)
-    set udg_ShopArmor = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'nS02', 640.0, -256.0, 270.0)
-    set udg_ShopMagic = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'nS03', -640.0, 256.0, 270.0)
-    set udg_ShopRelic = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'nS04', 640.0, 256.0, 270.0)
-    call SetUnitInvulnerable(udg_ShopWeapon, true)
-    call SetUnitInvulnerable(udg_ShopArmor, true)
-    call SetUnitInvulnerable(udg_ShopMagic, true)
-    call SetUnitInvulnerable(udg_ShopRelic, true)
-    call RemoveGuardPosition(udg_ShopWeapon)
-    call RemoveGuardPosition(udg_ShopArmor)
-    call RemoveGuardPosition(udg_ShopMagic)
-    call RemoveGuardPosition(udg_ShopRelic)
+    // Stock Goblin Merchants always exist in Warcraft III 1.26a, even without custom w3u.
+    set udg_ShopWeapon = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'ngme', -760.0, -380.0, 270.0)
+    set udg_ShopArmor = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'ngme', 760.0, -380.0, 270.0)
+    set udg_ShopMagic = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'ngme', -760.0, 380.0, 270.0)
+    set udg_ShopRelic = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), 'ngme', 760.0, 380.0, 270.0)
+    call Arena_PrepareShop(udg_ShopWeapon, 255, 130, 110)
+    call Arena_PrepareShop(udg_ShopArmor, 130, 185, 255)
+    call Arena_PrepareShop(udg_ShopMagic, 120, 255, 160)
+    call Arena_PrepareShop(udg_ShopRelic, 255, 215, 125)
+    // Each shop has distinct stock. Vanilla items remain available if custom w3t is absent.
+    call Arena_Stock(udg_ShopWeapon, 'ratf', 6)
+    call Arena_Stock(udg_ShopWeapon, 'ratc', 6)
+    call Arena_Stock(udg_ShopWeapon, 'ofir', 6)
     call Arena_Stock(udg_ShopWeapon, 'I001', 6)
     call Arena_Stock(udg_ShopWeapon, 'I002', 6)
     call Arena_Stock(udg_ShopWeapon, 'I003', 6)
-    call Arena_Stock(udg_ShopWeapon, 'ratf', 6)
+    call Arena_Stock(udg_ShopArmor, 'rde2', 6)
+    call Arena_Stock(udg_ShopArmor, 'rde3', 6)
+    call Arena_Stock(udg_ShopArmor, 'brac', 6)
     call Arena_Stock(udg_ShopArmor, 'I004', 6)
     call Arena_Stock(udg_ShopArmor, 'I005', 6)
     call Arena_Stock(udg_ShopArmor, 'I006', 6)
-    call Arena_Stock(udg_ShopArmor, 'rde2', 6)
-    call Arena_Stock(udg_ShopMagic, 'I007', 18)
-    call Arena_Stock(udg_ShopMagic, 'I008', 18)
-    call Arena_Stock(udg_ShopMagic, 'I009', 8)
     call Arena_Stock(udg_ShopMagic, 'phea', 20)
     call Arena_Stock(udg_ShopMagic, 'pman', 20)
+    call Arena_Stock(udg_ShopMagic, 'shrs', 8)
+    call Arena_Stock(udg_ShopMagic, 'I007', 12)
+    call Arena_Stock(udg_ShopMagic, 'I008', 12)
+    call Arena_Stock(udg_ShopMagic, 'I009', 6)
+    call Arena_Stock(udg_ShopRelic, 'ckng', 3)
+    call Arena_Stock(udg_ShopRelic, 'modt', 3)
+    call Arena_Stock(udg_ShopRelic, 'rwiz', 4)
     call Arena_Stock(udg_ShopRelic, 'I00A', 3)
     call Arena_Stock(udg_ShopRelic, 'I00B', 3)
     call Arena_Stock(udg_ShopRelic, 'I00C', 3)
+    call Arena_ShopLabel(-760.0, -380.0, "КУЗНИЦА ОСКОЛКОВ", 255, 160, 135)
+    call Arena_ShopLabel(760.0, -380.0, "ОПЛОТ СТРАЖА", 150, 190, 255)
+    call Arena_ShopLabel(-760.0, 380.0, "АЛХИМИЧЕСКАЯ ЛАВКА", 150, 255, 170)
+    call Arena_ShopLabel(760.0, 380.0, "ХРАНИЛИЩЕ РЕЛИКВИЙ", 255, 220, 125)
 endfunction
 
 //===========================================================================
