@@ -214,20 +214,21 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
 end
 
 function InitCustomTriggers()
-    -- Стартовое событие: создание диалога
+    -- Создаем диалог на старте карты (до вызова триггеров событий)
+    HeroDialog = DialogCreate()
+    DialogSetMessage(HeroDialog, "Выберите класс героя:")
+    
+    for i, classData in ipairs(HeroClasses) do
+        HeroDialogButtons[i] = DialogAddButton(HeroDialog, classData.name, 0)
+    end
+
+    -- Стартовое событие: отображение диалога через 1 секунду
     local initTrigger = CreateTrigger()
     TriggerRegisterTimerEvent(initTrigger, 1.00, false)
     TriggerAddAction(initTrigger, function()
         -- Отключаем туман войны
         FogEnableOff()
         FogMaskEnableOff()
-        
-        HeroDialog = DialogCreate()
-        DialogSetMessage(HeroDialog, "Выберите класс героя:")
-        
-        for i, classData in ipairs(HeroClasses) do
-            HeroDialogButtons[i] = DialogAddButton(HeroDialog, classData.name, 0)
-        end
         
         -- Показываем диалог всем играющим игрокам
         for pid = 0, 3 do
