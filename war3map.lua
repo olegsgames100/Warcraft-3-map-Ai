@@ -214,55 +214,59 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
 end
 
 function InitCustomTriggers()
-    -- Создаем диалог на старте карты (до вызова триггеров событий)
-    HeroDialog = DialogCreate()
-    DialogSetMessage(HeroDialog, "Выберите класс героя:")
-    
-    for i, classData in ipairs(HeroClasses) do
-        HeroDialogButtons[i] = DialogAddButton(HeroDialog, classData.name, 0)
-    end
-
-    -- Стартовое событие: отображение диалога через 1 секунду
-    local initTrigger = CreateTrigger()
-    TriggerRegisterTimerEvent(initTrigger, 1.00, false)
-    TriggerAddAction(initTrigger, function()
-        -- Отключаем туман войны
-        FogEnableOff()
-        FogMaskEnableOff()
-        
-        -- Показываем диалог всем играющим игрокам
-        for pid = 0, 3 do
-            if GetPlayerSlotState(Player(pid)) == PLAYER_SLOT_STATE_PLAYING and GetPlayerController(Player(pid)) == MAP_CONTROL_USER then
-                DialogDisplay(Player(pid), HeroDialog, true)
-            end
-        end
-    end)
-    
-    -- Триггер обработки выбора в диалоге
-    local dialogTrigger = CreateTrigger()
-    TriggerRegisterDialogEvent(dialogTrigger, HeroDialog)
-    TriggerAddAction(dialogTrigger, function()
-        local p = GetTriggerPlayer()
-        local pid = GetPlayerId(p)
-        local clickedBtn = GetClickedButton()
-        
-        for i, btn in ipairs(HeroDialogButtons) do
-            if btn == clickedBtn then
-                SpawnSelectedHero(pid, i)
-                break
-            end
-        end
-    end)
-
-    -- Триггер для отлова применения заклинаний
+    -- 1. Триггер для отлова применения заклинаний (создаем сразу)
     local spellTrigger = CreateTrigger()
     TriggerRegisterAnyUnitEventBJ(spellTrigger, EVENT_PLAYER_UNIT_SPELL_EFFECT)
     TriggerAddAction(spellTrigger, function()
         local caster = GetTriggerUnit()
         local spellId = GetSpellAbilityId()
         local pid = GetPlayerId(GetOwningPlayer(caster))
-        
         Arena_CustomCast_Lua(caster, pid, spellId)
+    end)
+
+    -- 2. Стартовый триггер (срабатывает через 0.5 сек ПОСЛЕ старта игры)
+    local initTimer = CreateTrigger()
+    TriggerRegisterTimerEvent(initTimer, 0.50, false)
+    TriggerAddAction(initTimer, function()
+        -- Отключаем туман войны
+        FogEnableOff()
+        FogMaskEnableOff()
+
+        print("|cffffcc00[Инициализация]: Запуск выбора героев...|r")
+
+        -- СОЗДАЕМ ДИАЛОГ ТОЛЬКО СЕЙЧАС (когда движок игры готов):
+        HeroDialog = DialogCreate()
+        DialogSetMessage(HeroDialog, "Выберите класс героя:")
+
+        HeroDialogButtons = {}
+        for i, classData in ipairs(HeroClasses) do
+            HeroDialogButtons[i] = DialogAddButton(HeroDialog, classData.name, 0)
+        end
+
+        -- Регистрируем триггер клика по кнопкам
+        local dialogTrigger = CreateTrigger()
+        TriggerRegisterDialogEvent(dialogTrigger, HeroDialog)
+        TriggerAddAction(dialogTrigger, function()
+            local p = GetTriggerPlayer()
+            local pid = GetPlayerId(p)
+            local clickedBtn = GetClickedButton()
+
+            for i, btn in ipairs(HeroDialogButtons) do
+                if btn == clickedBtn then
+                    SpawnSelectedHero(pid, i)
+                    break
+                end
+            end
+        end)
+
+        -- Показываем диалог игрокам
+        for pid = 0, 3 do
+            local p = Player(pid)
+            -- Проверяем: если игрок управляется человеком
+            if GetPlayerController(p) == MAP_CONTROL_USER then
+                DialogDisplay(p, HeroDialog, true)
+            end
+        end
     end)
 end
 
