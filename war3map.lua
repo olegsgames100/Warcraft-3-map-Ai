@@ -257,10 +257,6 @@ function InitCustomTriggers()
         Arena_CustomCast_Lua(caster, pid, spellId)
     end)
 
-    -- Триггер спавна волны по истечении таймера волны
-    local waveTrigger = CreateTrigger()
-    TriggerRegisterTimerExpireEvent(waveTrigger, udg_WaveTimer)
-    TriggerAddAction(waveTrigger, Trig_Wave_Actions)
 
     -- Триггер гибели юнитов (начисление золота, зачистка волны, воскрешение)
     local deathTrigger = CreateTrigger()
@@ -324,15 +320,19 @@ function InitCustomTriggers()
 end
 
 function InitCustomPlayerSlots()
-    SetPlayerStartLocation(Player(0), 0)
-    SetPlayerColor(Player(0), ConvertPlayerColor(0))
-    SetPlayerRacePreference(Player(0), RACE_PREF_HUMAN)
-    SetPlayerRaceSelectable(Player(0), true)
-    SetPlayerController(Player(0), MAP_CONTROL_USER)
+    for i = 0, 3 do
+        SetPlayerStartLocation(Player(i), i)
+        SetPlayerColor(Player(i), ConvertPlayerColor(i))
+        SetPlayerRacePreference(Player(i), RACE_PREF_HUMAN)
+        SetPlayerRaceSelectable(Player(i), false)
+        SetPlayerController(Player(i), MAP_CONTROL_USER)
+    end
 end
 
 function InitCustomTeams()
-    SetPlayerTeam(Player(0), 0)
+    for i = 0, 3 do
+        SetPlayerTeam(Player(i), 0)
+    end
 end
 
 function main()
@@ -360,10 +360,13 @@ end
 function config()
     SetMapName("TRIGSTR_001")
     SetMapDescription("TRIGSTR_003")
-    SetPlayers(1)
+    SetPlayers(4)
     SetTeams(1)
     InitCustomPlayerSlots()
     InitCustomTeams()
+    for i = 0, 3 do
+        SetPlayerSlotAvailable(Player(i), MAP_CONTROL_USER)
+    end
 end
 
 -- ===========================================================================
@@ -376,7 +379,12 @@ end
 
 function Arena_IsHuman(pid)
     local p = Player(pid)
-    return GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING and GetPlayerController(p) == MAP_CONTROL_USER
+    local slotState = GetPlayerSlotState(p)
+    local controller = GetPlayerController(p)
+    if slotState == PLAYER_SLOT_STATE_PLAYING then
+        return controller == MAP_CONTROL_USER or controller == MAP_CONTROL_COMPUTER
+    end
+    return false
 end
 
 function Arena_CountHumans()
@@ -605,7 +613,7 @@ function Arena_TryStartWaves()
         return
     end
     udg_WavesStarted = true
-    TimerStart(udg_WaveTimer, 15.00, false, nil)
+    TimerStart(udg_WaveTimer, 15.00, false, Trig_Wave_Actions)
     TimerDialogSetTitle(udg_WaveTD, "Волна 1")
     TimerDialogDisplay(udg_WaveTD, true)
     Arena_Msg("Все герои выбраны. Первая волна через 15 сек. Магазины по углам центра.")
@@ -689,7 +697,7 @@ function Trig_Wave_Actions()
     else
         TimerDialogSetTitle(udg_WaveTD, "Финальный босс")
     end
-    TimerStart(udg_WaveTimer, 100.00, false, nil)
+    TimerStart(udg_WaveTimer, 100.00, false, Trig_Wave_Actions)
 end
 
 function Arena_ReviveHero(pid)
@@ -712,7 +720,7 @@ function Arena_CheckWaveClear()
     if udg_WavesStarted and udg_Wave >= 1 and udg_Wave <= 50 and udg_EnemiesAlive == 0 and not udg_WaveCleared and udg_Boss == nil and not udg_GameOver then
         udg_WaveCleared = true
         Arena_Msg("|cff66ff99Волна зачищена! Следующая через 7 секунд.|r")
-        TimerStart(udg_WaveTimer, 7.00, false, nil)
+        TimerStart(udg_WaveTimer, 7.00, false, Trig_Wave_Actions)
     end
 end
 
