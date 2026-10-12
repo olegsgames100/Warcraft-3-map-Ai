@@ -607,16 +607,35 @@ function Arena_TryStartWaves()
     if udg_WavesStarted then
         return
     end
-    udg_HumanCount = Arena_CountHumans()
+
+    -- Считаем, сколько героев уже выбрано
     local pickedCount = Arena_CountPickedHumans()
-    if pickedCount < udg_HumanCount or pickedCount == 0 then
+    if pickedCount == 0 then
         return
     end
+
+    -- Запускаем волны (не ждем несуществующих игроков!)
     udg_WavesStarted = true
-    TimerStart(udg_WaveTimer, 15.00, false, Trig_Wave_Actions)
+
+    print("|cff00ff00[Арена]: Герой выбран! Запуск обратного отсчета...|r")
+
+    -- Проверяем и создаем таймер, если его еще нет
+    if udg_WaveTimer == nil then
+        udg_WaveTimer = CreateTimer()
+    end
+    if udg_WaveTD == nil then
+        udg_WaveTD = CreateTimerDialog(udg_WaveTimer)
+    end
+
+    -- Запуск таймера на 15 секунд с безопасным вызовом функции
+    TimerStart(udg_WaveTimer, 15.00, false, function()
+        Trig_Wave_Actions()
+    end)
+
     TimerDialogSetTitle(udg_WaveTD, "Волна 1")
     TimerDialogDisplay(udg_WaveTD, true)
-    Arena_Msg("Все герои выбраны. Первая волна через 15 сек. Магазины по углам центра.")
+    
+    Arena_Msg("|cffffcc00Первая волна начнется через 15 секунд! Подготовьтесь.|r")
 end
 
 function Arena_SpawnBoss()
