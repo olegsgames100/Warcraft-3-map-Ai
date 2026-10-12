@@ -232,9 +232,55 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
 end
 
 function InitCustomTriggers()
-    -- Инициализация таймера и диалога таймера волн
-    udg_WaveTimer = CreateTimer()
-    udg_WaveTD = CreateTimerDialog(udg_WaveTimer)
+ -- Стартовый триггер (срабатывает через 0.5 сек ПОСЛЕ старта игры)
+    local initTimer = CreateTrigger()
+    TriggerRegisterTimerEvent(initTimer, 0.50, false)
+    TriggerAddAction(initTimer, function()
+        -- Оборачиваем в pcall, чтобы игра показала ошибку, если она случится
+        local ok, err = pcall(function()
+            -- Отключаем туман войны
+            FogEnableOff()
+            FogMaskEnableOff()
+
+            print("|cffffcc00[Инициализация]: Запуск выбора героев...|r")
+
+            HeroDialog = DialogCreate()
+            DialogSetMessage(HeroDialog, "Выберите класс героя:")
+
+            HeroDialogButtons = {}
+            for i, classData in ipairs(HeroClasses) do
+                HeroDialogButtons[i] = DialogAddButton(HeroDialog, classData.name, 0)
+            end
+
+            -- Регистрируем триггер клика по кнопкам диалога
+            local dialogTrigger = CreateTrigger()
+            TriggerRegisterDialogEvent(dialogTrigger, HeroDialog)
+            TriggerAddAction(dialogTrigger, function()
+                local p = GetTriggerPlayer()
+                local pid = GetPlayerId(p)
+                local clickedBtn = GetClickedButton()
+
+                for i, btn in ipairs(HeroDialogButtons) do
+                    if btn == clickedBtn then
+                        SpawnSelectedHero(pid, i)
+                        break
+                    end
+                end
+            end)
+
+            -- ПОКАЗЫВАЕМ ДИАЛОГ НАПРЯМУЮ (без условий и фильтров):
+            for pid = 0, 3 do
+                DialogDisplay(Player(pid), HeroDialog, true)
+            end
+
+            print("|cff00ff00[Успех]: Окно выбора отправлено игрокам!|r")
+        end)
+
+        -- Если в коде была ошибка - игра выведет её красным текстом прямо на экран!
+        if not ok then
+            print("|cffff0000[ОШИБКА LUA]: " .. tostring(err) .. "|r")
+        end
+    end)
 
     -- Считаем количество игроков-людей
     udg_HumanCount = 0
