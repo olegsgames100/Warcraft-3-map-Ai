@@ -387,17 +387,15 @@ function Arena_IsHuman(pid)
     return false
 end
 
-function Arena_CountHumans()
-    local n = 0
-    for pid = 0, 3 do
-        if Arena_IsHuman(pid) then
-            n = n + 1
-        end
+function Arena_IsHuman(pid)
+    local p = Player(pid)
+    local slotState = GetPlayerSlotState(p)
+    local controller = GetPlayerController(p)
+    if slotState == PLAYER_SLOT_STATE_PLAYING then
+        -- Считаем только живых людей:
+        return controller == MAP_CONTROL_USER
     end
-    if n < 1 then
-        n = 1
-    end
-    return n
+    return false
 end
 
 function Arena_CreateEnemy(unitId, x, y)
