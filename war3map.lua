@@ -376,7 +376,20 @@ end
 
 function Arena_IsHuman(pid)
     local p = Player(pid)
-    return GetPlayerController(p) == MAP_CONTROL_USER and GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING
+    return GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING and GetPlayerController(p) == MAP_CONTROL_USER
+end
+
+function Arena_CountHumans()
+    local n = 0
+    for pid = 0, 3 do
+        if Arena_IsHuman(pid) then
+            n = n + 1
+        end
+    end
+    if n < 1 then
+        n = 1
+    end
+    return n
 end
 
 function Arena_CreateEnemy(unitId, x, y)
@@ -586,12 +599,13 @@ function Arena_TryStartWaves()
     if udg_WavesStarted then
         return
     end
+    udg_HumanCount = Arena_CountHumans()
     local pickedCount = Arena_CountPickedHumans()
     if pickedCount < udg_HumanCount or pickedCount == 0 then
         return
     end
     udg_WavesStarted = true
-    TimerStart(udg_WaveTimer, 15.00, false, function() end)
+    TimerStart(udg_WaveTimer, 15.00, false, nil)
     TimerDialogSetTitle(udg_WaveTD, "Волна 1")
     TimerDialogDisplay(udg_WaveTD, true)
     Arena_Msg("Все герои выбраны. Первая волна через 15 сек. Магазины по углам центра.")
@@ -675,7 +689,7 @@ function Trig_Wave_Actions()
     else
         TimerDialogSetTitle(udg_WaveTD, "Финальный босс")
     end
-    TimerStart(udg_WaveTimer, 100.00, false, function() end)
+    TimerStart(udg_WaveTimer, 100.00, false, nil)
 end
 
 function Arena_ReviveHero(pid)
@@ -698,7 +712,7 @@ function Arena_CheckWaveClear()
     if udg_WavesStarted and udg_Wave >= 1 and udg_Wave <= 50 and udg_EnemiesAlive == 0 and not udg_WaveCleared and udg_Boss == nil and not udg_GameOver then
         udg_WaveCleared = true
         Arena_Msg("|cff66ff99Волна зачищена! Следующая через 7 секунд.|r")
-        TimerStart(udg_WaveTimer, 7.00, false, function() end)
+        TimerStart(udg_WaveTimer, 7.00, false, nil)
     end
 end
 
