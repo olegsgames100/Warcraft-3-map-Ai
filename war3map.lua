@@ -6,6 +6,7 @@ function InitGlobals()
     -- Глобальные переменные
     Heroes = {}
     HeroKind = {}
+    BleedStacks = {} -- Таблица учета кровотечения: BleedStacks[targetHandleId] = { count = N, expires = T, caster = U }
     
     -- Глобальные переменные волн
     udg_Wave = 0
@@ -150,17 +151,50 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
             Arena_EarthquakeWall(caster, 500.0)
         end
 
-    -- 2. Призрачный Ловчий / Ассасин (Ловкость / Одиночный урон)
+    -- 2. Призрачный Ловчий / Ассасин (Ловкость / Одиночный урон — Мастер Клинка)
     elseif role == 2 then
-        if spellId == FourCC('A103') then -- Q: Теневой Бросок (Бросок кинжала + телепорт)
+        if spellId == FourCC('A103') then -- Q: Теневой Бросок (Урон + наложение 2 стаков кровотечения)
             Arena_CustomFinisher(caster, amount * 2.2)
             Arena_CustomMove(caster, 250.0)
-        elseif spellId == FourCC('A104') then -- W: Слияние с Тенью (Невидимость / Неуязвимость)
+            local g = CreateGroup()
+            GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), 350.0, nil)
+            local u = FirstOfGroup(g)
+            while u ~= nil do
+                GroupRemoveUnit(g, u)
+                if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+                    Arena_ApplyBleedStack(u, caster, 2, 8.0)
+                end
+                u = FirstOfGroup(g)
+            end
+            DestroyGroup(g)
+        elseif spellId == FourCC('A104') then -- W: Слияние с Тенью (Неуязвимость + наложение кровотечения)
             Arena_DivineShield(caster, 2.0 + rank * 0.5)
-        elseif spellId == FourCC('A10F') then -- E: Анатомический Удар (Критический урон)
+        elseif spellId == FourCC('A10F') then -- E: Анатомический Удар (Критический урон + 3 стака кровотечения)
             Arena_CustomFinisher(caster, amount * 3.5)
-        elseif spellId == FourCC('A10G') then -- R: Танец Лезвий (Омнислаш 5 ударов)
+            local g = CreateGroup()
+            GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), 300.0, nil)
+            local u = FirstOfGroup(g)
+            while u ~= nil do
+                GroupRemoveUnit(g, u)
+                if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+                    Arena_ApplyBleedStack(u, caster, 3, 10.0)
+                end
+                u = FirstOfGroup(g)
+            end
+            DestroyGroup(g)
+        elseif spellId == FourCC('A10G') then -- R: Танец Лезвий (Омнислаш + 5 стаков кровотечения на цели)
             Arena_Omnislash(caster, 5, amount * 1.8)
+            local g = CreateGroup()
+            GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), 450.0, nil)
+            local u = FirstOfGroup(g)
+            while u ~= nil do
+                GroupRemoveUnit(g, u)
+                if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+                    Arena_ApplyBleedStack(u, caster, 5, 12.0)
+                end
+                u = FirstOfGroup(g)
+            end
+            DestroyGroup(g)
         end
 
     -- 3. Элементалист Бури (Интеллект / Магический прокастер)
@@ -325,6 +359,8 @@ function Arena_CheckItemCrafting(hero)
 end
 
 function InitCustomTriggers()
+    -- Инициализация глобальной системы кровотечения
+    Arena_InitBleedSystem()
     -- Инициализация таймера и диалога таймера волн
     udg_WaveTimer = CreateTimer()
     udg_WaveTD = CreateTimerDialog(udg_WaveTimer)
@@ -955,6 +991,42 @@ function Arena_ShieldOfTorment(caster, shieldHp, armorBonus, duration)
         UnitRemoveAbility(caster, FourCC('Adev'))
         UnitRemoveAbility(caster, FourCC('AImx'))
         DestroyTimer(t)
+    end)
+end
+
+function Arena_ApplyBleedStack(target, caster, stacksToAdd, duration)
+    if target == nil or GetWidgetLife(target) <= 0.405 then return end
+    local id = GetHandleId(target)
+    if not BleedStacks[id] then
+        BleedStacks[id] = { count = 0, duration = duration, caster = caster, target = target }
+    end
+
+    BleedStacks[id].count = BleedStacks[id].count + stacksToAdd
+    BleedStacks[id].duration = duration
+
+    -- Накладываем стандартную иконку статуса "Теневой удар / Кровотечение" (Bshs)
+    UnitAddAbility(target, FourCC('Ashs')) -- Shadow Strike debuff ability
+    DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Other\\Blood\\BloodImpact.mdl", target, "origin"))
+end
+
+function Arena_InitBleedSystem()
+    local t = CreateTimer()
+    TimerStart(t, 1.0, true, function()
+        for id, data in pairs(BleedStacks) do
+            local target = data.target
+            if target ~= nil and GetWidgetLife(target) > 0.405 and data.count > 0 and data.duration > 0 then
+                data.duration = data.duration - 1.0
+                -- Каждый стак отнимает 1 единицу здоровья в секунду
+                local dmg = data.count * 1.0
+                UnitDamageTarget(data.caster, target, dmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Other\\Blood\\BloodImpact.mdl", target, "overhead"))
+            else
+                if target ~= nil then
+                    UnitRemoveAbility(target, FourCC('Ashs'))
+                end
+                BleedStacks[id] = nil
+            end
+        end
     end)
 end
 
