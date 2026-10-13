@@ -232,6 +232,98 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
     end
 end
 
+-- ===========================================================================
+-- 3-Tier Item & Auto-Crafting System Data
+-- ===========================================================================
+
+ItemCraftRecipes = {
+    -- 1. Переходные предметы (Midgame)
+    {
+        result = FourCC('I001'), -- Сапоги Скитальца
+        components = { FourCC('boot'), FourCC('glov') }, -- Сапоги Ветра + Перчатки Проворства
+        name = "Сапоги Скитальца"
+    },
+    {
+        result = FourCC('I002'), -- Каменный Бастион
+        components = { FourCC('rng1'), FourCC('prt5') }, -- Кольцо Закалки + Кристалл Жизни
+        name = "Каменный Бастион"
+    },
+    {
+        result = FourCC('I003'), -- Жало Пустоты
+        components = { FourCC('rat6'), FourCC('glov') }, -- Клинок Остроты + Перчатки Проворства
+        name = "Жало Пустоты"
+    },
+    {
+        result = FourCC('I004'), -- Кодекс Тайной Магии
+        components = { FourCC('I000'), FourCC('pman') }, -- Мантия Мудреца + Амулет Маны
+        name = "Кодекс Тайной Магии"
+    },
+
+    -- 2. Уникальные Легендарные Артефакты (Реликвии мини-боссов)
+    {
+        result = FourCC('I005'), -- Эгида Несокрушимости
+        components = { FourCC('I002'), FourCC('I00G') }, -- Каменный Бастион + Сердце Голема
+        name = "Эгида Несокрушимости"
+    },
+    {
+        result = FourCC('I006'), -- Погибель Миров: Клык Королевы
+        components = { FourCC('I003'), FourCC('I00V') }, -- Жало Пустоты + Хелицера Королевы Яда
+        name = "Погибель Миров: Клык Королевы"
+    },
+    {
+        result = FourCC('I007'), -- Секира Пекла
+        components = { FourCC('rat6'), FourCC('belv'), FourCC('I00F') }, -- Клинок Остроты + Пояс Титана + Пылающий Осколок
+        name = "Секира Пекла"
+    },
+    {
+        result = FourCC('I008'), -- Астральный Скипетр Времени
+        components = { FourCC('I004'), FourCC('I00E') }, -- Кодекс Тайной Магии + Око Вечности
+        name = "Астральный Скипетр Времени"
+    },
+    {
+        result = FourCC('I009'), -- Призрачные Поступи
+        components = { FourCC('I001'), FourCC('I00C') }, -- Сапоги Скитальца + Мантия Сумерек
+        name = "Призрачные Поступи"
+    }
+}
+
+function Arena_CheckItemCrafting(hero)
+    if hero == nil or GetWidgetLife(hero) <= 0.405 then return end
+
+    for _, recipe in ipairs(ItemCraftRecipes) do
+        local hasAll = true
+        local matchedSlots = {}
+
+        for _, reqComp in ipairs(recipe.components) do
+            local found = false
+            for slot = 0, 5 do
+                local it = UnitItemInSlot(hero, slot)
+                if it ~= nil and GetItemId(it) == reqComp and not matchedSlots[slot] then
+                    matchedSlots[slot] = it
+                    found = true
+                    break
+                end
+            end
+            if not found then
+                hasAll = false
+                break
+            end
+        end
+
+        if hasAll then
+            -- Удаляем компоненты
+            for _, it in pairs(matchedSlots) do
+                RemoveItem(it)
+            end
+            -- Создаем собранный артефакт
+            local crafted = UnitAddItemById(hero, recipe.result)
+            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Items\\AIam\\AIamTarget.mdl", hero, "origin"))
+            DisplayTimedTextToPlayer(GetOwningPlayer(hero), 0, 0, 8.0, "|cffffcc00[АРТЕФАКТ СОБРАН]:|r " .. recipe.name)
+            break
+        end
+    end
+end
+
 function InitCustomTriggers()
     -- Инициализация таймера и диалога таймера волн
     udg_WaveTimer = CreateTimer()
@@ -258,6 +350,14 @@ function InitCustomTriggers()
         Arena_CustomCast_Lua(caster, pid, spellId)
     end)
 
+
+    -- Триггер поднятия предметов для подбора рецептов / автосборки
+    local itemPickupTrigger = CreateTrigger()
+    TriggerRegisterAnyUnitEventBJ(itemPickupTrigger, EVENT_PLAYER_UNIT_PICKUP_ITEM)
+    TriggerAddAction(itemPickupTrigger, function()
+        local hero = GetManipulatingUnit()
+        Arena_CheckItemCrafting(hero)
+    end)
 
     -- Триггер гибели юнитов (начисление золота, зачистка волны, воскрешение)
     local deathTrigger = CreateTrigger()
@@ -734,8 +834,21 @@ function Trig_Death_Actions()
         end
         udg_TotalKills = udg_TotalKills + 1
         if GetUnitUserData(u) == 888 then
-            Arena_Msg("|cffffcc66Побеждён мини-босс! Команде начислена награда.|r")
+            Arena_Msg("|cffffcc66Побеждён мини-босс! Команде начислена награда и выпала Реликвия.|r")
             Arena_PayWaveGold(50 + udg_Wave * 3)
+            -- Выпадение реликвий с конкретных мини-боссов
+            local ux, uy = GetUnitX(u), GetUnitY(u)
+            if udg_Wave == 5 or udg_Wave == 20 then
+                CreateItem(FourCC('I00G'), ux, uy) -- Сердце Голема
+            elseif udg_Wave == 10 or udg_Wave == 30 then
+                CreateItem(FourCC('I00V'), ux, uy) -- Хелицера Королевы Яда
+            elseif udg_Wave == 15 or udg_Wave == 35 then
+                CreateItem(FourCC('I00F'), ux, uy) -- Пылающий Осколок Метеорита
+            elseif udg_Wave == 25 or udg_Wave == 40 then
+                CreateItem(FourCC('I00E'), ux, uy) -- Око Вечности
+            else
+                CreateItem(FourCC('I00C'), ux, uy) -- Мантия Сумерек
+            end
         end
         if udg_EnemiesAlive == 0 then
             Arena_CheckWaveClear()
