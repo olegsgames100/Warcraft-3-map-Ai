@@ -22,28 +22,28 @@ function InitGlobals()
     udg_ReviveTimer = {}
     udg_PlayerKills = {0, 0, 0, 0}
 
-    -- Данные классов героев с уникальными некопирующимися способностями
+    -- Концепция 10 героев AI Studio с их архетипами и уникальными способностями
     HeroClasses = {
-        -- 1. [ТАНК #1] Паладин-защитник: АоЕ агро, Божественный щит, Отражение урона, Воскрешение
-        { id = FourCC('Hpal'), name = "[Танк] Паладин-защитник",   role = "tank",    spells = {FourCC('A101'), FourCC('A102'), FourCC('A10D'), FourCC('A10E')} },
-        -- 2. [ДУЭЛЯНТ #1] Мастер клинка: Рассечение брони, Ветреный стремительный шаг, Критический урон, Финишер босса
-        { id = FourCC('Obla'), name = "[Дуэлянт] Мастер клинка",   role = "duelist", spells = {FourCC('A103'), FourCC('A104'), FourCC('A10F'), FourCC('A10G')} },
-        -- 3. [ДД #1] Боевой архимаг: Цепная молния, Чародейская нова, Чародейская аура, Штормовой катаклизм
-        { id = FourCC('Hamg'), name = "[ДД] Боевой архимаг",       role = "damage",  spells = {FourCC('A105'), FourCC('A106'), FourCC('A10H'), FourCC('A10I')} },
-        -- 4. [ПРИЗЫВАТЕЛЬ #1] Рыцарь смерти: Воскрешение скелета, Койл смерти, Тёмный ритуал (жертва), Вызов Мерзости
-        { id = FourCC('Udea'), name = "[Призыватель] Рыцарь смерти", role = "summoner", spells = {FourCC('A107'), FourCC('A108'), FourCC('A10J'), FourCC('A10K')} },
-        -- 5. [ДУЭЛЯНТ #2] Охотник на демонов: Выжигание маны/жизни, Кожа демона (уклонение), Рывок сквозь цели, Метаморфоза
-        { id = FourCC('Edem'), name = "[Дуэлянт] Охотник на демонов", role = "duelist", spells = {FourCC('A109'), FourCC('A10A'), FourCC('A10L'), FourCC('A10M')} },
-        -- 6. [САППОРТ #1] Лунная жрица: Лунная вспышка (ускорение+хил), Метка Луны (+30% урона по цели), Благодать, Звездопад
-        { id = FourCC('Emoo'), name = "[Саппорт] Лунная жрица",     role = "support", spells = {FourCC('A10B'), FourCC('A10C'), FourCC('A10N'), FourCC('A10O')} },
-        -- 7. [САППОРТ #2] Алхимик-боевик: Целебный спрей, Кислотная бомба (-броня), Трансмутация (золото+хил), Химический раж
-        { id = FourCC('Nalc'), name = "[Саппорт] Алхимик-боевик",   role = "support", spells = {FourCC('A111'), FourCC('A112'), FourCC('A113'), FourCC('A114')} },
-        -- 8. [ТАНК #2] Горный король: Громовой удар (замедление), Громовой молот (оглушение), Расталкивающий удар, Аватара
-        { id = FourCC('Hmkg'), name = "[Танк] Горный король",      role = "tank",    spells = {FourCC('A115'), FourCC('A116'), FourCC('A117'), FourCC('A118')} },
-        -- 9. [ПРИЗЫВАТЕЛЬ #2] Сумрачная охотница: Змеиные тотемы, Сглаз (превращение в лягушку), Тотем душ, Большое Темное Вуду
-        { id = FourCC('Ewar'), name = "[Призыватель] Сумрачная охотница", role = "summoner", spells = {FourCC('A119'), FourCC('A11A'), FourCC('A11B'), FourCC('A11C')} },
-        -- 10. [ДД #2] Ледяной лич: Ледяная нова (заморозка), Ледяная броня, Веер холода, Смерть и разложение (% урон)
-        { id = FourCC('Ulic'), name = "[ДД] Ледяной лич",          role = "damage",  spells = {FourCC('A11D'), FourCC('A11E'), FourCC('A11F'), FourCC('A11G')} }
+        -- 1. Тёмный Рыцарь (Сила / Танк-Джаггернаут)
+        { id = FourCC('Hpal'), name = "Тёмный Рыцарь (Сила / Танк)",     role = "tank",     spells = {FourCC('A101'), FourCC('A102'), FourCC('A10D'), FourCC('A10E')} },
+        -- 2. Призрачный Ловчий (Ловкость / Ассасин)
+        { id = FourCC('Obla'), name = "Призрачный Ловчий (Ловкость / Ассасин)", role = "assassin", spells = {FourCC('A103'), FourCC('A104'), FourCC('A10F'), FourCC('A10G')} },
+        -- 3. Элементалист Бури (Интеллект / Маг)
+        { id = FourCC('Hamg'), name = "Элементалист Бури (Интеллект / Маг)", role = "mage",     spells = {FourCC('A105'), FourCC('A106'), FourCC('A10H'), FourCC('A10I')} },
+        -- 4. Хозяин Стаи (Сила / Саммонер)
+        { id = FourCC('Udea'), name = "Хозяин Стаи (Сила / Саммонер)",   role = "summoner", spells = {FourCC('A107'), FourCC('A108'), FourCC('A10J'), FourCC('A10K')} },
+        -- 5. Токсиколог (Интеллект / ДоТ & Контроль)
+        { id = FourCC('Edem'), name = "Токсиколог (Интеллект / ДоТ)",    role = "dot_control", spells = {FourCC('A109'), FourCC('A10A'), FourCC('A10L'), FourCC('A10M')} },
+        -- 6. Мастер Клинка / Ронин (Ловкость / Керри Ближнего Боя)
+        { id = FourCC('Hmkg'), name = "Мастер Клинка-Ронин (Ловкость / Керри)", role = "carry", spells = {FourCC('A115'), FourCC('A116'), FourCC('A117'), FourCC('A118')} },
+        -- 7. Жрица Солнца (Интеллект / Саппорт-Хилер)
+        { id = FourCC('Emoo'), name = "Жрица Солнца (Интеллект / Хилер)", role = "healer",   spells = {FourCC('A10B'), FourCC('A10C'), FourCC('A10N'), FourCC('A10O')} },
+        -- 8. Инженер-Бомбардир (Ловкость / Осада и Зонинг)
+        { id = FourCC('Nalc'), name = "Инженер-Бомбардир (Ловкость / Осада)", role = "siege",  spells = {FourCC('A111'), FourCC('A112'), FourCC('A113'), FourCC('A114')} },
+        -- 9. Каменный Исполин (Сила / Инициатор)
+        { id = FourCC('Ewar'), name = "Каменный Исполин (Сила / Инициатор)", role = "initiator", spells = {FourCC('A119'), FourCC('A11A'), FourCC('A11B'), FourCC('A11C')} },
+        -- 10. Хрономант (Интеллект / Тактический Контроль)
+        { id = FourCC('Ulic'), name = "Хрономант (Интеллект / Контроль Времени)", role = "control", spells = {FourCC('A11D'), FourCC('A11E'), FourCC('A11F'), FourCC('A11G')} }
     }
     
     -- Переменные диалога
@@ -96,140 +96,135 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
 
     local amount = 35.0 + 25.0 * rank
 
-    -- 1. [ТАНК #1] Паладин-защитник (Hpal)
+    -- 1. Тёмный Рыцарь (Сила / Танк-Джаггернаут)
     if role == 1 then
-        if spellId == FourCC('A101') then -- Q: Святая провокация (АоЕ-таунт + агро)
-            Arena_TauntArea(caster, 550.0)
-        elseif spellId == FourCC('A102') then -- W: Божественный щит (Неуязвимость)
-            Arena_DivineShield(caster, 3.0 + 0.5 * rank)
-        elseif spellId == FourCC('A10D') then -- E: Щит возмездия (Возврат урона + самолечение)
-            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 2.5)
-            Arena_CustomArea(caster, 350.0, amount * 1.0, false)
-        elseif spellId == FourCC('A10E') then -- R: Последний рассвет (Воскрешение + полное исцеление отряда)
-            for i = 0, 3 do
-                if Heroes[i] ~= nil and GetWidgetLife(Heroes[i]) <= 0.405 and IsUnitAlly(Heroes[i], GetOwningPlayer(caster)) then
-                    ReviveHero(Heroes[i], GetUnitX(caster), GetUnitY(caster), true)
-                end
-            end
-            Arena_CustomArea(caster, 900.0, amount * 4.0, true)
-        end
-
-    -- 2. [ДУЭЛЯНТ #1] Мастер клинка (Obla)
-    elseif role == 2 then
-        if spellId == FourCC('A103') then -- Q: Рассечение брони (-броня цели)
-            Arena_ArmorSunder(caster, 300.0, 10.0)
-        elseif spellId == FourCC('A104') then -- W: Ветреный стремительный шаг (Скачок)
-            Arena_CustomMove(caster, 280.0 + 40.0 * rank)
-        elseif spellId == FourCC('A10F') then -- E: Критический удар (Огромный сольный урон по боссу)
-            Arena_CustomFinisher(caster, amount * 3.5)
-        elseif spellId == FourCC('A10G') then -- R: Шторм палача (Сокрушительный финишер по раненому боссу)
-            Arena_CustomFinisher(caster, amount * 8.0)
-        end
-
-    -- 3. [ДД #1] Боевой архимаг (Hamg)
-    elseif role == 3 then
-        if spellId == FourCC('A105') then -- Q: Цепная молния (Броски урон по волне)
-            Arena_CustomArea(caster, 500.0 + 30.0 * rank, amount * 2.2, false)
-        elseif spellId == FourCC('A106') then -- W: Чародейская нова (Взрыв вокруг себя)
+        if spellId == FourCC('A101') then -- Q: Раскол Рока (Урон перед героем и замедление)
             Arena_CustomArea(caster, 400.0, amount * 1.8, false)
-        elseif spellId == FourCC('A10H') then -- E: Чародейская аура (Восстановление маны себе и отряду)
-            Arena_ItemPulses(caster, 0, amount * 1.8)
-        elseif spellId == FourCC('A10I') then -- R: Штормовой катаклизм (Массовый град магии)
-            for i = 0, 9 do
-                Arena_CustomArea(caster, 700.0, amount * 0.8, false)
-            end
+            Arena_TauntArea(caster, 400.0)
+        elseif spellId == FourCC('A102') then -- W: Кровавая Жатва (Вампиризм / Исцеление)
+            Arena_SpellAid(caster, amount * 2.5, 0)
+        elseif spellId == FourCC('A10D') then -- E: Щит Мучений (Барьер и взрыв)
+            Arena_DivineShield(caster, 2.5 + rank * 0.5)
+            Arena_CustomArea(caster, 350.0, amount * 1.5, false)
+        elseif spellId == FourCC('A10E') then -- R: Врата Преисподней (Приковывающие цепи рока)
+            Arena_DoomChains(caster, 500.0, 4.0)
+            Arena_CustomFinisher(caster, amount * 5.0)
         end
 
-    -- 4. [ПРИЗЫВАТЕЛЬ #1] Рыцарь смерти (Udea)
+    -- 4. Хозяин Стаи (Сила / Призыватель)
     elseif role == 4 then
-        if spellId == FourCC('A107') then -- Q: Призыв скелета-воина
-            Arena_CustomSummon(caster, FourCC('uske'), 1 + math.floor(rank / 2), 20.0)
-        elseif spellId == FourCC('A108') then -- W: Койл смерти (Лечение нежити/союзника или урон врагу)
-            Arena_CustomFinisher(caster, amount * 2.2)
-            Arena_SpellAid(caster, amount * 1.5, 0)
-        elseif spellId == FourCC('A10J') then -- E: Тёмный ритуал (Жертва слуги для полного восстановления)
-            Arena_SpellAid(caster, amount * 3.0, amount * 2.0)
-        elseif spellId == FourCC('A10K') then -- R: Вызов Мерзости (Призыв элитного танка 'uabo')
-            Arena_CustomSummon(caster, FourCC('uabo'), 1, 35.0)
-            Arena_CustomSummon(caster, FourCC('uske'), 2, 35.0)
-        end
-
-    -- 5. [ДУЭЛЯНТ #2] Охотник на демонов (Edem)
-    elseif role == 5 then
-        if spellId == FourCC('A109') then -- Q: Выжигание маны/жизни у босса
-            Arena_ManaBurn(caster, amount * 2.0)
-        elseif spellId == FourCC('A10A') then -- W: Кожа демона (Уклонение + сольный урон)
-            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 2.0)
-        elseif spellId == FourCC('A10L') then -- E: Рывок сквозь скверну
-            Arena_CustomMove(caster, 300.0 + 30.0 * rank)
-            Arena_CustomFinisher(caster, amount * 2.0)
-        elseif spellId == FourCC('A10M') then -- R: Форма Метаморфозы (Предельный соло-урон)
-            Arena_CustomFinisher(caster, amount * 7.5)
-        end
-
-    -- 6. [САППОРТ #1] Лунная жрица (Emoo)
-    elseif role == 6 then
-        if spellId == FourCC('A10B') then -- Q: Лунная вспышка (Подлечивание + скорость)
-            Arena_CustomArea(caster, 400.0, amount * 1.6, true)
-        elseif spellId == FourCC('A10C') then -- W: Метка Луны (Враг получает больше урона)
-            Arena_ArmorSunder(caster, 500.0, 8.0)
-        elseif spellId == FourCC('A10N') then -- E: Благодать Элуны (Восполнение маны и жизней группе)
-            Arena_ItemPulses(caster, amount * 1.5, amount * 1.5)
-        elseif spellId == FourCC('A10O') then -- R: Звездопад святилища (Массовое лечение и АоЕ-урон)
-            Arena_CustomArea(caster, 800.0, amount * 3.0, true)
-            Arena_CustomArea(caster, 800.0, amount * 2.0, false)
-        end
-
-    -- 7. [САППОРТ #2] Алхимик-боевик (Nalc)
-    elseif role == 7 then
-        if spellId == FourCC('A111') then -- Q: Целебный спрей (Лечение союзников)
-            Arena_CustomArea(caster, 450.0, amount * 2.0, true)
-        elseif spellId == FourCC('A112') then -- W: Кислотная бомба (Снижение брони врагов)
-            Arena_ArmorSunder(caster, 450.0, 10.0)
-            Arena_CustomArea(caster, 450.0, amount * 1.0, false)
-        elseif spellId == FourCC('A113') then -- E: Трансмутация (Мгновенное убийство крипа за золото)
-            Arena_TransmuteTarget(caster, 350.0, 25 + rank * 15)
-        elseif spellId == FourCC('A114') then -- R: Химический раж (Полное восстановление здоровья отряда)
-            Arena_ItemPulses(caster, amount * 4.0, amount * 2.0)
-        end
-
-    -- 8. [ТАНК #2] Горный король (Hmkg)
-    elseif role == 8 then
-        if spellId == FourCC('A115') then -- Q: Громовой удар (Замедление и урон вокруг)
-            Arena_CustomArea(caster, 450.0, amount * 1.8, false)
-        elseif spellId == FourCC('A116') then -- W: Громовой молот (Оглушение одиночной цели)
-            Arena_CustomFinisher(caster, amount * 2.5)
-        elseif spellId == FourCC('A117') then -- E: Расталкивающий удар (Отбрасывает врагов от союзников)
-            Arena_KnockbackArea(caster, 350.0, 200.0)
-        elseif spellId == FourCC('A118') then -- R: Аватара монолита (Огромный прирост HP + АоЕ заслон)
-            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 4.0)
-            Arena_TauntArea(caster, 700.0)
-        end
-
-    -- 9. [ПРИЗЫВАТЕЛЬ #2] Сумрачная охотница (Ewar)
-    elseif role == 9 then
-        if spellId == FourCC('A119') then -- Q: Змеиные тотемы (Призыв стреляющих тотемов)
-            Arena_CustomSummon(caster, FourCC('nska'), 1 + math.floor(rank / 2), 25.0)
-        elseif spellId == FourCC('A11A') then -- W: Сглаз (Превращение врага в лягушку)
-            Arena_HexTarget(caster, 400.0)
-        elseif spellId == FourCC('A11B') then -- E: Тотем душ (Исцеляющий тотем для группы)
+        if spellId == FourCC('A107') then -- Q: Призыв Волков-Фантомов
+            Arena_CustomSummon(caster, FourCC('nska'), 2, 25.0)
+        elseif spellId == FourCC('A108') then -- W: Охотничий Клич (Усиление отряда)
+            Arena_ItemPulses(caster, amount * 1.2, 0)
+        elseif spellId == FourCC('A10J') then -- E: Дух Вожака (Аура восстановления HP)
             Arena_ItemPulses(caster, amount * 1.8, 0)
-        elseif spellId == FourCC('A11C') then -- R: Большое Темное Вуду (Неуязвимость для всех союзников рядом)
-            Arena_VoodooInvuln(caster, 600.0, 5.0 + rank * 1.0)
+        elseif spellId == FourCC('A10K') then -- R: Гнев Природы (Форма Древнего Медведя + сплеш)
+            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 4.0)
+            Arena_CustomArea(caster, 450.0, amount * 3.0, false)
         end
 
-    -- 10. [ДД #2] Ледяной лич (Ulic)
-    elseif role == 10 then
-        if spellId == FourCC('A11D') then -- Q: Ледяная нова (Заморозка цели и урон вокруг)
-            Arena_CustomArea(caster, 400.0, amount * 2.4, false)
-        elseif spellId == FourCC('A11E') then -- W: Ледяная броня (Защита + замедление атаки врагов)
-            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 1.8)
-        elseif spellId == FourCC('A11F') then -- E: Веер холода (Конус ледяного урона)
-            Arena_CustomArea(caster, 500.0, amount * 1.9, false)
-        elseif spellId == FourCC('A11G') then -- R: Смерть и разложение (Процентный урон по площади)
-            for i = 0, 7 do
-                Arena_CustomArea(caster, 600.0, amount * 0.9, false)
+    -- 6. Мастер Клинка / Ронин (Ловкость / Керри Ближнего Боя)
+    elseif role == 6 then
+        if spellId == FourCC('A115') then -- Q: Рассекающий Выпад (Рывок вперед)
+            Arena_CustomMove(caster, 300.0 + 30.0 * rank)
+            Arena_CustomArea(caster, 250.0, amount * 1.5, false)
+        elseif spellId == FourCC('A116') then -- W: Парирование (Контратака / Щит)
+            Arena_DivineShield(caster, 1.5)
+            Arena_CustomFinisher(caster, amount * 2.0)
+        elseif spellId == FourCC('A117') then -- E: Заточка Клинка (Пробивание брони)
+            Arena_ArmorSunder(caster, 300.0, 8.0)
+            Arena_CustomFinisher(caster, amount * 2.5)
+        elseif spellId == FourCC('A118') then -- R: Абсолютный Разрез (Разрубание пространства)
+            Arena_CustomArea(caster, 650.0, amount * 6.0, false)
+        end
+
+    -- 9. Каменный Исполин (Сила / Инициатор и Контроль)
+    elseif role == 9 then
+        if spellId == FourCC('A119') then -- Q: Бросок Валуна (Оглушающий валун)
+            Arena_CustomFinisher(caster, amount * 2.5)
+        elseif spellId == FourCC('A11A') then -- W: Дрожь Земли (Замедление в области)
+            Arena_CustomArea(caster, 450.0, amount * 1.8, false)
+        elseif spellId == FourCC('A11B') then -- E: Гранитная Кожа (Блок урона и самоисцеление)
+            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 3.0)
+        elseif spellId == FourCC('A11C') then -- R: Тектонический Разлом (Врезание + каменный барьер)
+            Arena_EarthquakeWall(caster, 500.0)
+        end
+
+    -- 2. Призрачный Ловчий / Ассасин (Ловкость / Одиночный урон)
+    elseif role == 2 then
+        if spellId == FourCC('A103') then -- Q: Теневой Бросок (Бросок кинжала + телепорт)
+            Arena_CustomFinisher(caster, amount * 2.2)
+            Arena_CustomMove(caster, 250.0)
+        elseif spellId == FourCC('A104') then -- W: Слияние с Тенью (Невидимость / Неуязвимость)
+            Arena_DivineShield(caster, 2.0 + rank * 0.5)
+        elseif spellId == FourCC('A10F') then -- E: Анатомический Удар (Критический урон)
+            Arena_CustomFinisher(caster, amount * 3.5)
+        elseif spellId == FourCC('A10G') then -- R: Танец Лезвий (Омнислаш 5 ударов)
+            Arena_Omnislash(caster, 5, amount * 1.8)
+        end
+
+    -- 3. Элементалист Бури (Интеллект / Магический прокастер)
+    elseif role == 3 then
+        if spellId == FourCC('A105') then -- Q: Цепной Разряд (Цепная молния)
+            Arena_CustomArea(caster, 550.0, amount * 2.2, false)
+        elseif spellId == FourCC('A106') then -- W: Статическое Поле (Электрическая зона)
+            Arena_CustomArea(caster, 450.0, amount * 1.6, false)
+        elseif spellId == FourCC('A10H') then -- E: Перегрузка (Заряд маны)
+            Arena_ItemPulses(caster, 0, amount * 1.5)
+        elseif spellId == FourCC('A10I') then -- R: Око Бури (Грозовой фронт)
+            for i = 0, 8 do
+                Arena_CustomArea(caster, 650.0, amount * 0.85, false)
             end
+        end
+
+    -- 5. Токсиколог / Чумной Доктор (Интеллект / Контроль и ДоТ)
+    elseif role == 5 then
+        if spellId == FourCC('A109') then -- Q: Склянка с Ядом (Ядовитый газ)
+            Arena_PoisonGas(caster, 400.0, amount * 1.5, 5.0)
+        elseif spellId == FourCC('A10A') then -- W: Едкая Инъекция (-броня)
+            Arena_ArmorSunder(caster, 350.0, 6.0)
+            Arena_CustomFinisher(caster, amount * 2.0)
+        elseif spellId == FourCC('A10L') then -- E: Эпидемия (Заражение окружающих)
+            Arena_PoisonGas(caster, 450.0, amount * 1.2, 6.0)
+        elseif spellId == FourCC('A10M') then -- R: Биологический Коллапс (Мгновенный взрыв ядов)
+            Arena_CustomArea(caster, 600.0, amount * 5.0, false)
+        end
+
+    -- 7. Жрица Солнца (Интеллект / Саппорт-Хилер)
+    elseif role == 7 then
+        if spellId == FourCC('A10B') then -- Q: Благодать Света (Лечение/урон)
+            Arena_CustomArea(caster, 400.0, amount * 1.8, true)
+        elseif spellId == FourCC('A10C') then -- W: Очищающее Сияние (Снятие негатива + ускорение)
+            Arena_ItemPulses(caster, amount * 1.5, amount * 1.0)
+        elseif spellId == FourCC('A10N') then -- E: Солнечная Аура (Регенерация маны/броня)
+            Arena_ItemPulses(caster, amount * 1.0, amount * 2.0)
+        elseif spellId == FourCC('A10O') then -- R: Восход (Солнечный свет + ослепление + хил)
+            Arena_CustomArea(caster, 800.0, amount * 3.5, true)
+        end
+
+    -- 8. Инженер-Бомбардир (Ловкость / Осада и Зонинг)
+    elseif role == 8 then
+        if spellId == FourCC('A111') then -- Q: Кластерная Граната
+            Arena_ClusterGrenade(caster, GetUnitX(caster) + 200.0, GetUnitY(caster), amount * 2.0)
+        elseif spellId == FourCC('A112') then -- W: Капкан с Проводами (Обездвиживание)
+            Arena_HexTarget(caster, 350.0)
+        elseif spellId == FourCC('A113') then -- E: Разрывные Пули (Сплеш урон)
+            Arena_CustomArea(caster, 300.0, amount * 1.8, false)
+        elseif spellId == FourCC('A114') then -- R: Развертывание Мортиры (Осадный обстрел)
+            Arena_CustomArea(caster, 750.0, amount * 5.0, false)
+        end
+
+    -- 10. Хрономант / Повелитель Времени (Интеллект / Тактический контроль)
+    elseif role == 10 then
+        if spellId == FourCC('A11D') then -- Q: Петля Времени (Возврат положения/HP)
+            Arena_TimeLoop(caster, 4.0)
+        elseif spellId == FourCC('A11E') then -- W: Ускорение / Замедление
+            Arena_CustomArea(caster, 450.0, amount * 1.5, false)
+        elseif spellId == FourCC('A11F') then -- E: Предвидение (Щит от уклонения)
+            Arena_DivineShield(caster, 2.0)
+        elseif spellId == FourCC('A11G') then -- R: Хроносфера (Временной купол полного замирания)
+            Arena_Chronosphere(caster, 600.0, 4.0)
         end
     end
 end
@@ -903,6 +898,147 @@ function Arena_DivineShield(caster, duration)
     end)
 end
 
+function Arena_DoomChains(caster, radius, duration)
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), radius, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(caster, u, 120.0, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
+            PauseUnit(u, true)
+            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Other\\EntanglingRoots\\EntanglingRootsTarget.mdl", u, "origin"))
+            local victim = u
+            local t = CreateTimer()
+            TimerStart(t, duration, false, function()
+                if GetWidgetLife(victim) > 0.405 then
+                    PauseUnit(victim, false)
+                end
+                DestroyTimer(t)
+            end)
+            break
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+end
+
+function Arena_Omnislash(caster, count, damage)
+    SetUnitInvulnerable(caster, true)
+    local i = 0
+    local t = CreateTimer()
+    TimerStart(t, 0.25, true, function()
+        i = i + 1
+        local g = CreateGroup()
+        GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), 450.0, nil)
+        local u = FirstOfGroup(g)
+        while u ~= nil do
+            GroupRemoveUnit(g, u)
+            if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+                SetUnitPosition(caster, GetUnitX(u), GetUnitY(u))
+                UnitDamageTarget(caster, u, damage, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\NightElf\\Blink\\BlinkTarget.mdl", u, "origin"))
+                break
+            end
+            u = FirstOfGroup(g)
+        end
+        DestroyGroup(g)
+        if i >= count then
+            SetUnitInvulnerable(caster, false)
+            DestroyTimer(t)
+        end
+    end)
+end
+
+function Arena_PoisonGas(caster, radius, damage, duration)
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), radius, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(caster, u, damage, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_POISON, WEAPON_TYPE_WHOKNOWS)
+            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdl", u, "head"))
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+end
+
+function Arena_ClusterGrenade(caster, x, y, damage)
+    DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Other\\Bombster\\BombsterTarget.mdl", x, y))
+    local i = 0
+    while i < 3 do
+        local rx = x + GetRandomReal(-120.0, 120.0)
+        local ry = y + GetRandomReal(-120.0, 120.0)
+        DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Other\\Bombster\\BombsterTarget.mdl", rx, ry))
+        local g = CreateGroup()
+        GroupEnumUnitsInRange(g, rx, ry, 200.0, nil)
+        local u = FirstOfGroup(g)
+        while u ~= nil do
+            GroupRemoveUnit(g, u)
+            if GetWidgetLife(u) > 0.405 and IsUnitEnemy(u, GetOwningPlayer(caster)) then
+                UnitDamageTarget(caster, u, damage * 0.5, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
+                DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Human\\ThunderClap\\ThunderClapCaster.mdl", u, "origin"))
+            end
+            u = FirstOfGroup(g)
+        end
+        DestroyGroup(g)
+        i = i + 1
+    end
+end
+
+function Arena_TimeLoop(target, duration)
+    if target == nil or GetWidgetLife(target) <= 0.405 then return end
+    local x, y = GetUnitX(target), GetUnitY(target)
+    local hp = GetUnitState(target, UNIT_STATE_LIFE)
+    local mp = GetUnitState(target, UNIT_STATE_MANA)
+    DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Items\\AIam\\AIamTarget.mdl", target, "origin"))
+    local t = CreateTimer()
+    TimerStart(t, duration, false, function()
+        if GetWidgetLife(target) > 0.405 then
+            SetUnitPosition(target, x, y)
+            SetUnitState(target, UNIT_STATE_LIFE, hp)
+            SetUnitState(target, UNIT_STATE_MANA, mp)
+            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdl", target, "origin"))
+        end
+        DestroyTimer(t)
+    end)
+end
+
+function Arena_Chronosphere(caster, radius, duration)
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Other\\Tornado\\TornadoElemental.mdl", cx, cy))
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, cx, cy, radius, nil)
+    local u = FirstOfGroup(g)
+    local pausedUnits = {}
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if u ~= caster and GetWidgetLife(u) > 0.405 then
+            PauseUnit(u, true)
+            table.insert(pausedUnits, u)
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+    local t = CreateTimer()
+    TimerStart(t, duration, false, function()
+        for _, pUnit in ipairs(pausedUnits) do
+            if GetWidgetLife(pUnit) > 0.405 then
+                PauseUnit(pUnit, false)
+            end
+        end
+        DestroyTimer(t)
+    end)
+end
+
+function Arena_EarthquakeWall(caster, radius)
+    Arena_KnockbackArea(caster, radius, 150.0)
+    Arena_CustomArea(caster, radius, 200.0, false)
+    DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl", GetUnitX(caster), GetUnitY(caster)))
+end
+
 function Arena_VoodooInvuln(caster, radius, duration)
     local g = CreateGroup()
     GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), radius, nil)
@@ -1030,7 +1166,9 @@ function Arena_CustomSummon(caster, unitId, count, duration)
     local x = GetUnitX(caster)
     local y = GetUnitY(caster)
     while i < count do
-        local u = CreateUnit(p, unitId, x + math.random(-80, 80), y + math.random(-80, 80), GetUnitFacing(caster))
+        local rx = x + GetRandomReal(-80.0, 80.0)
+        local ry = y + GetRandomReal(-80.0, 80.0)
+        local u = CreateUnit(p, unitId, rx, ry, GetUnitFacing(caster))
         UnitApplyTimedLife(u, FourCC('BTLF'), duration)
         DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdl", u, "origin"))
         i = i + 1
