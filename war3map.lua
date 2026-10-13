@@ -472,13 +472,35 @@ function InitCustomTriggers()
             end
         end)
 
-        -- Показываем диалог игрокам
-        for pid = 0, 3 do
-            local p = Player(pid)
-            if GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING then
-                DialogDisplay(p, HeroDialog, true)
+        function ShowHeroSelectionDialog()
+            for pid = 0, 3 do
+                local p = Player(pid)
+                if GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING then
+                    DialogDisplay(p, HeroDialog, true)
+                end
             end
         end
+
+        ShowHeroSelectionDialog()
+
+        -- Чат-триггер выбора героя через -1 .. -10
+        Arena_ChatTrigger = CreateTrigger()
+        for pid = 0, 3 do
+            TriggerRegisterPlayerChatEvent(Arena_ChatTrigger, Player(pid), "-", false)
+        end
+        TriggerAddAction(Arena_ChatTrigger, function()
+            local p = GetTriggerPlayer()
+            local pid = GetPlayerId(p)
+            local msg = GetEventPlayerChatString()
+            local num = tonumber(string.sub(msg, 2))
+            if num and num >= 1 and num <= 10 then
+                if HeroDialog ~= nil then
+                    DialogDisplay(p, HeroDialog, false)
+                end
+                SpawnSelectedHero(pid, num)
+            end
+        end)
+        DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 15.0, "|cffff0000[АРЕНА]:|r Выберите класс героя в окне (или напишите в чат от -1 до -10)!")
     end)
 end
 
