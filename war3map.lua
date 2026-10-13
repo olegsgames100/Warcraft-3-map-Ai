@@ -165,16 +165,20 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
 
     -- 3. Элементалист Бури (Интеллект / Магический прокастер)
     elseif role == 3 then
-        if spellId == FourCC('A105') then -- Q: Цепной Разряд (Цепная молния)
-            Arena_CustomArea(caster, 550.0, amount * 2.2, false)
-        elseif spellId == FourCC('A106') then -- W: Статическое Поле (Электрическая зона)
-            Arena_CustomArea(caster, 450.0, amount * 1.6, false)
-        elseif spellId == FourCC('A10H') then -- E: Перегрузка (Заряд маны)
+        if spellId == FourCC('A105') then -- Q: Цепной Разряд (Молния + накапливание и перескок 4/5/6/7/8 зарядов)
+            Arena_CustomArea(caster, 550.0, amount * 1.8, false)
+            Arena_ApplyStaticCharges(caster, rank, 550.0, amount * 0.6)
+        elseif spellId == FourCC('A106') then -- W: Статическое Поле (Электрическая зона + перескоки)
+            Arena_CustomArea(caster, 450.0, amount * 1.4, false)
+            Arena_ApplyStaticCharges(caster, rank, 450.0, amount * 0.5)
+        elseif spellId == FourCC('A10H') then -- E: Перегрузка (Восполнение маны + перескок статитики)
             Arena_ItemPulses(caster, 0, amount * 1.5)
-        elseif spellId == FourCC('A10I') then -- R: Око Бури (Грозовой фронт)
-            for i = 0, 8 do
-                Arena_CustomArea(caster, 650.0, amount * 0.85, false)
+            Arena_ApplyStaticCharges(caster, rank, 500.0, amount * 0.4)
+        elseif spellId == FourCC('A10I') then -- R: Око Бури (Грозовой фронт + массовые перескоки зарядов)
+            for i = 0, 4 do
+                Arena_CustomArea(caster, 650.0, amount * 0.8, false)
             end
+            Arena_ApplyStaticCharges(caster, rank, 650.0, amount * 0.8)
         end
 
     -- 5. Токсиколог / Чумной Доктор (Интеллект / Контроль и ДоТ)
@@ -838,6 +842,55 @@ function Arena_ShieldOfTorment(caster, shieldHp, armorBonus, duration)
         UnitRemoveAbility(caster, FourCC('Adev'))
         UnitRemoveAbility(caster, FourCC('AImx'))
         DestroyTimer(t)
+    end)
+end
+
+function Arena_ApplyStaticCharges(caster, spellRank, radius, baseDamage)
+    local maxJumps = 3 + spellRank -- 4 jumps at rank 1, 5 at rank 2, 6 at rank 3, 7 at rank 4, 8 at rank 5
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, cx, cy, radius, nil)
+    local currentTarget = FirstOfGroup(g)
+    while currentTarget ~= nil and not (IsUnitEnemy(currentTarget, GetOwningPlayer(caster)) and GetWidgetLife(currentTarget) > 0.405) do
+        GroupRemoveUnit(g, currentTarget)
+        currentTarget = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+
+    if currentTarget == nil then return end
+
+    local jumpsDone = 0
+    local t = CreateTimer()
+    TimerStart(t, 0.35, true, function()
+        jumpsDone = jumpsDone + 1
+        if currentTarget ~= nil and GetWidgetLife(currentTarget) > 0.405 then
+            UnitDamageTarget(caster, currentTarget, baseDamage, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_LIGHTNING, WEAPON_TYPE_WHOKNOWS)
+            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Other\\MonkThunderClap\\MonkThunderClap.mdl", currentTarget, "origin"))
+
+            -- Find next jump target
+            local tx, ty = GetUnitX(currentTarget), GetUnitY(currentTarget)
+            local nextGroup = CreateGroup()
+            GroupEnumUnitsInRange(nextGroup, tx, ty, 450.0, nil)
+            local nextTarget = FirstOfGroup(nextGroup)
+            local found = nil
+            while nextTarget ~= nil do
+                GroupRemoveUnit(nextGroup, nextTarget)
+                if nextTarget ~= currentTarget and IsUnitEnemy(nextTarget, GetOwningPlayer(caster)) and GetWidgetLife(nextTarget) > 0.405 then
+                    found = nextTarget
+                    break
+                end
+                nextTarget = FirstOfGroup(nextGroup)
+            end
+            DestroyGroup(nextGroup)
+
+            if found ~= nil then
+                currentTarget = found
+            end
+        end
+
+        if jumpsDone >= maxJumps or currentTarget == nil or GetWidgetLife(currentTarget) <= 0.405 then
+            DestroyTimer(t)
+        end
     end)
 end
 
