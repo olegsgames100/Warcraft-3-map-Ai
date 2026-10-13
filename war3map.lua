@@ -22,6 +22,8 @@ function InitGlobals()
     LichRevenant = {}
     LichWyrm = {}
     ChronoParadoxSaved = {}
+    InductionStacks = {}
+    StormSupercharge = {}
     GrandChronosphereActive = {}
     
     -- Глобальные переменные волн
@@ -45,8 +47,8 @@ function InitGlobals()
         { id = FourCC('Hpal'), name = "Тёмный Рыцарь (Сила / Танк)",     role = "tank",     spells = {FourCC('A101'), FourCC('A102'), FourCC('A10D'), FourCC('A10E')} },
         -- 2. Призрачный Ловчий (Ловкость / Ассасин)
         { id = FourCC('Obla'), name = "Призрачный Ловчий (Ловкость / Ассасин)", role = "assassin", spells = {FourCC('A103'), FourCC('A104'), FourCC('A10F'), FourCC('A10G')} },
-        -- 3. Элементалист Бури (Интеллект / Маг)
-        { id = FourCC('Hamg'), name = "Элементалист Бури (Интеллект / Маг)", role = "mage",     spells = {FourCC('A105'), FourCC('A106'), FourCC('A10H'), FourCC('A10I')} },
+        -- 3. Элементалист Бури / Архимаг Гроз (Интеллект / Абсолютный Магический AoE-Кастер)
+        { id = FourCC('Hamg'), name = "Элементалист Бури (Интеллект / АоЕ-Маг)", role = "mage", spells = {FourCC('A105'), FourCC('A106'), FourCC('A10H'), FourCC('A10I')} },
         -- 4. Хранитель Древней / Друид Первобытного Леса (Сила / Саммонер & Биомасса)
         { id = FourCC('Udea'), name = "Хранитель Древней (Сила / Саммонер)", role = "summoner", spells = {FourCC('A107'), FourCC('A108'), FourCC('A10J'), FourCC('A10K')} },
         -- 5. Архилич Чумы / Повелитель Мёртвых (Интеллект / Некромант-Призыватель)
@@ -209,22 +211,16 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
             DestroyGroup(g)
         end
 
-    -- 3. Элементалист Бури (Интеллект / Магический прокастер)
+    -- 3. Элементалист Бури / Архимаг Гроз (Интеллект / Абсолютный Магический AoE-Кастер)
     elseif role == 3 then
-        if spellId == FourCC('A105') then -- Q: Цепной Разряд (Молния + накапливание и перескок 4/5/6/7/8 зарядов)
-            Arena_CustomArea(caster, 550.0, amount * 1.8, false)
-            Arena_ApplyStaticCharges(caster, rank, 550.0, amount * 0.6)
-        elseif spellId == FourCC('A106') then -- W: Статическое Поле (Электрическая зона + перескоки)
-            Arena_CustomArea(caster, 450.0, amount * 1.4, false)
-            Arena_ApplyStaticCharges(caster, rank, 450.0, amount * 0.5)
-        elseif spellId == FourCC('A10H') then -- E: Перегрузка (Восполнение маны + перескок статитики)
-            Arena_ItemPulses(caster, 0, amount * 1.5)
-            Arena_ApplyStaticCharges(caster, rank, 500.0, amount * 0.4)
-        elseif spellId == FourCC('A10I') then -- R: Око Бури (Грозовой фронт + массовые перескоки зарядов)
-            for i = 0, 4 do
-                Arena_CustomArea(caster, 650.0, amount * 0.8, false)
-            end
-            Arena_ApplyStaticCharges(caster, rank, 650.0, amount * 0.8)
+        if spellId == FourCC('A105') then -- Q: Цепной Разряд «Каскадная Дуга» (Arcing Discharge)
+            Arena_Storm_Q(caster, rank)
+        elseif spellId == FourCC('A106') then -- W: Статическое Поле «Грозовая Ловушка» (Static Field)
+            Arena_Storm_W(caster, rank)
+        elseif spellId == FourCC('A10H') then -- E: Перегрузка Ядра «Сверхпроводимость» (Core Supercharge)
+            Arena_Storm_E(caster, rank)
+        elseif spellId == FourCC('A10I') then -- R: Катаклизм Бури «Око Сверхновой» (Supercell Cataclysm)
+            Arena_Storm_R(caster, rank)
         end
 
     -- 5. Архилич Чумы / Повелитель Мёртвых (Интеллект / Некромант-Призыватель)
@@ -1303,6 +1299,22 @@ function Arena_OnUnitAttack(attacker, target)
 
     if Heroes[pid] and Heroes[pid] == attacker then
         local kind = HeroKind[pid]
+
+        -- Storm Elementalist Supercharge Attacks (role == 3)
+        if kind == 3 then
+            local cid = GetHandleId(attacker)
+            local st = StormSupercharge[cid]
+            if st and st.active then
+                local pInt = GetHeroInt(attacker, true)
+                UnitDamageTarget(attacker, target, pInt * 1.2, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_UNIVERSAL, WEAPON_TYPE_WHOKNOWS)
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/Monsoon/MonsoonBoltTarget.mdl", target, "origin"))
+
+                local tid = GetHandleId(target)
+                if not InductionStacks[tid] then InductionStacks[tid] = { count = 0, target = target, caster = attacker } end
+                InductionStacks[tid].count = math.min(5, InductionStacks[tid].count + 2)
+                InductionStacks[tid].duration = 6.0
+            end
+        end
 
         -- Priestess Sacred Flame Aura Bonus (role == 7)
         local priestessAuraDmg = 0.0
@@ -3163,6 +3175,245 @@ function Arena_Chrono_R(caster, rank)
         end
 
         DestroyTimer(domeTimer)
+    end)
+end
+
+function Arena_ApplyInductionStack(target, caster, count)
+    if target == nil or GetWidgetLife(target) <= 0.405 then return end
+    local tid = GetHandleId(target)
+    if not InductionStacks[tid] then
+        InductionStacks[tid] = { count = 0, target = target, caster = caster, duration = 6.0 }
+    end
+    local data = InductionStacks[tid]
+    data.count = math.min(5, data.count + (count or 1))
+    data.duration = 6.0
+    data.caster = caster
+
+    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/LightningShield/LightningShieldTarget.mdl", target, "origin"))
+
+    if data.count >= 5 then
+        Arena_Storm_ShortCircuit(target, caster)
+    end
+end
+
+function Arena_Storm_ShortCircuit(target, caster)
+    if target == nil or GetWidgetLife(target) <= 0.405 then return end
+    local tid = GetHandleId(target)
+    InductionStacks[tid] = nil
+
+    local pInt = GetHeroInt(caster, true)
+    local tx, ty = GetUnitX(target), GetUnitY(target)
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/ThunderClap/ThunderClapCaster.mdl", tx, ty))
+
+    if udg_Boss ~= nil and target == udg_Boss then
+        local bossCurHp = GetUnitState(target, UNIT_STATE_LIFE)
+        local baseDmg = 800.0 + pInt * 2.5 + (bossCurHp * 0.10)
+        UnitDamageTarget(caster, target, baseDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_UNIVERSAL, WEAPON_TYPE_WHOKNOWS)
+        PauseUnit(target, true)
+        UnitAddAbility(target, FourCC('ACrf'))
+        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/NightElf/FaerieFire/FaerieFireTarget.mdl", target, "overhead"))
+
+        local tu = target
+        local stTimer = CreateTimer()
+        TimerStart(stTimer, 2.0, false, function()
+            if GetWidgetLife(tu) > 0.405 then PauseUnit(tu, false) end
+            DestroyTimer(stTimer)
+        end)
+        DisplayTimedTextToPlayer(GetOwningPlayer(caster), 0, 0, 4.0, "|cff00ff00[КОРОТКОЕ ЗАМЫКАНИЕ]:|r Босс оглушен и его маг. резист снижен на 40%!")
+    else
+        SetWidgetLife(target, 0.0)
+        DestroyEffect(AddSpecialEffect("Abilities/Spells/Other/NeutralExplode/NeutralExplode.mdl", tx, ty))
+
+        local g = CreateGroup()
+        GroupEnumUnitsInRange(g, tx, ty, 300.0, nil)
+        local u = FirstOfGroup(g)
+        while u ~= nil do
+            GroupRemoveUnit(g, u)
+            if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+                UnitDamageTarget(caster, u, 300.0 + pInt * 1.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/Monsoon/MonsoonBoltTarget.mdl", u, "origin"))
+            end
+            u = FirstOfGroup(g)
+        end
+        DestroyGroup(g)
+    end
+end
+
+function Arena_Storm_Q(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local target = GetSpellTargetUnit()
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+
+    local pInt = GetHeroInt(caster, true)
+    local baseDmg = 150.0 + 100.0 * (rank - 1) + pInt * 1.0
+    if rank == 3 then baseDmg = 360.0 + pInt * 1.0 end
+    if rank >= 4 then baseDmg = 480.0 + pInt * 1.0 end
+
+    local maxJumps = 5 + (rank - 1) * 2 -- 5, 7, 9, 12
+    if rank >= 4 then maxJumps = 12 end
+
+    local currentUnit = target
+    if currentUnit == nil then
+        local g = CreateGroup()
+        GroupEnumUnitsInRange(g, cx, cy, 600.0, nil)
+        currentUnit = FirstOfGroup(g)
+        DestroyGroup(g)
+    end
+
+    if currentUnit == nil or not IsUnitEnemy(currentUnit, GetOwningPlayer(caster)) then return end
+
+    local hitUnits = {}
+    local currentDmg = baseDmg
+
+    for jump = 1, maxJumps do
+        if currentUnit == nil or GetWidgetLife(currentUnit) <= 0.405 then break end
+
+        local tid = GetHandleId(currentUnit)
+        hitUnits[tid] = true
+
+        if InductionStacks[tid] then
+            currentDmg = currentDmg * 1.08
+        end
+
+        UnitDamageTarget(caster, currentUnit, currentDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/Monsoon/MonsoonBoltTarget.mdl", currentUnit, "origin"))
+        Arena_ApplyInductionStack(currentUnit, caster, 1)
+
+        local ux, uy = GetUnitX(currentUnit), GetUnitY(currentUnit)
+        local nextUnit = nil
+        local ng = CreateGroup()
+        GroupEnumUnitsInRange(ng, ux, uy, 400.0, nil)
+        local nu = FirstOfGroup(ng)
+        while nu ~= nil do
+            GroupRemoveUnit(ng, nu)
+            local ntid = GetHandleId(nu)
+            if not hitUnits[ntid] and IsUnitEnemy(nu, GetOwningPlayer(caster)) and GetWidgetLife(nu) > 0.405 then
+                nextUnit = nu
+                break
+            end
+            nu = FirstOfGroup(ng)
+        end
+        DestroyGroup(ng)
+
+        currentUnit = nextUnit
+    end
+end
+
+function Arena_Storm_W(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local tx = GetSpellTargetX()
+    local ty = GetSpellTargetY()
+    if tx == 0.0 and ty == 0.0 then
+        tx = GetUnitX(caster)
+        ty = GetUnitY(caster)
+    end
+
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/LightningShield/LightningShieldTarget.mdl", tx, ty))
+
+    local pInt = GetHeroInt(caster, true)
+    local p = GetOwningPlayer(caster)
+
+    local wTicks = 0
+    local wTimer = CreateTimer()
+    TimerStart(wTimer, 0.5, true, function()
+        wTicks = wTicks + 1
+        if wTicks > 12 or GetWidgetLife(caster) <= 0.405 then
+            DestroyTimer(wTimer)
+            return
+        end
+
+        local g = CreateGroup()
+        GroupEnumUnitsInRange(g, tx, ty, 450.0, nil)
+        local u = FirstOfGroup(g)
+        while u ~= nil do
+            GroupRemoveUnit(g, u)
+            if IsUnitEnemy(u, p) and GetWidgetLife(u) > 0.405 then
+                UnitDamageTarget(caster, u, 30.0 + pInt * 0.2, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+
+                if wTicks % 2 == 0 then
+                    Arena_ApplyInductionStack(u, caster, 1)
+                end
+
+                if wTicks % 3 == 0 then
+                    UnitAddAbility(u, FourCC('Aslow'))
+                    local ux, uy = GetUnitX(u), GetUnitY(u)
+                    local angle = math.atan2(ty - uy, tx - ux)
+                    SetUnitPosition(u, ux + math.cos(angle) * 20.0, uy + math.sin(angle) * 20.0)
+                end
+            end
+            u = FirstOfGroup(g)
+        end
+        DestroyGroup(g)
+    end)
+end
+
+function Arena_Storm_E(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cid = GetHandleId(caster)
+    StormSupercharge[cid] = {
+        active = true,
+        duration = 5.0,
+        caster = caster
+    }
+
+    local maxMp = GetUnitState(caster, UNIT_STATE_MAX_MANA)
+    local curMp = GetUnitState(caster, UNIT_STATE_MANA)
+    SetUnitState(caster, UNIT_STATE_MANA, math.min(maxMp, curMp + maxMp * 0.25))
+
+    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/BlueDragonRoar/BlueDragonRoar.mdl", caster, "origin"))
+    DisplayTimedTextToPlayer(GetOwningPlayer(caster), 0, 0, 4.0, "|cff00ff00[СВЕРХПРОВОДИМОСТЬ]:|r Перегрузка ядра на 5 секунд!")
+
+    local eTimer = CreateTimer()
+    TimerStart(eTimer, 5.0, false, function()
+        if StormSupercharge[cid] then
+            StormSupercharge[cid].active = false
+        end
+        DestroyTimer(eTimer)
+    end)
+end
+
+function Arena_Storm_R(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    local pInt = GetHeroInt(caster, true)
+
+    local shieldHp = 1000.0 + 1000.0 * (rank - 1)
+    local curHp = GetUnitState(caster, UNIT_STATE_LIFE)
+    SetUnitState(caster, UNIT_STATE_LIFE, curHp + shieldHp)
+    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/LightningShield/LightningShieldTarget.mdl", caster, "origin"))
+
+    local rTicks = 0
+    local rTimer = CreateTimer()
+    TimerStart(rTimer, 0.4, true, function()
+        rTicks = rTicks + 1
+        if rTicks > 15 or GetWidgetLife(caster) <= 0.405 then
+            DestroyTimer(rTimer)
+            return
+        end
+
+        local p = GetOwningPlayer(caster)
+        local baseStrike = 180.0 + 120.0 * (rank - 1) + pInt * 0.4
+        if rank == 3 then baseStrike = 450.0 + pInt * 0.4 end
+
+        local g = CreateGroup()
+        GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), 800.0, nil)
+        local u = FirstOfGroup(g)
+        local struckCount = 0
+        while u ~= nil and struckCount < 3 do
+            GroupRemoveUnit(g, u)
+            if IsUnitEnemy(u, p) and GetWidgetLife(u) > 0.405 then
+                UnitDamageTarget(caster, u, baseStrike, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/Monsoon/MonsoonBoltTarget.mdl", u, "chest"))
+                Arena_ApplyInductionStack(u, caster, 1)
+                struckCount = struckCount + 1
+            end
+            u = FirstOfGroup(g)
+        end
+        DestroyGroup(g)
     end)
 end
 
