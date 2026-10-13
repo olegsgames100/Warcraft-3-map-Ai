@@ -1,13 +1,15 @@
 -- ===========================================================================
--- Map Script: Warcraft III (Lua Mode) - ARENA SMERTI
+-- Map Script: Warcraft III (Lua Mode)
 -- ===========================================================================
 
 function InitGlobals()
+    -- Глобальные переменные
     Heroes = {}
     HeroKind = {}
     
+    -- Глобальные переменные волн
     udg_Wave = 0
-    udg_HumanCount = 1
+    udg_HumanCount = 0
     udg_EnemiesAlive = 0
     udg_TotalKills = 0
     udg_BossPhase = 0
@@ -20,19 +22,31 @@ function InitGlobals()
     udg_ReviveTimer = {}
     udg_PlayerKills = {0, 0, 0, 0}
 
+    -- Данные классов героев с четким распределением ролей (2 Танка, 2 ДД, 2 Саппорта, 2 Дуэлянта, 2 Призывателя)
     HeroClasses = {
-        { id = FourCC('Hpal'), name = "Паладин-защитник",   spells = {FourCC('A101'), FourCC('A102'), FourCC('A10D'), FourCC('A10E')} },
-        { id = FourCC('Obla'), name = "Мастер клинка",      spells = {FourCC('A103'), FourCC('A104'), FourCC('A10F'), FourCC('A10G')} },
-        { id = FourCC('Hamg'), name = "Боевой архимаг",     spells = {FourCC('A105'), FourCC('A106'), FourCC('A10H'), FourCC('A10I')} },
-        { id = FourCC('Udea'), name = "Рыцарь смерти",      spells = {FourCC('A107'), FourCC('A108'), FourCC('A10J'), FourCC('A10K')} },
-        { id = FourCC('Edem'), name = "Охотник на демонов", spells = {FourCC('A109'), FourCC('A10A'), FourCC('A10L'), FourCC('A10M')} },
-        { id = FourCC('Emoo'), name = "Лунная жрица",       spells = {FourCC('A10B'), FourCC('A10C'), FourCC('A10N'), FourCC('A10O')} },
-        { id = FourCC('Nalc'), name = "Алхимик-боевик",     spells = {FourCC('A111'), FourCC('A112'), FourCC('A113'), FourCC('A114')} },
-        { id = FourCC('Hmkg'), name = "Горный король",      spells = {FourCC('A115'), FourCC('A116'), FourCC('A117'), FourCC('A118')} },
-        { id = FourCC('Ewar'), name = "Сумрачная охотница", spells = {FourCC('A119'), FourCC('A11A'), FourCC('A11B'), FourCC('A11C')} },
-        { id = FourCC('Ulic'), name = "Ледяной лич",        spells = {FourCC('A11D'), FourCC('A11E'), FourCC('A11F'), FourCC('A11G')} }
+        -- 1. [ТАНК #1] Паладин-защитник: АоЕ агро, щиты, агора защиты
+        { id = FourCC('Hpal'), name = "[Танк] Паладин-защитник",   role = "tank",    spells = {FourCC('A101'), FourCC('A102'), FourCC('A10D'), FourCC('A10E')} },
+        -- 2. [ДУЭЛЯНТ #1] Мастер клинка: Соло-атака босса, финишеры, рывок
+        { id = FourCC('Obla'), name = "[Дуэлянт] Мастер клинка",   role = "duelist", spells = {FourCC('A103'), FourCC('A104'), FourCC('A10F'), FourCC('A10G')} },
+        -- 3. [ДД #1] Боевой архимаг: Цепные заклинания, АоЕ урон по волнам
+        { id = FourCC('Hamg'), name = "[ДД] Боевой архимаг",       role = "damage",  spells = {FourCC('A105'), FourCC('A106'), FourCC('A10H'), FourCC('A10I')} },
+        -- 4. [ПРИЗЫВАТЕЛЬ #1] Рыцарь смерти: Призыв скелетов, армия нежити
+        { id = FourCC('Udea'), name = "[Призыватель] Рыцарь смерти", role = "summoner", spells = {FourCC('A107'), FourCC('A108'), FourCC('A10J'), FourCC('A10K')} },
+        -- 5. [ДУЭЛЯНТ #2] Охотник на демонов: Выжигание ресурсов, урон по единичной цели
+        { id = FourCC('Edem'), name = "[Дуэлянт] Охотник на демонов", role = "duelist", spells = {FourCC('A109'), FourCC('A10A'), FourCC('A10L'), FourCC('A10M')} },
+        -- 6. [САППОРТ #1] Лунная жрица: Групповое лечение, заслон света, благословение
+        { id = FourCC('Emoo'), name = "[Саппорт] Лунная жрица",     role = "support", spells = {FourCC('A10B'), FourCC('A10C'), FourCC('A10N'), FourCC('A10O')} },
+        -- 7. [САППОРТ #2] Алхимик-боевик: Зелья маны/здоровья, усиление отряда
+        { id = FourCC('Nalc'), name = "[Саппорт] Алхимик-боевик",   role = "support", spells = {FourCC('A111'), FourCC('A112'), FourCC('A113'), FourCC('A114')} },
+        -- 8. [ТАНК #2] Горный король: Провокация, оглушение волн, каменный заслон
+        { id = FourCC('Hmkg'), name = "[Танк] Горный король",      role = "tank",    spells = {FourCC('A115'), FourCC('A116'), FourCC('A117'), FourCC('A118')} },
+        -- 9. [ПРИЗЫВАТЕЛЬ #2] Сумрачная охотница: Призыв духов и стражей
+        { id = FourCC('Ewar'), name = "[Призыватель] Сумрачная охотница", role = "summoner", spells = {FourCC('A119'), FourCC('A11A'), FourCC('A11B'), FourCC('A11C')} },
+        -- 10. [ДД #2] Ледяной лич: Заморозка, ледяные кольца и шторм по площади
+        { id = FourCC('Ulic'), name = "[ДД] Ледяной лич",          role = "damage",  spells = {FourCC('A11D'), FourCC('A11E'), FourCC('A11F'), FourCC('A11G')} }
     }
     
+    -- Переменные диалога
     HeroDialog = nil
     HeroDialogButtons = {}
 end
@@ -40,12 +54,13 @@ end
 function SpawnSelectedHero(pid, roleId)
     local p = Player(pid)
     local classData = HeroClasses[roleId]
-    if classData == nil then return end
     
+    -- Спавн героя в центре карты (X: 0, Y: 0)
     local hero = CreateUnit(p, classData.id, 0.0, 0.0, 270.0)
     Heroes[pid] = hero
     HeroKind[pid] = roleId
     
+    -- Выдаем способности
     for _, spellId in ipairs(classData.spells) do
         UnitAddAbility(hero, spellId)
     end
@@ -53,154 +68,203 @@ function SpawnSelectedHero(pid, roleId)
     SelectUnitForPlayerSingle(hero, p)
     PanCameraToTimedForPlayer(p, 0.0, 0.0, 0.0)
     DisplayTextToPlayer(p, 0, 0, "|cff88ff88Выбран класс:|r " .. classData.name)
-    DisplayTextToPlayer(p, 0, 0, "|cffffcc00Задание:|r Защитите арену от 50 волн врагов!")
 
+    -- Стартовое сообщение
+    DisplayTextToPlayer(p, 0, 0, "|cffffcc00Задание получено:|r Исследуйте местность и победите босса!")
+
+    -- Стартовый квест
     local myQuest = CreateQuest()
-    QuestSetTitle(myQuest, "Арена Смерти")
-    QuestSetDescription(myQuest, "Уничтожьте 50 волн и победите финального босса.")
+    QuestSetTitle(myQuest, "Очищение земель")
+    QuestSetDescription(myQuest, "Найдите и уничтожьте лагерь врагов.")
     QuestSetRequired(myQuest, true)
     QuestSetDiscovered(myQuest, true)
     FlashQuestDialogButton()
 
-    -- СРАЗУ запускаем таймер волн без ожидания других игроков!
+    -- Проверяем запуск волн при выборе каждого героя
     Arena_TryStartWaves()
 end
 
-function Arena_TryStartWaves()
-    if udg_WavesStarted then return end
-    udg_WavesStarted = true
-
-    print("|cff00ff00[Арена]: Герой выбран! Запуск волны 1...|r")
-
-    if udg_WaveTimer == nil then
-        udg_WaveTimer = CreateTimer()
-    end
-    if udg_WaveTD == nil then
-        udg_WaveTD = CreateTimerDialog(udg_WaveTimer)
-    end
-
-    TimerStart(udg_WaveTimer, 15.00, false, function()
-        Trig_Wave_Actions()
-    end)
-    TimerDialogSetTitle(udg_WaveTD, "Волна 1")
-    TimerDialogDisplay(udg_WaveTD, true)
-    Arena_Msg("|cffffcc00Первая волна начнется через 15 секунд! Подготовьтесь.|r")
-end
-
 function Arena_CustomCast_Lua(caster, pid, spellId)
+    -- Диспетчер способностей с балансировкой ролей
     if not Heroes[pid] or Heroes[pid] ~= caster then return end
+
     local role = HeroKind[pid]
     if not role then return end
+
     local rank = GetUnitAbilityLevel(caster, spellId)
     if rank < 1 then return end
-    local amount = 32.0 + 21.0 * rank
 
+    local amount = 35.0 + 25.0 * rank
+
+    -- 1. [ТАНК #1] Паладин-защитник (Hpal)
     if role == 1 then
-        if spellId == FourCC('A101') then Arena_CustomFinisher(caster, amount * 2.5)
-        elseif spellId == FourCC('A102') then Arena_CustomArea(caster, 600.0, amount * 2.1, true)
-        elseif spellId == FourCC('A10D') then
-            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 2.4)
-            Arena_CustomArea(caster, 240.0, amount * 0.4, false)
-        elseif spellId == FourCC('A10E') then
+        if spellId == FourCC('A101') then -- Q: Святая провокация (АоЕ принудительное агро + урон)
+            Arena_TauntArea(caster, 500.0)
+            Arena_CustomArea(caster, 400.0, amount * 1.2, false)
+        elseif spellId == FourCC('A102') then -- W: Купол клятвы (Щит и лечение союзников)
+            Arena_CustomArea(caster, 600.0, amount * 2.2, true)
+        elseif spellId == FourCC('A10D') then -- E: Перехват (Самолечение + укрепление защиты)
+            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 3.0)
+            Arena_CustomArea(caster, 300.0, amount * 0.5, false)
+        elseif spellId == FourCC('A10E') then -- R: Последний рассвет (Массовое воскрешение + абсолютный заслон)
             for i = 0, 3 do
                 if Heroes[i] ~= nil and GetWidgetLife(Heroes[i]) <= 0.405 and IsUnitAlly(Heroes[i], GetOwningPlayer(caster)) then
                     ReviveHero(Heroes[i], GetUnitX(caster), GetUnitY(caster), true)
                 end
             end
-            Arena_CustomArea(caster, 900.0, amount * 3.1, true)
+            Arena_CustomArea(caster, 950.0, amount * 3.5, true)
         end
+
+    -- 2. [ДУЭЛЯНТ #1] Мастер клинка (Obla)
     elseif role == 2 then
-        if spellId == FourCC('A103') then
-            Arena_CustomMove(caster, 200.0 + 30.0 * rank)
-            Arena_CustomArea(caster, 310.0, amount * 1.3, false)
-        elseif spellId == FourCC('A104') then
-            for i = 0, 3 do Arena_CustomArea(caster, 260.0 + i * 65.0, amount * 0.50, false) end
-        elseif spellId == FourCC('A10F') then Arena_CustomSummon(caster, FourCC('uske'), 1 + math.floor(rank / 2), 12.0 + rank)
-        elseif spellId == FourCC('A10G') then
-            Arena_CustomSummon(caster, FourCC('uske'), 2, 16.0)
-            Arena_CustomArea(caster, 550.0, amount * 4.4, false)
+        if spellId == FourCC('A103') then -- Q: Стремительный выпад (Рывок + Соло-урон)
+            Arena_CustomMove(caster, 220.0 + 35.0 * rank)
+            Arena_CustomFinisher(caster, amount * 2.8)
+        elseif spellId == FourCC('A104') then -- W: Танец клинков (Серия рассекающих ударов)
+            for i = 0, 3 do
+                Arena_CustomArea(caster, 250.0 + i * 50.0, amount * 0.70, false)
+            end
+        elseif spellId == FourCC('A10F') then -- E: Зеркальный клон (Боевой иллюзорный дуэт)
+            Arena_CustomSummon(caster, FourCC('Obla'), 1, 12.0 + rank)
+        elseif spellId == FourCC('A10G') then -- R: Клинковый шторм дуэлянта (Огромный сольный урон по боссу/цели)
+            Arena_CustomFinisher(caster, amount * 6.5)
         end
+
+    -- 3. [ДД #1] Боевой архимаг (Hamg)
     elseif role == 3 then
-        if spellId == FourCC('A105') then Arena_CustomArea(caster, 390.0 + 22.0 * rank, amount * 1.8, false)
-        elseif spellId == FourCC('A106') then
-            Arena_CustomArea(caster, 520.0, amount * 1.1, false)
-            SetUnitState(caster, UNIT_STATE_MANA, GetUnitState(caster, UNIT_STATE_MANA) + amount)
-        elseif spellId == FourCC('A10H') then Arena_ItemPulses(caster, amount, amount * 0.7)
-        elseif spellId == FourCC('A10I') then
-            for i = 0, 7 do Arena_CustomArea(caster, 600.0 + i * 25.0, amount * 0.58, false) end
+        if spellId == FourCC('A105') then -- Q: Цепная молния (Массовый урон по волнам)
+            Arena_CustomArea(caster, 500.0 + 30.0 * rank, amount * 2.0, false)
+        elseif spellId == FourCC('A106') then -- W: Грозовой столп (Восстановление маны + АоЕ урон)
+            Arena_CustomArea(caster, 550.0, amount * 1.5, false)
+            SetUnitState(caster, UNIT_STATE_MANA, GetUnitState(caster, UNIT_STATE_MANA) + amount * 1.2)
+        elseif spellId == FourCC('A10H') then -- E: Магический импульс
+            Arena_ItemPulses(caster, amount * 0.5, amount * 1.0)
+        elseif spellId == FourCC('A10I') then -- R: Штормовой катаклизм (Массированный АоЕ каскад)
+            for i = 0, 8 do
+                Arena_CustomArea(caster, 650.0 + i * 20.0, amount * 0.8, false)
+            end
         end
+
+    -- 4. [ПРИЗЫВАТЕЛЬ #1] Рыцарь смерти (Udea)
     elseif role == 4 then
-        if spellId == FourCC('A107') then Arena_CustomFinisher(caster, amount * 2.5)
-        elseif spellId == FourCC('A108') then Arena_CustomSummon(caster, FourCC('uske'), 1 + math.floor(rank / 2), 14.0)
-        elseif spellId == FourCC('A10J') then Arena_CustomSummon(caster, FourCC('uske'), 1 + math.floor(rank / 2), 12.0 + rank)
-        elseif spellId == FourCC('A10K') then
-            Arena_CustomSummon(caster, FourCC('uske'), 3 + rank, 25.0)
-            Arena_CustomArea(caster, 400.0, amount * 1.6, false)
+        if spellId == FourCC('A107') then -- Q: Печать некромантии (Урон + призыв воина)
+            Arena_CustomFinisher(caster, amount * 2.0)
+            Arena_CustomSummon(caster, FourCC('uske'), 1, 15.0)
+        elseif spellId == FourCC('A108') then -- W: Поднятие скелетов (Отряд бойцов)
+            Arena_CustomSummon(caster, FourCC('uske'), 2 + math.floor(rank / 2), 18.0)
+        elseif spellId == FourCC('A10J') then -- E: Костяной страж (Вампиризм и призыв)
+            Arena_CustomSummon(caster, FourCC('nska'), 1 + math.floor(rank / 2), 16.0)
+        elseif spellId == FourCC('A10K') then -- R: Чёрный легион (Массовая армия нежити)
+            Arena_CustomSummon(caster, FourCC('uske'), 4 + rank, 30.0)
+            Arena_CustomSummon(caster, FourCC('uabo'), 1, 25.0)
+            Arena_CustomArea(caster, 450.0, amount * 1.8, false)
         end
+
+    -- 5. [ДУЭЛЯНТ #2] Охотник на демонов (Edem)
     elseif role == 5 then
-        if spellId == FourCC('A109') then
-            Arena_CustomMove(caster, 200.0 + 30.0 * rank)
-            Arena_CustomArea(caster, 310.0, amount * 1.3, false)
-        elseif spellId == FourCC('A10A') then
-            Arena_CustomArea(caster, 520.0, amount * 1.1, false)
+        if spellId == FourCC('A109') then -- Q: Шаг сквозь тьму (Кувырок + Сольный пронзающий урон)
+            Arena_CustomMove(caster, 250.0 + 30.0 * rank)
+            Arena_CustomFinisher(caster, amount * 2.5)
+        elseif spellId == FourCC('A10A') then -- W: Сожжение маны босса (Сжигание ресурсов/жизни)
+            Arena_CustomFinisher(caster, amount * 3.2)
             SetUnitState(caster, UNIT_STATE_MANA, GetUnitState(caster, UNIT_STATE_MANA) + amount)
-        elseif spellId == FourCC('A10L') then
-            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 2.4)
-            Arena_CustomArea(caster, 240.0, amount * 0.4, false)
-        elseif spellId == FourCC('A10M') then Arena_CustomArea(caster, 500.0, amount * 3.3, false)
+        elseif spellId == FourCC('A10L') then -- E: Демонический вампиризм
+            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 3.0)
+        elseif spellId == FourCC('A10M') then -- R: Форма метаморфозы (Катастрофический соло-урон)
+            Arena_CustomFinisher(caster, amount * 7.0)
         end
+
+    -- 6. [САППОРТ #1] Лунная жрица (Emoo)
     elseif role == 6 then
-        if spellId == FourCC('A10B') then Arena_CustomArea(caster, 450.0, amount * 0.65, true)
-        elseif spellId == FourCC('A10C') then Arena_CustomArea(caster, 600.0, amount * 2.1, true)
-        elseif spellId == FourCC('A10N') then Arena_ItemPulses(caster, amount, amount * 0.7)
-        elseif spellId == FourCC('A10O') then
-            for i = 0, 9 do Arena_CustomArea(caster, 700.0 + i * 20.0, amount * 0.75, true) end
+        if spellId == FourCC('A10B') then -- Q: Лучезарное исцеление (Оздоровление отряда)
+            Arena_CustomArea(caster, 550.0, amount * 1.8, true)
+        elseif spellId == FourCC('A10C') then -- W: Заслон Элуны (Защитный щит)
+            Arena_CustomArea(caster, 650.0, amount * 2.5, true)
+        elseif spellId == FourCC('A10N') then -- E: Благословение маны
+            Arena_ItemPulses(caster, amount * 1.2, amount * 1.2)
+        elseif spellId == FourCC('A10O') then -- R: Звездопад поддержки (Восстановление группы + АоЕ контроль)
+            for i = 0, 8 do
+                Arena_CustomArea(caster, 750.0, amount * 0.9, true)
+            end
         end
+
+    -- 7. [САППОРТ #2] Алхимик-боевик (Nalc)
     elseif role == 7 then
-        if spellId == FourCC('A111') then Arena_CustomArea(caster, 260.0, amount, false)
-        elseif spellId == FourCC('A112') then
-            for i = 0, 3 do Arena_CustomArea(caster, 260.0 + i * 65.0, amount * 0.50, false) end
-        elseif spellId == FourCC('A113') then Arena_ItemPulses(caster, amount, amount * 0.7)
-        elseif spellId == FourCC('A114') then
-            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_MAX_LIFE))
-            SetUnitState(caster, UNIT_STATE_MANA, GetUnitState(caster, UNIT_STATE_MAX_MANA))
-            Arena_CustomArea(caster, 600.0, amount * 2.5, false)
+        if spellId == FourCC('A111') then -- Q: Лечебный спрей
+            Arena_CustomArea(caster, 400.0, amount * 1.5, true)
+        elseif spellId == FourCC('A112') then -- W: Укрепляющий эликсир
+            Arena_ItemPulses(caster, amount * 1.5, amount * 0.8)
+        elseif spellId == FourCC('A113') then -- E: Трансмутация ресурсов
+            Arena_ItemPulses(caster, amount * 1.0, amount * 1.5)
+        elseif spellId == FourCC('A114') then -- R: Химическая революция (Полный сброс ран и исцеление)
+            Arena_CustomArea(caster, 700.0, amount * 3.5, true)
         end
+
+    -- 8. [ТАНК #2] Горный король (Hmkg)
     elseif role == 8 then
-        if spellId == FourCC('A115') then Arena_CustomArea(caster, 390.0 + 22.0 * rank, amount * 1.8, false)
-        elseif spellId == FourCC('A116') then Arena_CustomArea(caster, 300.0, amount * 1.5, false)
-        elseif spellId == FourCC('A117') then
-            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 2.4)
-            Arena_CustomArea(caster, 240.0, amount * 0.4, false)
-        elseif spellId == FourCC('A118') then
-            Arena_CustomArea(caster, 650.0, amount * 4.0, false)
+        if spellId == FourCC('A115') then -- Q: Громовой удар (АоЕ Провокация + оглушение)
+            Arena_TauntArea(caster, 550.0)
+            Arena_CustomArea(caster, 450.0, amount * 1.8, false)
+        elseif spellId == FourCC('A116') then -- W: Каменная кожа (Массивный щит здоровья)
+            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 3.5)
+        elseif spellId == FourCC('A117') then -- E: Непреклонность (Удержание строя)
+            Arena_CustomArea(caster, 300.0, amount * 0.8, false)
             SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 2.0)
+        elseif spellId == FourCC('A118') then -- R: Аватара монолита (Абсолютная агро-аура + устойчивость)
+            Arena_TauntArea(caster, 800.0)
+            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 5.0)
+            Arena_CustomArea(caster, 700.0, amount * 2.5, false)
         end
+
+    -- 9. [ПРИЗЫВАТЕЛЬ #2] Сумрачная охотница (Ewar)
     elseif role == 9 then
-        if spellId == FourCC('A119') then Arena_CustomFinisher(caster, amount * 2.5)
-        elseif spellId == FourCC('A11A') then
-            for i = 0, 3 do Arena_CustomArea(caster, 260.0 + i * 65.0, amount * 0.50, false) end
-        elseif spellId == FourCC('A11B') then
-            Arena_CustomMove(caster, 230.0 + 20.0 * rank)
-            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount)
-        elseif spellId == FourCC('A11C') then Arena_CustomFinisher(caster, amount * 5.0)
+        if spellId == FourCC('A119') then -- Q: Призыв духа предков
+            Arena_CustomSummon(caster, FourCC('nftr'), 1 + math.floor(rank / 2), 16.0)
+        elseif spellId == FourCC('A11A') then -- W: Страж засады
+            Arena_CustomSummon(caster, FourCC('nftb'), 1 + math.floor(rank / 2), 18.0)
+        elseif spellId == FourCC('A11B') then -- E: Теневой скачок и отряд
+            Arena_CustomMove(caster, 250.0 + 20.0 * rank)
+            Arena_CustomSummon(caster, FourCC('nftr'), 1, 12.0)
+        elseif spellId == FourCC('A11C') then -- R: Тотем катаклизма (Вызов группы элитных духов)
+            Arena_CustomSummon(caster, FourCC('nogr'), 2 + math.floor(rank / 2), 25.0)
         end
+
+    -- 10. [ДД #2] Ледяной лич (Ulic)
     elseif role == 10 then
-        if spellId == FourCC('A11D') then Arena_CustomArea(caster, 390.0 + 22.0 * rank, amount * 1.8, false)
-        elseif spellId == FourCC('A11E') then
-            for i = 0, 3 do Arena_CustomArea(caster, 260.0 + i * 65.0, amount * 0.50, false) end
-        elseif spellId == FourCC('A11F') then Arena_CustomSummon(caster, FourCC('uske'), 1 + math.floor(rank / 2), 12.0 + rank)
-        elseif spellId == FourCC('A11G') then
-            for i = 0, 7 do Arena_CustomArea(caster, 600.0 + i * 25.0, amount * 0.58, false) end
+        if spellId == FourCC('A11D') then -- Q: Ледяное кольцо (АоЕ заморозка и урон по волне)
+            Arena_CustomArea(caster, 450.0 + 25.0 * rank, amount * 2.2, false)
+        elseif spellId == FourCC('A11E') then -- W: Кольцо инея (Взрыв холода)
+            for i = 0, 3 do
+                Arena_CustomArea(caster, 280.0 + i * 60.0, amount * 0.75, false)
+            end
+        elseif spellId == FourCC('A11F') then -- E: Морозная броня и выброс холода
+            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 1.5)
+            Arena_CustomArea(caster, 400.0, amount * 1.2, false)
+        elseif spellId == FourCC('A11G') then -- R: Дыхание вечной мерзлоты (Разрушительный масс-урон)
+            for i = 0, 9 do
+                Arena_CustomArea(caster, 650.0 + i * 25.0, amount * 0.85, false)
+            end
         end
     end
 end
 
 function InitCustomTriggers()
+    -- Инициализация таймера и диалога таймера волн
     udg_WaveTimer = CreateTimer()
     udg_WaveTD = CreateTimerDialog(udg_WaveTimer)
-    udg_HumanCount = 1
 
+    -- Считаем количество игроков-людей
+    udg_HumanCount = 0
+    for i = 0, 3 do
+        if Arena_IsHuman(i) then
+            udg_HumanCount = udg_HumanCount + 1
+        end
+    end
+    if udg_HumanCount == 0 then
+        udg_HumanCount = 1
+    end
+
+    -- 1. Триггер для отлова применения заклинаний (создаем сразу)
     local spellTrigger = CreateTrigger()
     TriggerRegisterAnyUnitEventBJ(spellTrigger, EVENT_PLAYER_UNIT_SPELL_EFFECT)
     TriggerAddAction(spellTrigger, function()
@@ -210,25 +274,33 @@ function InitCustomTriggers()
         Arena_CustomCast_Lua(caster, pid, spellId)
     end)
 
+
+    -- Триггер гибели юнитов (начисление золота, зачистка волны, воскрешение)
     local deathTrigger = CreateTrigger()
     TriggerRegisterAnyUnitEventBJ(deathTrigger, EVENT_PLAYER_UNIT_DEATH)
-    TriggerAddAction(deathTrigger, function() Trig_Death_Actions() end)
+    TriggerAddAction(deathTrigger, Trig_Death_Actions)
 
+    -- Триггер гибели босса
     local bossDeathTrigger = CreateTrigger()
     TriggerRegisterPlayerUnitEvent(bossDeathTrigger, Player(PLAYER_NEUTRAL_AGGRESSIVE), EVENT_PLAYER_UNIT_DEATH, nil)
-    TriggerAddAction(bossDeathTrigger, function() Trig_Boss_Actions() end)
+    TriggerAddAction(bossDeathTrigger, Trig_Boss_Actions)
 
+    -- Периодический триггер мышления босса (фазы 65% и 30%)
     local bossThinkTrigger = CreateTrigger()
     TriggerRegisterTimerEvent(bossThinkTrigger, 1.00, true)
-    TriggerAddAction(bossThinkTrigger, function() Trig_BossThink_Actions() end)
+    TriggerAddAction(bossThinkTrigger, Trig_BossThink_Actions)
 
+    -- 2. Стартовый триггер (срабатывает через 0.5 сек ПОСЛЕ старта игры)
     local initTimer = CreateTrigger()
     TriggerRegisterTimerEvent(initTimer, 0.50, false)
     TriggerAddAction(initTimer, function()
+        -- Отключаем туман войны
         FogEnableOff()
         FogMaskEnableOff()
+
         print("|cffffcc00[Инициализация]: Запуск выбора героев...|r")
 
+        -- СОЗДАЕМ ДИАЛОГ ТОЛЬКО СЕЙЧАС (когда движок игры готов):
         HeroDialog = DialogCreate()
         DialogSetMessage(HeroDialog, "Выберите класс героя:")
 
@@ -237,12 +309,14 @@ function InitCustomTriggers()
             HeroDialogButtons[i] = DialogAddButton(HeroDialog, classData.name, 0)
         end
 
+        -- Регистрируем триггер клика по кнопкам
         local dialogTrigger = CreateTrigger()
         TriggerRegisterDialogEvent(dialogTrigger, HeroDialog)
         TriggerAddAction(dialogTrigger, function()
             local p = GetTriggerPlayer()
             local pid = GetPlayerId(p)
             local clickedBtn = GetClickedButton()
+
             for i, btn in ipairs(HeroDialogButtons) do
                 if btn == clickedBtn then
                     SpawnSelectedHero(pid, i)
@@ -251,8 +325,13 @@ function InitCustomTriggers()
             end
         end)
 
+        -- Показываем диалог игрокам
         for pid = 0, 3 do
-            DialogDisplay(Player(pid), HeroDialog, true)
+            local p = Player(pid)
+            -- Проверяем: если игрок управляется человеком
+            if GetPlayerController(p) == MAP_CONTROL_USER then
+                DialogDisplay(p, HeroDialog, true)
+            end
         end
     end)
 end
@@ -268,7 +347,9 @@ function InitCustomPlayerSlots()
 end
 
 function InitCustomTeams()
-    for i = 0, 3 do SetPlayerTeam(Player(i), 0) end
+    for i = 0, 3 do
+        SetPlayerTeam(Player(i), 0)
+    end
 end
 
 function main()
@@ -300,16 +381,47 @@ function config()
     SetTeams(1)
     InitCustomPlayerSlots()
     InitCustomTeams()
-    for i = 0, 3 do SetPlayerSlotAvailable(Player(i), MAP_CONTROL_USER) end
+    for i = 0, 3 do
+        SetPlayerSlotAvailable(Player(i), MAP_CONTROL_USER)
+    end
 end
+
+-- ===========================================================================
+-- Wave System Helper Functions
+-- ===========================================================================
 
 function Arena_Msg(s)
     DisplayTimedTextToPlayer(GetLocalPlayer(), 0, 0, 10.0, s)
 end
 
+function Arena_IsHuman(pid)
+    local p = Player(pid)
+    local slotState = GetPlayerSlotState(p)
+    local controller = GetPlayerController(p)
+    if slotState == PLAYER_SLOT_STATE_PLAYING then
+        return controller == MAP_CONTROL_USER or controller == MAP_CONTROL_COMPUTER
+    end
+    return false
+end
+
+function Arena_CountHumans()
+    local n = 0
+    for pid = 0, 3 do
+        if Arena_IsHuman(pid) then
+            n = n + 1
+        end
+    end
+    if n < 1 then
+        n = 1
+    end
+    return n
+end
+
 function Arena_CreateEnemy(unitId, x, y)
     local u = CreateUnit(Player(PLAYER_NEUTRAL_AGGRESSIVE), unitId, x, y, 270.0)
-    if u == nil then return end
+    if u == nil then
+        return
+    end
     udg_EnemiesAlive = udg_EnemiesAlive + 1
     SetUnitUserData(u, 777)
     SetUnitCreepGuard(u, false)
@@ -320,7 +432,9 @@ end
 
 function Arena_SpawnRing(unitId, count, dist)
     local scaled = math.floor((count * (udg_HumanCount + 2) + 3) / 4)
-    if scaled < 2 then scaled = 2 end
+    if scaled < 2 then
+        scaled = 2
+    end
     local i = 0
     while i < scaled and udg_EnemiesAlive < 70 do
         local ang = (3.14159 * 2.0) * i / scaled
@@ -360,10 +474,14 @@ function Arena_EliteType(wave)
 end
 
 function Arena_EliteVoicePath(wave)
-    if wave <= 10 then return "Units\\Creeps\\Bandit\\BanditPissed1.wav"
-    elseif wave <= 20 then return "Units\\Creeps\\Ogre\\OgrePissed1.wav"
-    elseif wave <= 30 then return "Units\\Undead\\Necromancer\\NecromancerPissed1.wav"
-    elseif wave <= 40 then return "Units\\Demon\\FelGuard\\FelGuardPissed1.wav"
+    if wave <= 10 then
+        return "Units\\Creeps\\Bandit\\BanditPissed1.wav"
+    elseif wave <= 20 then
+        return "Units\\Creeps\\Ogre\\OgrePissed1.wav"
+    elseif wave <= 30 then
+        return "Units\\Undead\\Necromancer\\NecromancerPissed1.wav"
+    elseif wave <= 40 then
+        return "Units\\Demon\\FelGuard\\FelGuardPissed1.wav"
     end
     return "Units\\Undead\\Abomination\\AbominationPissed1.wav"
 end
@@ -404,9 +522,13 @@ end
 function Arena_SpawnElite(wave)
     local x = 0.0
     local y = 1510.0
-    if udg_EnemiesAlive >= 70 then return end
+    if udg_EnemiesAlive >= 70 then
+        return
+    end
     local elite = CreateUnit(Player(PLAYER_NEUTRAL_AGGRESSIVE), Arena_EliteType(wave), x, y, 270.0)
-    if elite == nil then return end
+    if elite == nil then
+        return
+    end
     udg_EnemiesAlive = udg_EnemiesAlive + 1
     SetUnitUserData(elite, 888)
     local scale = 1.20 + 0.003 * wave
@@ -415,15 +537,19 @@ function Arena_SpawnElite(wave)
     SetUnitCreepGuard(elite, false)
     UnitWakeUp(elite)
     SetUnitAcquireRange(elite, 4500.0)
-    if wave >= 25 then UnitAddAbility(elite, FourCC('ACav')) end
+    if wave >= 25 then
+        UnitAddAbility(elite, FourCC('ACav'))
+    end
     Arena_EliteAnnouncement(wave, x, y)
     IssuePointOrder(elite, "attack", 0.0, 0.0)
 end
 
 function Arena_PayWaveGold(gold)
     for i = 0, 3 do
-        local p = Player(i)
-        SetPlayerState(p, PLAYER_STATE_RESOURCE_GOLD, GetPlayerState(p, PLAYER_STATE_RESOURCE_GOLD) + gold)
+        if Arena_IsHuman(i) then
+            local p = Player(i)
+            SetPlayerState(p, PLAYER_STATE_RESOURCE_GOLD, GetPlayerState(p, PLAYER_STATE_RESOURCE_GOLD) + gold)
+        end
     end
 end
 
@@ -447,7 +573,9 @@ function Arena_SpawnWaveCreeps(wave)
     local front = 5 + math.floor(wave / 8)
     local back = 2 + math.floor(wave / 15)
     local eliteSupport = 0
-    if wave % 5 == 0 then eliteSupport = 1 end
+    if wave % 5 == 0 then
+        eliteSupport = 1
+    end
     if chapter == 0 then
         Arena_SpawnRing(FourCC('nban'), front, 1210.0)
         Arena_SpawnRing(FourCC('ngno'), back, 1480.0)
@@ -482,8 +610,36 @@ function Arena_SpawnWaveCreeps(wave)
     end
 end
 
+function Arena_CountPickedHumans()
+    local count = 0
+    for pid = 0, 3 do
+        if Arena_IsHuman(pid) and Heroes[pid] ~= nil then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+function Arena_TryStartWaves()
+    if udg_WavesStarted then
+        return
+    end
+    udg_HumanCount = Arena_CountHumans()
+    local pickedCount = Arena_CountPickedHumans()
+    if pickedCount < udg_HumanCount or pickedCount == 0 then
+        return
+    end
+    udg_WavesStarted = true
+    TimerStart(udg_WaveTimer, 15.00, false, Trig_Wave_Actions)
+    TimerDialogSetTitle(udg_WaveTD, "Волна 1")
+    TimerDialogDisplay(udg_WaveTD, true)
+    Arena_Msg("Все герои выбраны. Первая волна через 15 сек. Магазины по углам центра.")
+end
+
 function Arena_SpawnBoss()
-    if udg_Boss ~= nil or udg_GameOver then return end
+    if udg_Boss ~= nil or udg_GameOver then
+        return
+    end
     udg_BossPhase = 0
     udg_Boss = CreateUnit(Player(PLAYER_NEUTRAL_AGGRESSIVE), FourCC('Nplh'), 0.0, 900.0, 270.0)
     if udg_Boss == nil then
@@ -517,7 +673,9 @@ function Arena_BossNova(damage)
 end
 
 function Trig_BossThink_Actions()
-    if udg_GameOver or udg_Boss == nil or GetWidgetLife(udg_Boss) <= 0.405 then return end
+    if udg_GameOver or udg_Boss == nil or GetWidgetLife(udg_Boss) <= 0.405 then
+        return
+    end
     local health = GetUnitLifePercent(udg_Boss)
     if udg_BossPhase == 0 and health <= 65.0 then
         udg_BossPhase = 1
@@ -535,7 +693,9 @@ function Trig_BossThink_Actions()
 end
 
 function Trig_Wave_Actions()
-    if udg_GameOver then return end
+    if udg_GameOver then
+        return
+    end
     if udg_Wave >= 50 then
         TimerDialogDisplay(udg_WaveTD, false)
         Arena_SpawnBoss()
@@ -544,7 +704,9 @@ function Trig_Wave_Actions()
     udg_Wave = udg_Wave + 1
     udg_WaveCleared = false
     Arena_SpawnWaveCreeps(udg_Wave)
-    if udg_Wave % 5 == 0 then Arena_SpawnElite(udg_Wave) end
+    if udg_Wave % 5 == 0 then
+        Arena_SpawnElite(udg_Wave)
+    end
     Arena_PayWaveGold(38 + udg_Wave * 5)
     Arena_Msg("|cffffcc00Волна " .. tostring(udg_Wave) .. "/50|r — " .. Arena_WaveTheme(udg_Wave) .. ". Врагов: " .. tostring(udg_EnemiesAlive))
     if udg_Wave < 50 then
@@ -552,11 +714,13 @@ function Trig_Wave_Actions()
     else
         TimerDialogSetTitle(udg_WaveTD, "Финальный босс")
     end
-    TimerStart(udg_WaveTimer, 100.00, false, function() Trig_Wave_Actions() end)
+    TimerStart(udg_WaveTimer, 100.00, false, Trig_Wave_Actions)
 end
 
 function Arena_ReviveHero(pid)
-    if udg_GameOver or Heroes[pid] == nil then return end
+    if udg_GameOver or Heroes[pid] == nil then
+        return
+    end
     local x, y = -144.0, -144.0
     if pid == 1 then x, y = 144.0, -144.0
     elseif pid == 2 then x, y = -144.0, 144.0
@@ -573,7 +737,7 @@ function Arena_CheckWaveClear()
     if udg_WavesStarted and udg_Wave >= 1 and udg_Wave <= 50 and udg_EnemiesAlive == 0 and not udg_WaveCleared and udg_Boss == nil and not udg_GameOver then
         udg_WaveCleared = true
         Arena_Msg("|cff66ff99Волна зачищена! Следующая через 7 секунд.|r")
-        TimerStart(udg_WaveTimer, 7.00, false, function() Trig_Wave_Actions() end)
+        TimerStart(udg_WaveTimer, 7.00, false, Trig_Wave_Actions)
     end
 end
 
@@ -581,16 +745,20 @@ function Trig_Death_Actions()
     local u = GetDyingUnit()
     local killer = GetKillingUnit()
     if GetOwningPlayer(u) == Player(PLAYER_NEUTRAL_AGGRESSIVE) and u ~= udg_Boss then
-        if udg_EnemiesAlive > 0 then udg_EnemiesAlive = udg_EnemiesAlive - 1 end
+        if udg_EnemiesAlive > 0 then
+            udg_EnemiesAlive = udg_EnemiesAlive - 1
+        end
         udg_TotalKills = udg_TotalKills + 1
         if GetUnitUserData(u) == 888 then
             Arena_Msg("|cffffcc66Побеждён мини-босс! Команде начислена награда.|r")
             Arena_PayWaveGold(50 + udg_Wave * 3)
         end
-        if udg_EnemiesAlive == 0 then Arena_CheckWaveClear() end
+        if udg_EnemiesAlive == 0 then
+            Arena_CheckWaveClear()
+        end
         if killer ~= nil then
             local pid = GetPlayerId(GetOwningPlayer(killer))
-            if pid >= 0 and pid < 4 then
+            if pid >= 0 and pid < 4 and Arena_IsHuman(pid) then
                 local reward = 5 + udg_Wave
                 udg_PlayerKills[pid + 1] = (udg_PlayerKills[pid + 1] or 0) + 1
                 SetPlayerState(Player(pid), PLAYER_STATE_RESOURCE_GOLD, GetPlayerState(Player(pid), PLAYER_STATE_RESOURCE_GOLD) + reward)
@@ -598,21 +766,50 @@ function Trig_Death_Actions()
         end
         return
     end
-    if not IsUnitType(u, UNIT_TYPE_HERO) or GetOwningPlayer(u) == Player(PLAYER_NEUTRAL_AGGRESSIVE) then return end
+    if not IsUnitType(u, UNIT_TYPE_HERO) or GetOwningPlayer(u) == Player(PLAYER_NEUTRAL_AGGRESSIVE) then
+        return
+    end
     local pid = GetPlayerId(GetOwningPlayer(u))
-    if pid < 0 or pid > 3 or u ~= Heroes[pid] then return end
+    if pid < 0 or pid > 3 or not Arena_IsHuman(pid) or u ~= Heroes[pid] then
+        return
+    end
     DisplayTimedTextToPlayer(Player(pid), 0, 0, 8.00, "Смерть. Воскрешение через 12 сек.")
-    if not udg_ReviveTimer[pid] then udg_ReviveTimer[pid] = CreateTimer() end
-    TimerStart(udg_ReviveTimer[pid], 12.00, false, function() Arena_ReviveHero(pid) end)
+    if not udg_ReviveTimer[pid] then
+        udg_ReviveTimer[pid] = CreateTimer()
+    end
+    TimerStart(udg_ReviveTimer[pid], 12.00, false, function()
+        Arena_ReviveHero(pid)
+    end)
 end
 
 function Trig_Boss_Actions()
-    if udg_GameOver or GetDyingUnit() ~= udg_Boss then return end
+    if udg_GameOver or GetDyingUnit() ~= udg_Boss then
+        return
+    end
     udg_GameOver = true
     PauseTimer(udg_WaveTimer)
     TimerDialogDisplay(udg_WaveTD, false)
     Arena_Msg("|cff00ff00Победа! Каз'Рул повержен. Арена остается открытой для свободной игры.|r")
     Arena_PayWaveGold(800)
+end
+
+-- ===========================================================================
+-- Helper functions for Custom Spells
+-- ===========================================================================
+
+function Arena_TauntArea(caster, radius)
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), radius, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            IssueTargetOrder(u, "attack", caster)
+            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Other\\HowlOfTerror\\HowlTarget.mdl", u, "overhead"))
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
 end
 
 function Arena_CustomFinisher(caster, damage)
@@ -662,6 +859,22 @@ function Arena_CustomMove(caster, dist)
     DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Orc\\Blink\\BlinkTarget.mdl", nx, ny))
 end
 
+function Arena_HeroBurst(caster, radius, damage, friendlyFire)
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), radius, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if GetWidgetLife(u) > 0.405 then
+            if friendlyFire or IsUnitEnemy(u, GetOwningPlayer(caster)) then
+                UnitDamageTarget(caster, u, damage, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
+            end
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+end
+
 function Arena_ItemPulses(caster, hpAmount, manaAmount)
     local g = CreateGroup()
     GroupEnumUnitsInRange(g, GetUnitX(caster), GetUnitY(caster), 600.0, nil)
@@ -681,6 +894,17 @@ function Arena_ItemPulses(caster, hpAmount, manaAmount)
         u = FirstOfGroup(g)
     end
     DestroyGroup(g)
+end
+
+function Arena_SpellAid(caster, hpAmount, manaAmount)
+    if hpAmount > 0 then
+        SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + hpAmount)
+        DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Items\\HealingSalve\\HealingSalveTarget.mdl", caster, "origin"))
+    end
+    if manaAmount > 0 then
+        SetUnitState(caster, UNIT_STATE_MANA, GetUnitState(caster, UNIT_STATE_MANA) + manaAmount)
+        DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Items\\ClarifyPotion\\ClarifyPotionTarget.mdl", caster, "origin"))
+    end
 end
 
 function Arena_CustomSummon(caster, unitId, count, duration)
