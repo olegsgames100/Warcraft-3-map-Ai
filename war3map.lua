@@ -7,6 +7,12 @@ function InitGlobals()
     Heroes = {}
     HeroKind = {}
     BleedStacks = {} -- Таблица учета кровотечения: BleedStacks[targetHandleId] = { count = N, expires = T, caster = U }
+    BombardierTraps = {}
+    BombardierRocketState = {}
+    ShrapnelDebuffs = {}
+    RoninDeepCut = {}
+    RoninParryState = {}
+    RoninCleaveTimer = {}
     
     -- Глобальные переменные волн
     udg_Wave = 0
@@ -126,17 +132,14 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
 
     -- 6. Мастер Клинка / Ронин (Ловкость / Керри Ближнего Боя)
     elseif role == 6 then
-        if spellId == FourCC('A115') then -- Q: Рассекающий Выпад (Рывок вперед)
-            Arena_CustomMove(caster, 300.0 + 30.0 * rank)
-            Arena_CustomArea(caster, 250.0, amount * 1.5, false)
-        elseif spellId == FourCC('A116') then -- W: Парирование (Контратака / Щит)
-            Arena_DivineShield(caster, 1.5)
-            Arena_CustomFinisher(caster, amount * 2.0)
-        elseif spellId == FourCC('A117') then -- E: Заточка Клинка (Пробивание брони)
-            Arena_ArmorSunder(caster, 300.0, 8.0)
-            Arena_CustomFinisher(caster, amount * 2.5)
-        elseif spellId == FourCC('A118') then -- R: Абсолютный Разрез (Разрубание пространства)
-            Arena_CustomArea(caster, 650.0, amount * 6.0, false)
+        if spellId == FourCC('A115') then -- Q: Рассекающий Выпад (Flash Step)
+            Arena_Ronin_Q(caster, rank)
+        elseif spellId == FourCC('A116') then -- W: Стойка Парирования (Blade Parry)
+            Arena_Ronin_W(caster, rank)
+        elseif spellId == FourCC('A117') then -- E: Заточка Клинка: Рассечение Душ (Soul Edge)
+            Arena_Ronin_E(caster, rank)
+        elseif spellId == FourCC('A118') then -- R: Абсолютный Разрез: Суд Времени (Spatial Rend)
+            Arena_Ronin_R(caster, rank)
         end
 
     -- 9. Каменный Исполин (Сила / Инициатор и Контроль)
@@ -242,14 +245,14 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
 
     -- 8. Инженер-Бомбардир (Ловкость / Осада и Зонинг)
     elseif role == 8 then
-        if spellId == FourCC('A111') then -- Q: Кластерная Граната
-            Arena_ClusterGrenade(caster, GetUnitX(caster) + 200.0, GetUnitY(caster), amount * 2.0)
-        elseif spellId == FourCC('A112') then -- W: Капкан с Проводами (Обездвиживание)
-            Arena_HexTarget(caster, 350.0)
-        elseif spellId == FourCC('A113') then -- E: Разрывные Пули (Сплеш урон)
-            Arena_CustomArea(caster, 300.0, amount * 1.8, false)
-        elseif spellId == FourCC('A114') then -- R: Развертывание Мортиры (Осадный обстрел)
-            Arena_CustomArea(caster, 750.0, amount * 5.0, false)
+        if spellId == FourCC('A111') then -- Q: Кластерная Бомба «Осколочный Каскад»
+            Arena_Bombardier_Q(caster, rank)
+        elseif spellId == FourCC('A112') then -- W: Барьер из Растяжек и Капканов
+            Arena_Bombardier_W(caster, rank)
+        elseif spellId == FourCC('A113') then -- E: Зажигательно-разрывные патроны
+            Arena_Bombardier_E(caster, rank)
+        elseif spellId == FourCC('A114') then -- R: Передвижная Батарея «Град Огня»
+            Arena_Bombardier_R(caster, rank)
         end
 
     -- 10. Хрономант / Повелитель Времени (Интеллект / Тактический контроль)
@@ -351,7 +354,7 @@ function Arena_CheckItemCrafting(hero)
             end
             -- Создаем собранный артефакт
             local crafted = UnitAddItemById(hero, recipe.result)
-            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Items\\AIam\\AIamTarget.mdl", hero, "origin"))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Items/AIam/AIamTarget.mdl", hero, "origin"))
             DisplayTimedTextToPlayer(GetOwningPlayer(hero), 0, 0, 8.0, "|cffffcc00[АРТЕФАКТ СОБРАН]:|r " .. recipe.name)
             break
         end
@@ -361,6 +364,26 @@ end
 function InitCustomTriggers()
     -- Инициализация глобальной системы кровотечения
     Arena_InitBleedSystem()
+    -- Инициализация систем Инженера-Бомбардира
+    Arena_InitBombardierSystem()
+
+    -- Триггер автоатак
+    local attackTrigger = CreateTrigger()
+    TriggerRegisterAnyUnitEventBJ(attackTrigger, EVENT_PLAYER_UNIT_ATTACKED)
+    TriggerAddAction(attackTrigger, function()
+        local attacker = GetAttacker()
+        local target = GetTriggerUnit()
+        if attacker ~= nil and target ~= nil and GetWidgetLife(attacker) > 0.405 and GetWidgetLife(target) > 0.405 then
+            Arena_OnUnitAttack(attacker, target)
+
+            -- Check Ronin Parry stance on target
+            local tid = GetHandleId(target)
+            local st = RoninParryState[tid]
+            if st and st.inStance then
+                Arena_Ronin_CounterAttack(target, 100.0)
+            end
+        end
+    end)
     -- Инициализация таймера и диалога таймера волн
     udg_WaveTimer = CreateTimer()
     udg_WaveTD = CreateTimerDialog(udg_WaveTimer)
@@ -482,8 +505,8 @@ function main()
                      3328.0 - GetCameraMargin(CAMERA_MARGIN_RIGHT), 
                     -3584.0 + GetCameraMargin(CAMERA_MARGIN_BOTTOM))
 
-    SetDayNightModels("Environment\\DNC\\DNCLordaeron\\DNCLordaeronTerrain\\DNCLordaeronTerrain.mdl", 
-                       "Environment\\DNC\\DNCLordaeron\\DNCLordaeronUnit\\DNCLordaeronUnit.mdl")
+    SetDayNightModels("Environment/DNC/DNCLordaeron/DNCLordaeronTerrain/DNCLordaeronTerrain.mdl",
+                       "Environment/DNC/DNCLordaeron/DNCLordaeronUnit/DNCLordaeronUnit.mdl")
     NewSoundEnvironment("Default")
     SetAmbientDaySound("LordaeronSummerDay")
     SetAmbientNightSound("LordaeronSummerNight")
@@ -595,15 +618,15 @@ end
 
 function Arena_EliteVoicePath(wave)
     if wave <= 10 then
-        return "Units\\Creeps\\Bandit\\BanditPissed1.wav"
+        return "Units/Creeps/Bandit/BanditPissed1.wav"
     elseif wave <= 20 then
-        return "Units\\Creeps\\Ogre\\OgrePissed1.wav"
+        return "Units/Creeps/Ogre/OgrePissed1.wav"
     elseif wave <= 30 then
-        return "Units\\Undead\\Necromancer\\NecromancerPissed1.wav"
+        return "Units/Undead/Necromancer/NecromancerPissed1.wav"
     elseif wave <= 40 then
-        return "Units\\Demon\\FelGuard\\FelGuardPissed1.wav"
+        return "Units/Demon/FelGuard/FelGuardPissed1.wav"
     end
-    return "Units\\Undead\\Abomination\\AbominationPissed1.wav"
+    return "Units/Undead/Abomination/AbominationPissed1.wav"
 end
 
 function Arena_EliteTaunt(wave)
@@ -782,7 +805,7 @@ function Arena_SpawnBoss()
 end
 
 function Arena_BossNova(damage)
-    local fx = AddSpecialEffect("Abilities\\Spells\\Human\\ThunderClap\\ThunderClapCaster.mdl", GetUnitX(udg_Boss), GetUnitY(udg_Boss))
+    local fx = AddSpecialEffect("Abilities/Spells/Human/ThunderClap/ThunderClapCaster.mdl", GetUnitX(udg_Boss), GetUnitY(udg_Boss))
     DestroyEffect(fx)
     for i = 0, 3 do
         local hero = Heroes[i]
@@ -932,7 +955,7 @@ end
 
 function Arena_PullArea(caster, radius, delay, damageAmount)
     local cx, cy = GetUnitX(caster), GetUnitY(caster)
-    DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdl", cx, cy))
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Undead/DarkRitual/DarkRitualCaster.mdl", cx, cy))
     local t = CreateTimer()
     TimerStart(t, delay, false, function()
         local ncx, ncy = GetUnitX(caster), GetUnitY(caster)
@@ -944,7 +967,7 @@ function Arena_PullArea(caster, radius, delay, damageAmount)
             if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
                 SetUnitPosition(u, ncx + GetRandomReal(-40.0, 40.0), ncy + GetRandomReal(-40.0, 40.0))
                 IssueTargetOrder(u, "attack", caster)
-                DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Other\\HowlOfTerror\\HowlTarget.mdl", u, "overhead"))
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/HowlOfTerror/HowlTarget.mdl", u, "overhead"))
             end
             u = FirstOfGroup(g)
         end
@@ -974,7 +997,7 @@ function Arena_BloodHarvestActive(caster, amountPerMissingPercent)
     local healAmount = avgMissingPercent * amountPerMissingPercent
     if healAmount < 50.0 then healAmount = 50.0 end
     SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + healAmount)
-    DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Undead\\VampiricAura\\VampiricAuraTarget.mdl", caster, "origin"))
+    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/VampiricAura/VampiricAuraTarget.mdl", caster, "origin"))
 end
 
 function Arena_ShieldOfTorment(caster, shieldHp, armorBonus, duration)
@@ -985,7 +1008,7 @@ function Arena_ShieldOfTorment(caster, shieldHp, armorBonus, duration)
     SetUnitAbilityLevel(caster, FourCC('AImx'), 1)
     local curHp = GetUnitState(caster, UNIT_STATE_LIFE)
     SetUnitState(caster, UNIT_STATE_LIFE, curHp + shieldHp)
-    DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdl", caster, "origin"))
+    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/DivineShield/DivineShieldTarget.mdl", caster, "origin"))
     local t = CreateTimer()
     TimerStart(t, duration, false, function()
         UnitRemoveAbility(caster, FourCC('Adev'))
@@ -1006,7 +1029,7 @@ function Arena_ApplyBleedStack(target, caster, stacksToAdd, duration)
 
     -- Накладываем стандартную иконку статуса "Теневой удар / Кровотечение" (Bshs)
     UnitAddAbility(target, FourCC('Ashs')) -- Shadow Strike debuff ability
-    DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Other\\Blood\\BloodImpact.mdl", target, "origin"))
+    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/Blood/BloodImpact.mdl", target, "origin"))
 end
 
 function Arena_InitBleedSystem()
@@ -1019,7 +1042,7 @@ function Arena_InitBleedSystem()
                 -- Каждый стак отнимает 1 единицу здоровья в секунду
                 local dmg = data.count * 1.0
                 UnitDamageTarget(data.caster, target, dmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
-                DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Other\\Blood\\BloodImpact.mdl", target, "overhead"))
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/Blood/BloodImpact.mdl", target, "overhead"))
             else
                 if target ~= nil then
                     UnitRemoveAbility(target, FourCC('Ashs'))
@@ -1050,7 +1073,7 @@ function Arena_ApplyStaticCharges(caster, spellRank, radius, baseDamage)
         jumpsDone = jumpsDone + 1
         if currentTarget ~= nil and GetWidgetLife(currentTarget) > 0.405 then
             UnitDamageTarget(caster, currentTarget, baseDamage, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_LIGHTNING, WEAPON_TYPE_WHOKNOWS)
-            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Other\\MonkThunderClap\\MonkThunderClap.mdl", currentTarget, "origin"))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/MonkThunderClap/MonkThunderClap.mdl", currentTarget, "origin"))
 
             -- Find next jump target
             local tx, ty = GetUnitX(currentTarget), GetUnitY(currentTarget)
@@ -1087,7 +1110,7 @@ function Arena_TauntArea(caster, radius)
         GroupRemoveUnit(g, u)
         if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
             IssueTargetOrder(u, "attack", caster)
-            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Other\\HowlOfTerror\\HowlTarget.mdl", u, "overhead"))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/HowlOfTerror/HowlTarget.mdl", u, "overhead"))
         end
         u = FirstOfGroup(g)
     end
@@ -1107,7 +1130,7 @@ function Arena_KnockbackArea(caster, radius, dist)
             local nx = ux + math.cos(angle) * dist
             local ny = uy + math.sin(angle) * dist
             SetUnitPosition(u, nx, ny)
-            DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Human\\WarStomp\\WarStompCaster.mdl", nx, ny))
+            DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/WarStomp/WarStompCaster.mdl", nx, ny))
         end
         u = FirstOfGroup(g)
     end
@@ -1122,7 +1145,7 @@ function Arena_ArmorSunder(caster, radius, duration)
         GroupRemoveUnit(g, u)
         if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
             UnitAddAbility(u, FourCC('ACrf')) -- Faerie Fire
-            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\NightElf\\FaerieFire\\FaerieFireTarget.mdl", u, "overhead"))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/NightElf/FaerieFire/FaerieFireTarget.mdl", u, "overhead"))
         end
         u = FirstOfGroup(g)
     end
@@ -1140,7 +1163,7 @@ function Arena_ManaBurn(caster, amount)
             local burned = math.min(currentMana, amount)
             SetUnitState(u, UNIT_STATE_MANA, currentMana - burned)
             UnitDamageTarget(caster, u, burned * 1.5, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
-            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\NightElf\\ManaBurn\\ManaBurnTarget.mdl", u, "origin"))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/NightElf/ManaBurn/ManaBurnTarget.mdl", u, "origin"))
         end
         u = FirstOfGroup(g)
     end
@@ -1156,7 +1179,7 @@ function Arena_HexTarget(caster, radius)
         if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 and u ~= udg_Boss then
             UnitAddAbility(u, FourCC('Ahex'))
             PauseUnit(u, true)
-            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Orc\\Hex\\HexTarget.mdl", u, "overhead"))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Orc/Hex/HexTarget.mdl", u, "overhead"))
             local victim = u
             local t = CreateTimer()
             TimerStart(t, 3.5, false, function()
@@ -1181,7 +1204,7 @@ function Arena_TransmuteTarget(caster, radius, goldBonus)
             KillUnit(u)
             local p = GetOwningPlayer(caster)
             SetPlayerState(p, PLAYER_STATE_RESOURCE_GOLD, GetPlayerState(p, PLAYER_STATE_RESOURCE_GOLD) + goldBonus)
-            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Items\\AIgold\\AIgoldTarget.mdl", caster, "origin"))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Items/AIgold/AIgoldTarget.mdl", caster, "origin"))
             break
         end
         u = FirstOfGroup(g)
@@ -1191,7 +1214,7 @@ end
 
 function Arena_DivineShield(caster, duration)
     SetUnitInvulnerable(caster, true)
-    DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdl", caster, "origin"))
+    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/DivineShield/DivineShieldTarget.mdl", caster, "origin"))
     local t = CreateTimer()
     TimerStart(t, duration, false, function()
         SetUnitInvulnerable(caster, false)
@@ -1208,7 +1231,7 @@ function Arena_DoomChains(caster, radius, duration)
         if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
             UnitDamageTarget(caster, u, 120.0, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
             PauseUnit(u, true)
-            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Other\\EntanglingRoots\\EntanglingRootsTarget.mdl", u, "origin"))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/EntanglingRoots/EntanglingRootsTarget.mdl", u, "origin"))
             local victim = u
             local t = CreateTimer()
             TimerStart(t, duration, false, function()
@@ -1238,7 +1261,7 @@ function Arena_Omnislash(caster, count, damage)
             if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
                 SetUnitPosition(caster, GetUnitX(u), GetUnitY(u))
                 UnitDamageTarget(caster, u, damage, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
-                DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\NightElf\\Blink\\BlinkTarget.mdl", u, "origin"))
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/NightElf/Blink/BlinkTarget.mdl", u, "origin"))
                 break
             end
             u = FirstOfGroup(g)
@@ -1259,34 +1282,786 @@ function Arena_PoisonGas(caster, radius, damage, duration)
         GroupRemoveUnit(g, u)
         if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
             UnitDamageTarget(caster, u, damage, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_POISON, WEAPON_TYPE_WHOKNOWS)
-            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdl", u, "head"))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/PlagueCloud/PlagueCloudCaster.mdl", u, "head"))
         end
         u = FirstOfGroup(g)
     end
     DestroyGroup(g)
 end
 
-function Arena_ClusterGrenade(caster, x, y, damage)
-    DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Other\\Bombster\\BombsterTarget.mdl", x, y))
-    local i = 0
-    while i < 3 do
-        local rx = x + GetRandomReal(-120.0, 120.0)
-        local ry = y + GetRandomReal(-120.0, 120.0)
-        DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Other\\Bombster\\BombsterTarget.mdl", rx, ry))
+function Arena_OnUnitAttack(attacker, target)
+    if attacker == nil or target == nil then return end
+    local pid = GetPlayerId(GetOwningPlayer(attacker))
+
+    if Heroes[pid] and Heroes[pid] == attacker then
+        local kind = HeroKind[pid]
+
+        -- Ronin Attack Handlers (role == 6)
+        if kind == 6 then
+            local rankE = GetUnitAbilityLevel(attacker, FourCC('A117'))
+            if rankE > 0 then
+                Arena_Ronin_E_Attack(attacker, target, rankE)
+            end
+        -- Bombardier Attack Handlers (role == 8)
+        elseif kind == 8 then
+            -- 1. E (Incendiary Munitions) passive splash & shrapnel
+            local rankE = GetUnitAbilityLevel(attacker, FourCC('A113'))
+            if rankE > 0 then
+                Arena_Bombardier_E_Attack(attacker, target, rankE)
+            end
+
+            -- 2. R (Mobile Rocket Battery) homing rockets every 2nd attack
+            local cid = GetHandleId(attacker)
+            local st = BombardierRocketState[cid]
+            if st and st.active then
+                st.attackCount = st.attackCount + 1
+                if st.attackCount % 2 == 0 then
+                    Arena_Bombardier_FireRocket(attacker, target, st.rank)
+                end
+            end
+        end
+    end
+end
+
+function Arena_DetonateTrap(trap, caster, rank)
+    if trap == nil or not trap.active then return end
+    trap.active = false
+    if trap.effect ~= nil then
+        DestroyEffect(trap.effect)
+        trap.effect = nil
+    end
+
+    local tx, ty = trap.x, trap.y
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/LightningShield/LightningShieldTarget.mdl", tx, ty))
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/ThunderClap/ThunderClapCaster.mdl", tx, ty))
+
+    local trapDmg = 150.0 + 100.0 * rank
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, tx, ty, 350.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(caster, u, trapDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+            PauseUnit(u, true)
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/Thunderclap/ThunderclapTarget.mdl", u, "overhead"))
+            local st = u
+            local t = CreateTimer()
+            TimerStart(t, 1.5, false, function()
+                if GetWidgetLife(st) > 0.405 then
+                    PauseUnit(st, false)
+                end
+                DestroyTimer(t)
+            end)
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+end
+
+function Arena_Bombardier_Q(caster, rank)
+    local tx = GetSpellTargetX()
+    local ty = GetSpellTargetY()
+    if tx == 0.0 and ty == 0.0 then
+        local facing = GetUnitFacing(caster) * (math.pi / 180.0)
+        tx = GetUnitX(caster) + math.cos(facing) * 300.0
+        ty = GetUnitY(caster) + math.sin(facing) * 300.0
+    end
+
+    local centerDmg = 120.0 + 100.0 * (rank - 1)
+    if rank == 3 then centerDmg = 340.0 end
+    if rank >= 4 then centerDmg = 480.0 end
+
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Other/Bombster/BombsterTarget.mdl", tx, ty))
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/ThunderClap/ThunderClapCaster.mdl", tx, ty))
+
+    local hitByCenter = {}
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, tx, ty, 275.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(caster, u, centerDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+            local uid = GetHandleId(u)
+            hitByCenter[uid] = u
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+
+    for _, trap in ipairs(BombardierTraps) do
+        if trap.active then
+            local dx = trap.x - tx
+            local dy = trap.y - ty
+            if (dx * dx + dy * dy) <= (350.0 * 350.0) then
+                Arena_DetonateTrap(trap, caster, rank)
+            end
+        end
+    end
+
+    local fragDmg = 60.0 + 50.0 * (rank - 1)
+    if rank == 3 then fragDmg = 170.0 end
+    if rank >= 4 then fragDmg = 240.0 end
+
+    local angles = { 0.0, 1.5708, 3.14159, 4.71239 }
+    local fragCoords = {}
+    for i = 1, 4 do
+        local fx = tx + math.cos(angles[i]) * 150.0
+        local fy = ty + math.sin(angles[i]) * 150.0
+        table.insert(fragCoords, { x = fx, y = fy })
+    end
+
+    local qTimer = CreateTimer()
+    TimerStart(qTimer, 0.5, false, function()
+        local fragmentHitCounts = {}
+
+        for _, fc in ipairs(fragCoords) do
+            DestroyEffect(AddSpecialEffect("Abilities/Spells/Other/Bombster/BombsterTarget.mdl", fc.x, fc.y))
+
+            for _, trap in ipairs(BombardierTraps) do
+                if trap.active then
+                    local dx = trap.x - fc.x
+                    local dy = trap.y - fc.y
+                    if (dx * dx + dy * dy) <= (200.0 * 200.0) then
+                        Arena_DetonateTrap(trap, caster, rank)
+                    end
+                end
+            end
+
+            local fg = CreateGroup()
+            GroupEnumUnitsInRange(fg, fc.x, fc.y, 200.0, nil)
+            local fu = FirstOfGroup(fg)
+            while fu ~= nil do
+                GroupRemoveUnit(fg, fu)
+                if IsUnitEnemy(fu, GetOwningPlayer(caster)) and GetWidgetLife(fu) > 0.405 then
+                    UnitDamageTarget(caster, fu, fragDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                    UnitAddAbility(fu, FourCC('Aslow'))
+                    local fuid = GetHandleId(fu)
+                    fragmentHitCounts[fuid] = (fragmentHitCounts[fuid] or 0) + 1
+                end
+                fu = FirstOfGroup(fg)
+            end
+            DestroyGroup(fg)
+        end
+
+        for fuid, count in pairs(fragmentHitCounts) do
+            if count >= 2 and hitByCenter[fuid] ~= nil then
+                local targetUnit = hitByCenter[fuid]
+                if GetWidgetLife(targetUnit) > 0.405 then
+                    PauseUnit(targetUnit, true)
+                    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/Thunderclap/ThunderclapTarget.mdl", targetUnit, "overhead"))
+                    local tu = targetUnit
+                    local stTimer = CreateTimer()
+                    TimerStart(stTimer, 1.2, false, function()
+                        if GetWidgetLife(tu) > 0.405 then
+                            PauseUnit(tu, false)
+                        end
+                        DestroyTimer(stTimer)
+                    end)
+                end
+            end
+        end
+
+        DestroyTimer(qTimer)
+    end)
+end
+
+function Arena_Bombardier_W(caster, rank)
+    local tx = GetSpellTargetX()
+    local ty = GetSpellTargetY()
+    if tx == 0.0 and ty == 0.0 then
+        tx = GetUnitX(caster)
+        ty = GetUnitY(caster)
+    end
+
+    local casterTraps = {}
+    for i, trap in ipairs(BombardierTraps) do
+        if trap.caster == caster and trap.active then
+            table.insert(casterTraps, { index = i, trap = trap })
+        end
+    end
+
+    if #casterTraps >= 3 then
+        local oldest = casterTraps[1].trap
+        oldest.active = false
+        if oldest.effect ~= nil then
+            DestroyEffect(oldest.effect)
+            oldest.effect = nil
+        end
+    end
+
+    local eff = AddSpecialEffect("Abilities/Spells/Orc/StasisTrap/StasisTotem.mdl", tx, ty)
+    table.insert(BombardierTraps, {
+        x = tx,
+        y = ty,
+        caster = caster,
+        rank = rank,
+        active = true,
+        effect = eff
+    })
+
+    DisplayTimedTextToPlayer(GetOwningPlayer(caster), 0, 0, 3.0, "|cff00ff00[Инженер]:|r Капкан-растяжка установлен! (Всего: " .. (#casterTraps < 3 and (#casterTraps + 1) or 3) .. "/3)")
+end
+
+function Arena_ApplyShrapnelStack(target, caster, rank)
+    if target == nil or GetWidgetLife(target) <= 0.405 then return end
+    local tid = GetHandleId(target)
+    if not ShrapnelDebuffs[tid] then
+        ShrapnelDebuffs[tid] = { stacks = 0, duration = 3.0, caster = caster, rank = rank, target = target }
+    end
+
+    local data = ShrapnelDebuffs[tid]
+    if data.stacks < 3 then
+        data.stacks = data.stacks + 1
+    end
+    data.duration = 3.0
+    data.rank = rank
+    data.caster = caster
+
+    UnitAddAbility(target, FourCC('ACrf'))
+    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/NightElf/FaerieFire/FaerieFireTarget.mdl", target, "overhead"))
+end
+
+function Arena_Bombardier_E(caster, rank)
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Other/NeutralExplode/NeutralExplode.mdl", cx, cy))
+
+    local burstDmg = 100.0 + 80.0 * rank
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, cx, cy, 350.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(caster, u, burstDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+            Arena_ApplyShrapnelStack(u, caster, rank)
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+end
+
+function Arena_Bombardier_E_Attack(attacker, target, rank)
+    if attacker == nil or target == nil then return end
+
+    local agi = GetHeroAgi(attacker, true)
+    local splashPct = 0.35 + 0.15 * (rank - 1)
+    local baseDmg = 40.0 + 20.0 * rank + agi * 0.5
+    local splashDmg = baseDmg * splashPct
+
+    local tx, ty = GetUnitX(target), GetUnitY(target)
+    Arena_ApplyShrapnelStack(target, attacker, rank)
+
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, tx, ty, 250.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if u ~= target and IsUnitEnemy(u, GetOwningPlayer(attacker)) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(attacker, u, splashDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+            Arena_ApplyShrapnelStack(u, attacker, rank)
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+end
+
+function Arena_Bombardier_R(caster, rank)
+    local cid = GetHandleId(caster)
+    local st = BombardierRocketState[cid]
+
+    if st == nil or not st.active then
+        BombardierRocketState[cid] = {
+            active = true,
+            duration = 12.0,
+            attackCount = 0,
+            rank = rank,
+            caster = caster
+        }
+        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/Avatar/AvatarCaster.mdl", caster, "origin"))
+        SetUnitMoveSpeed(caster, GetUnitDefaultMoveSpeed(caster) * 1.15)
+        DisplayTimedTextToPlayer(GetOwningPlayer(caster), 0, 0, 5.0, "|cffffcc00[АРТИЛЛЕРИЯ]:|r Мобильная ракетная батарея АКТИВИРОВАНА на 12 секунд!")
+    else
+        st.active = false
+        SetUnitMoveSpeed(caster, GetUnitDefaultMoveSpeed(caster))
+
+        local bx, by = GetUnitX(caster), GetUnitY(caster)
+        DisplayTimedTextToPlayer(GetOwningPlayer(caster), 0, 0, 4.0, "|cffff0000[АВАРИЙНЫЙ СБРОС]:|r Ракетная батарея сброшена! Детонация через 1 секунду!")
+
+        local jettisonEff = AddSpecialEffect("Abilities/Spells/Human/SiegeEngine/SiegeEngineTarget.mdl", bx, by)
+
+        local jTimer = CreateTimer()
+        TimerStart(jTimer, 1.0, false, function()
+            DestroyEffect(jettisonEff)
+            DestroyEffect(AddSpecialEffect("Abilities/Spells/Other/NeutralExplode/NeutralExplode.mdl", bx, by))
+            DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/ThunderClap/ThunderClapCaster.mdl", bx, by))
+
+            local agi = GetHeroAgi(caster, true)
+            local overloadDmg = 500.0 + 350.0 * (rank - 1) + agi * 2.0
+            if rank == 3 then overloadDmg = 850.0 + agi * 2.0 end
+            if rank >= 4 then overloadDmg = 1300.0 + agi * 2.0 end
+
+            local g = CreateGroup()
+            GroupEnumUnitsInRange(g, bx, by, 450.0, nil)
+            local u = FirstOfGroup(g)
+            while u ~= nil do
+                GroupRemoveUnit(g, u)
+                if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+                    UnitDamageTarget(caster, u, overloadDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                    PauseUnit(u, true)
+                    local tu = u
+                    local stt = CreateTimer()
+                    TimerStart(stt, 1.0, false, function()
+                        if GetWidgetLife(tu) > 0.405 then PauseUnit(tu, false) end
+                        DestroyTimer(stt)
+                    end)
+                end
+                u = FirstOfGroup(g)
+            end
+            DestroyGroup(g)
+
+            Arena_KnockbackArea(caster, 450.0, 400.0)
+
+            for _, trap in ipairs(BombardierTraps) do
+                if trap.active then
+                    local dx = trap.x - bx
+                    local dy = trap.y - by
+                    if (dx * dx + dy * dy) <= (450.0 * 450.0) then
+                        Arena_DetonateTrap(trap, caster, rank)
+                    end
+                end
+            end
+
+            DestroyTimer(jTimer)
+        end)
+    end
+end
+
+function Arena_Bombardier_FireRocket(caster, target, rank)
+    if caster == nil or target == nil or GetWidgetLife(target) <= 0.405 then return end
+
+    local tx, ty = GetUnitX(target), GetUnitY(target)
+    DestroyEffect(AddSpecialEffect("Abilities/Weapons/RocketMissile/RocketMissile.mdl", tx, ty))
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Other/Bombster/BombsterTarget.mdl", tx, ty))
+
+    local agi = GetHeroAgi(caster, true)
+    local rDmg = 250.0 + 200.0 * (rank - 1) + agi * 1.2
+    if rank == 3 then rDmg = 700.0 + agi * 1.2 end
+
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, tx, ty, 250.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(caster, u, rDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+            PauseUnit(u, true)
+            local tu = u
+            local t = CreateTimer()
+            TimerStart(t, 0.3, false, function()
+                if GetWidgetLife(tu) > 0.405 then PauseUnit(tu, false) end
+                DestroyTimer(t)
+            end)
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+end
+
+function Arena_Ronin_Q(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    local tx, ty = GetSpellTargetX(), GetSpellTargetY()
+
+    local dx = tx - cx
+    local dy = ty - cy
+    local dist = math.sqrt(dx * dx + dy * dy)
+    local angle = GetUnitFacing(caster) * (math.pi / 180.0)
+    if dist > 10.0 then
+        angle = math.atan2(dy, dx)
+    end
+
+    local dashDist = 650.0
+    local endX = cx + math.cos(angle) * dashDist
+    local endY = cy + math.sin(angle) * dashDist
+
+    SetUnitPathing(caster, false)
+    SetUnitPosition(caster, endX, endY)
+    SetUnitPathing(caster, true)
+
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/NightElf/Blink/BlinkCaster.mdl", cx, cy))
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/NightElf/Blink/BlinkTarget.mdl", endX, endY))
+
+    local atkDmg = (BlzGetUnitBaseDamage and BlzGetUnitBaseDamage(caster, 0) or 50.0)
+    local baseDmg = 100.0 + 80.0 * (rank - 1)
+    if rank == 3 then baseDmg = 260.0 end
+    if rank >= 4 then baseDmg = 340.0 end
+    local totalDmg = baseDmg + (atkDmg * 1.2)
+
+    local killedUnit = false
+    local hitBoss = false
+
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, (cx + endX) * 0.5, (cy + endY) * 0.5, 350.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(caster, u, totalDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/HeroBladeMaster/BladeMasterTarget.mdl", u, "chest"))
+
+            if GetWidgetLife(u) <= 0.405 then
+                killedUnit = true
+            end
+            if udg_Boss ~= nil and u == udg_Boss then
+                hitBoss = true
+            end
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+
+    if killedUnit then
+        UnitResetCooldown(caster)
+        local maxHp = GetUnitState(caster, UNIT_STATE_MAX_LIFE)
+        local curHp = GetUnitState(caster, UNIT_STATE_LIFE)
+        SetUnitState(caster, UNIT_STATE_LIFE, curHp + maxHp * 0.03)
+        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/Heal/HealTarget.mdl", caster, "origin"))
+        DisplayTimedTextToPlayer(GetOwningPlayer(caster), 0, 0, 3.0, "|cff00ff00[ПОТОК КЛИНКА]:|r Перезарядка сброшена (+3% HP)!")
+    elseif hitBoss then
+        local t = CreateTimer()
+        TimerStart(t, 0.1, false, function()
+            UnitStartCooldown(caster, FourCC('A115'), 4.0)
+            DestroyTimer(t)
+        end)
+        DisplayTimedTextToPlayer(GetOwningPlayer(caster), 0, 0, 3.0, "|cffffcc00[ПОТОК КЛИНКА]:|r Кулдаун сокращен на 50%!")
+    end
+end
+
+function Arena_Ronin_W(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cid = GetHandleId(caster)
+    RoninParryState[cid] = {
+        inStance = true,
+        rank = rank,
+        caster = caster,
+        buffActive = false,
+        duration = 1.2
+    }
+
+    SetUnitInvulnerable(caster, true)
+    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/DivineShield/DivineShieldTarget.mdl", caster, "origin"))
+
+    local t = CreateTimer()
+    TimerStart(t, 1.2, false, function()
+        SetUnitInvulnerable(caster, false)
+        local st = RoninParryState[cid]
+        if st and st.inStance then
+            st.inStance = false
+        end
+        DestroyTimer(t)
+    end)
+end
+
+function Arena_Ronin_CounterAttack(caster, absorbedDamage)
+    local cid = GetHandleId(caster)
+    local st = RoninParryState[cid]
+    if st == nil or not st.inStance then return end
+
+    st.inStance = false
+    SetUnitInvulnerable(caster, false)
+
+    local rank = st.rank or 1
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/ThunderClap/ThunderClapCaster.mdl", cx, cy))
+
+    local baseCounter = 150.0 + 100.0 * (rank - 1)
+    if rank == 3 then baseCounter = 350.0 end
+    if rank >= 4 then baseCounter = 450.0 end
+    local bonus = absorbedDamage or 100.0
+    if bonus > 500.0 then bonus = 500.0 end
+    local counterDmg = baseCounter + bonus
+
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, cx, cy, 300.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(caster, u, counterDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+            PauseUnit(u, true)
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/Thunderclap/ThunderclapTarget.mdl", u, "overhead"))
+            local tu = u
+            local stTimer = CreateTimer()
+            TimerStart(stTimer, 1.2, false, function()
+                if GetWidgetLife(tu) > 0.405 then PauseUnit(tu, false) end
+                DestroyTimer(stTimer)
+            end)
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+
+    st.buffActive = true
+    st.buffDuration = 4.0
+    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Orc/Bloodlust/BloodlustTarget.mdl", caster, "origin"))
+    DisplayTimedTextToPlayer(GetOwningPlayer(caster), 0, 0, 4.0, "|cff00ff00[КОНТРАТАКА]:|r Удар заблокирован! +50% скорости атаки и Клив активированы!")
+end
+
+function Arena_Ronin_E(caster, rank)
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/HeroBladeMaster/BladeMasterTarget.mdl", cx, cy))
+
+    local burstDmg = 120.0 + 80.0 * rank
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, cx, cy, 300.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(caster, u, burstDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_HERO, WEAPON_TYPE_WHOKNOWS)
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/Blood/BloodImpact.mdl", u, "overhead"))
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+end
+
+function Arena_Ronin_E_Attack(attacker, target, rank)
+    if attacker == nil or target == nil then return end
+
+    local tid = GetHandleId(target)
+    if not RoninDeepCut[tid] then
+        RoninDeepCut[tid] = { count = 0, caster = attacker }
+    end
+
+    local dc = RoninDeepCut[tid]
+    dc.count = dc.count + 1
+
+    if dc.count >= 3 then
+        dc.count = 0
+        local agi = GetHeroAgi(attacker, true)
+        local bonusPure = 80.0 + 60.0 * (rank - 1) + agi * 0.8
+        if rank == 3 then bonusPure = 200.0 + agi * 0.8 end
+        if rank >= 4 then bonusPure = 260.0 + agi * 0.8 end
+
+        UnitDamageTarget(attacker, target, bonusPure, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_UNIVERSAL, WEAPON_TYPE_WHOKNOWS)
+        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/Blood/BloodImpact.mdl", target, "chest"))
+    end
+
+    local cid = GetHandleId(attacker)
+    local pSt = RoninParryState[cid]
+    local hasWBuff = pSt and pSt.buffActive
+    local rTime = RoninCleaveTimer[cid] or 0.0
+    local hasRBuff = rTime > 0.0
+
+    if hasWBuff or hasRBuff then
+        local cleavePct = 0.40 + 0.15 * (rank - 1)
+        local atkDmg = (BlzGetUnitBaseDamage and BlzGetUnitBaseDamage(attacker, 0) or 50.0)
+        local cleaveDmg = atkDmg * cleavePct
+        local tx, ty = GetUnitX(target), GetUnitY(target)
+
         local g = CreateGroup()
-        GroupEnumUnitsInRange(g, rx, ry, 200.0, nil)
+        GroupEnumUnitsInRange(g, tx, ty, 250.0, nil)
         local u = FirstOfGroup(g)
         while u ~= nil do
             GroupRemoveUnit(g, u)
-            if GetWidgetLife(u) > 0.405 and IsUnitEnemy(u, GetOwningPlayer(caster)) then
-                UnitDamageTarget(caster, u, damage * 0.5, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
-                DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Human\\ThunderClap\\ThunderClapCaster.mdl", u, "origin"))
+            if u ~= target and IsUnitEnemy(u, GetOwningPlayer(attacker)) and GetWidgetLife(u) > 0.405 then
+                UnitDamageTarget(attacker, u, cleaveDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/HeroBladeMaster/BladeMasterTarget.mdl", u, "origin"))
             end
             u = FirstOfGroup(g)
         end
         DestroyGroup(g)
-        i = i + 1
     end
+end
+
+function Arena_Ronin_R(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    local tx, ty = GetSpellTargetX(), GetSpellTargetY()
+    local dx = tx - cx
+    local dy = ty - cy
+    local dist = math.sqrt(dx * dx + dy * dy)
+    local angle = GetUnitFacing(caster) * (math.pi / 180.0)
+    if dist > 10.0 then
+        angle = math.atan2(dy, dx)
+    end
+
+    local length = 900.0
+    local endX = cx + math.cos(angle) * length
+    local endY = cy + math.sin(angle) * length
+
+    SetUnitInvulnerable(caster, true)
+    PauseUnit(caster, true)
+
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/NightElf/Blink/BlinkCaster.mdl", cx, cy))
+
+    local frozenUnits = {}
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, (cx + endX) * 0.5, (cy + endY) * 0.5, 450.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            PauseUnit(u, true)
+            table.insert(frozenUnits, u)
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/FreezingBreath/FreezingBreathTarget.mdl", u, "origin"))
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+
+    local channelTimer = CreateTimer()
+    TimerStart(channelTimer, 0.4, false, function()
+        SetUnitInvulnerable(caster, false)
+        PauseUnit(caster, false)
+
+        SetUnitPathing(caster, false)
+        SetUnitPosition(caster, endX, endY)
+        SetUnitPathing(caster, true)
+
+        DestroyEffect(AddSpecialEffect("Abilities/Spells/NightElf/Blink/BlinkTarget.mdl", endX, endY))
+
+        UnitResetCooldown(caster)
+
+        local cid = GetHandleId(caster)
+        RoninCleaveTimer[cid] = 6.0
+
+        local burstTimer = CreateTimer()
+        TimerStart(burstTimer, 1.1, false, function()
+            DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/ThunderClap/ThunderClapCaster.mdl", (cx + endX) * 0.5, (cy + endY) * 0.5))
+
+            local agi = GetHeroAgi(caster, true)
+            local baseDmg = 500.0 + 300.0 * (rank - 1) + agi * 2.5
+            if rank == 3 then baseDmg = 1200.0 + agi * 2.5 end
+
+            for _, targetUnit in ipairs(frozenUnits) do
+                if GetWidgetLife(targetUnit) > 0.405 then
+                    PauseUnit(targetUnit, false)
+
+                    if udg_Boss ~= nil and targetUnit == udg_Boss then
+                        local bossMaxHp = GetUnitState(targetUnit, UNIT_STATE_MAX_LIFE)
+                        local bossCurHp = GetUnitState(targetUnit, UNIT_STATE_LIFE)
+                        local bossDmg = baseDmg + (bossCurHp * 0.12)
+                        UnitDamageTarget(caster, targetUnit, bossDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_UNIVERSAL, WEAPON_TYPE_WHOKNOWS)
+                        UnitAddAbility(targetUnit, FourCC('ACrf'))
+                        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/Blood/BloodImpact.mdl", targetUnit, "chest"))
+                    else
+                        local curHp = GetUnitState(targetUnit, UNIT_STATE_LIFE)
+                        local maxHp = GetUnitState(targetUnit, UNIT_STATE_MAX_LIFE)
+                        if (curHp / maxHp) < 0.20 then
+                            SetWidgetLife(targetUnit, 0.0)
+                            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/Blood/BloodImpact.mdl", targetUnit, "origin"))
+                        else
+                            UnitDamageTarget(caster, targetUnit, baseDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/HeroBladeMaster/BladeMasterTarget.mdl", targetUnit, "chest"))
+                        end
+                    end
+                end
+            end
+
+            DestroyTimer(burstTimer)
+        end)
+
+        DestroyTimer(channelTimer)
+    end)
+end
+
+function Arena_InitBombardierSystem()
+    local t = CreateTimer()
+    TimerStart(t, 0.5, true, function()
+        for _, trap in ipairs(BombardierTraps) do
+            if trap.active then
+                local g = CreateGroup()
+                GroupEnumUnitsInRange(g, trap.x, trap.y, 150.0, nil)
+                local u = FirstOfGroup(g)
+                local enemiesHit = 0
+                while u ~= nil and enemiesHit < 3 do
+                    GroupRemoveUnit(g, u)
+                    if IsUnitEnemy(u, GetOwningPlayer(trap.caster)) and GetWidgetLife(u) > 0.405 then
+                        enemiesHit = enemiesHit + 1
+
+                        local rootDur = 2.5 + 0.5 * trap.rank
+                        if udg_Boss ~= nil and u == udg_Boss then rootDur = 1.5 end
+
+                        SetUnitMoveSpeed(u, 0.0)
+                        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/Net/NetTarget.mdl", u, "origin"))
+
+                        local tu = u
+                        local origSpeed = GetUnitDefaultMoveSpeed(tu)
+                        local rTimer = CreateTimer()
+                        TimerStart(rTimer, rootDur, false, function()
+                            if GetWidgetLife(tu) > 0.405 then
+                                SetUnitMoveSpeed(tu, origSpeed)
+                            end
+                            DestroyTimer(rTimer)
+                        end)
+                    end
+                    u = FirstOfGroup(g)
+                end
+                DestroyGroup(g)
+
+                if enemiesHit > 0 then
+                    trap.active = false
+                    if trap.effect ~= nil then
+                        DestroyEffect(trap.effect)
+                        trap.effect = nil
+                    end
+                end
+            end
+        end
+
+        for tid, data in pairs(ShrapnelDebuffs) do
+            local target = data.target
+            if target ~= nil and GetWidgetLife(target) > 0.405 and data.duration > 0 then
+                data.duration = data.duration - 0.5
+                local agi = GetHeroAgi(data.caster, true)
+                local maxHp = GetUnitState(target, UNIT_STATE_MAX_LIFE)
+
+                local dotPerSec = (agi * 0.15 + maxHp * 0.015) * data.stacks
+                local dotTick = dotPerSec * 0.5
+
+                UnitDamageTarget(data.caster, target, dotTick, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Other/Blood/BloodImpact.mdl", target, "origin"))
+            else
+                if target ~= nil then
+                    UnitRemoveAbility(target, FourCC('ACrf'))
+                end
+                ShrapnelDebuffs[tid] = nil
+            end
+        end
+
+        for cid, st in pairs(BombardierRocketState) do
+            if st.active then
+                st.duration = st.duration - 0.5
+                if st.duration <= 0 then
+                    st.active = false
+                    SetUnitMoveSpeed(st.caster, GetUnitDefaultMoveSpeed(st.caster))
+                    DisplayTimedTextToPlayer(GetOwningPlayer(st.caster), 0, 0, 4.0, "|cffffcc00[АРТИЛЛЕРИЯ]:|r Режим Мобильной Батареи завершен.")
+                end
+            end
+        end
+
+        for cid, st in pairs(RoninParryState) do
+            if st.buffActive then
+                st.buffDuration = st.buffDuration - 0.5
+                if st.buffDuration <= 0 then
+                    st.buffActive = false
+                end
+            end
+        end
+
+        for cid, tLeft in pairs(RoninCleaveTimer) do
+            if tLeft > 0 then
+                RoninCleaveTimer[cid] = tLeft - 0.5
+            end
+        end
+    end)
 end
 
 function Arena_TimeLoop(target, duration)
@@ -1294,14 +2069,14 @@ function Arena_TimeLoop(target, duration)
     local x, y = GetUnitX(target), GetUnitY(target)
     local hp = GetUnitState(target, UNIT_STATE_LIFE)
     local mp = GetUnitState(target, UNIT_STATE_MANA)
-    DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Items\\AIam\\AIamTarget.mdl", target, "origin"))
+    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Items/AIam/AIamTarget.mdl", target, "origin"))
     local t = CreateTimer()
     TimerStart(t, duration, false, function()
         if GetWidgetLife(target) > 0.405 then
             SetUnitPosition(target, x, y)
             SetUnitState(target, UNIT_STATE_LIFE, hp)
             SetUnitState(target, UNIT_STATE_MANA, mp)
-            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdl", target, "origin"))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/MassTeleport/MassTeleportTarget.mdl", target, "origin"))
         end
         DestroyTimer(t)
     end)
@@ -1309,7 +2084,7 @@ end
 
 function Arena_Chronosphere(caster, radius, duration)
     local cx, cy = GetUnitX(caster), GetUnitY(caster)
-    DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Other\\Tornado\\TornadoElemental.mdl", cx, cy))
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Other/Tornado/TornadoElemental.mdl", cx, cy))
     local g = CreateGroup()
     GroupEnumUnitsInRange(g, cx, cy, radius, nil)
     local u = FirstOfGroup(g)
@@ -1337,7 +2112,7 @@ end
 function Arena_EarthquakeWall(caster, radius)
     Arena_KnockbackArea(caster, radius, 150.0)
     Arena_CustomArea(caster, radius, 200.0, false)
-    DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl", GetUnitX(caster), GetUnitY(caster)))
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Demon/DemonBoltImpact/DemonBoltImpact.mdl", GetUnitX(caster), GetUnitY(caster)))
 end
 
 function Arena_VoodooInvuln(caster, radius, duration)
@@ -1349,7 +2124,7 @@ function Arena_VoodooInvuln(caster, radius, duration)
         GroupRemoveUnit(g, u)
         if IsUnitAlly(u, GetOwningPlayer(caster)) and u ~= caster and GetWidgetLife(u) > 0.405 then
             SetUnitInvulnerable(u, true)
-            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Orc\\Voodoo\\VoodooTarget.mdl", u, "origin"))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Orc/Voodoo/VoodooTarget.mdl", u, "origin"))
             table.insert(allies, u)
         end
         u = FirstOfGroup(g)
@@ -1378,7 +2153,7 @@ function Arena_CustomFinisher(caster, damage)
             else
                 UnitDamageTarget(caster, target, damage, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
             end
-            DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdl", target, "chest"))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/DeathCoil/DeathCoilSpecialArt.mdl", target, "chest"))
         end
         target = FirstOfGroup(g)
     end
@@ -1394,10 +2169,10 @@ function Arena_CustomArea(caster, radius, amount, healing)
         if GetWidgetLife(u) > 0.405 then
             if healing and IsUnitAlly(u, GetOwningPlayer(caster)) and IsUnitType(u, UNIT_TYPE_HERO) then
                 SetUnitState(u, UNIT_STATE_LIFE, GetUnitState(u, UNIT_STATE_LIFE) + amount)
-                DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl", u, "origin"))
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/HolyBolt/HolyBoltSpecialArt.mdl", u, "origin"))
             elseif not healing and IsUnitEnemy(u, GetOwningPlayer(caster)) then
                 UnitDamageTarget(caster, u, amount, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS)
-                DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Human\\ThunderClap\\ThunderClapCaster.mdl", u, "origin"))
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/ThunderClap/ThunderClapCaster.mdl", u, "origin"))
             end
         end
         u = FirstOfGroup(g)
@@ -1410,7 +2185,7 @@ function Arena_CustomMove(caster, dist)
     local nx = GetUnitX(caster) + dist * math.cos(ang)
     local ny = GetUnitY(caster) + dist * math.sin(ang)
     SetUnitPosition(caster, nx, ny)
-    DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Orc\\Blink\\BlinkTarget.mdl", nx, ny))
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Orc/Blink/BlinkTarget.mdl", nx, ny))
 end
 
 function Arena_HeroBurst(caster, radius, damage, friendlyFire)
@@ -1438,11 +2213,11 @@ function Arena_ItemPulses(caster, hpAmount, manaAmount)
         if GetWidgetLife(u) > 0.405 and IsUnitAlly(u, GetOwningPlayer(caster)) and IsUnitType(u, UNIT_TYPE_HERO) then
             if hpAmount > 0 then
                 SetUnitState(u, UNIT_STATE_LIFE, GetUnitState(u, UNIT_STATE_LIFE) + hpAmount)
-                DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Items\\HealingSalve\\HealingSalveTarget.mdl", u, "origin"))
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Items/HealingSalve/HealingSalveTarget.mdl", u, "origin"))
             end
             if manaAmount > 0 then
                 SetUnitState(u, UNIT_STATE_MANA, GetUnitState(u, UNIT_STATE_MANA) + manaAmount)
-                DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Items\\ClarifyPotion\\ClarifyPotionTarget.mdl", u, "origin"))
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Items/ClarifyPotion/ClarifyPotionTarget.mdl", u, "origin"))
             end
         end
         u = FirstOfGroup(g)
@@ -1453,11 +2228,11 @@ end
 function Arena_SpellAid(caster, hpAmount, manaAmount)
     if hpAmount > 0 then
         SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + hpAmount)
-        DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Items\\HealingSalve\\HealingSalveTarget.mdl", caster, "origin"))
+        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Items/HealingSalve/HealingSalveTarget.mdl", caster, "origin"))
     end
     if manaAmount > 0 then
         SetUnitState(caster, UNIT_STATE_MANA, GetUnitState(caster, UNIT_STATE_MANA) + manaAmount)
-        DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Items\\ClarifyPotion\\ClarifyPotionTarget.mdl", caster, "origin"))
+        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Items/ClarifyPotion/ClarifyPotionTarget.mdl", caster, "origin"))
     end
 end
 
@@ -1471,7 +2246,7 @@ function Arena_CustomSummon(caster, unitId, count, duration)
         local ry = y + GetRandomReal(-80.0, 80.0)
         local u = CreateUnit(p, unitId, rx, ry, GetUnitFacing(caster))
         UnitApplyTimedLife(u, FourCC('BTLF'), duration)
-        DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdl", u, "origin"))
+        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/AnimateDead/AnimateDeadTarget.mdl", u, "origin"))
         i = i + 1
     end
 end
