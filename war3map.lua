@@ -98,14 +98,13 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
 
     -- 1. Тёмный Рыцарь (Сила / Танк-Джаггернаут)
     if role == 1 then
-        if spellId == FourCC('A101') then -- Q: Раскол Рока (Урон перед героем и замедление)
-            Arena_CustomArea(caster, 400.0, amount * 1.8, false)
-            Arena_TauntArea(caster, 400.0)
-        elseif spellId == FourCC('A102') then -- W: Кровавая Жатва (Вампиризм / Исцеление)
-            Arena_SpellAid(caster, amount * 2.5, 0)
-        elseif spellId == FourCC('A10D') then -- E: Щит Мучений (Барьер и взрыв)
-            Arena_DivineShield(caster, 2.5 + rank * 0.5)
-            Arena_CustomArea(caster, 350.0, amount * 1.5, false)
+        if spellId == FourCC('A101') then -- Q: Раскол Рока (Стягивание 0.5с + АоЕ урон + таунт)
+            Arena_PullArea(caster, 500.0, 0.5, amount * 2.0)
+        elseif spellId == FourCC('A102') then -- W: Кровавая Жатва (Активная, процент от недостающего HP отряда)
+            Arena_BloodHarvestActive(caster, amount * 0.08)
+        elseif spellId == FourCC('A10D') then -- E: Щит Мучений (Щит здоровья + доп. броня)
+            Arena_ShieldOfTorment(caster, amount * 3.5, 10 + rank * 5, 8.0)
+            Arena_CustomArea(caster, 350.0, amount * 1.2, false)
         elseif spellId == FourCC('A10E') then -- R: Врата Преисподней (Приковывающие цепи рока)
             Arena_DoomChains(caster, 500.0, 4.0)
             Arena_CustomFinisher(caster, amount * 5.0)
@@ -777,6 +776,70 @@ end
 -- ===========================================================================
 -- Helper functions for Custom Spells
 -- ===========================================================================
+
+function Arena_PullArea(caster, radius, delay, damageAmount)
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdl", cx, cy))
+    local t = CreateTimer()
+    TimerStart(t, delay, false, function()
+        local ncx, ncy = GetUnitX(caster), GetUnitY(caster)
+        local g = CreateGroup()
+        GroupEnumUnitsInRange(g, ncx, ncy, radius, nil)
+        local u = FirstOfGroup(g)
+        while u ~= nil do
+            GroupRemoveUnit(g, u)
+            if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+                SetUnitPosition(u, ncx + GetRandomReal(-40.0, 40.0), ncy + GetRandomReal(-40.0, 40.0))
+                IssueTargetOrder(u, "attack", caster)
+                DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Other\\HowlOfTerror\\HowlTarget.mdl", u, "overhead"))
+            end
+            u = FirstOfGroup(g)
+        end
+        DestroyGroup(g)
+        Arena_CustomArea(caster, radius, damageAmount, false)
+        DestroyTimer(t)
+    end)
+end
+
+function Arena_BloodHarvestActive(caster, amountPerMissingPercent)
+    local totalMissingPercent = 0.0
+    local heroCount = 0
+    for i = 0, 3 do
+        local h = Heroes[i]
+        if h ~= nil and GetWidgetLife(h) > 0.405 then
+            local maxHp = GetUnitState(h, UNIT_STATE_MAX_LIFE)
+            local curHp = GetUnitState(h, UNIT_STATE_LIFE)
+            if maxHp > 0 then
+                local missingPct = (maxHp - curHp) / maxHp * 100.0
+                totalMissingPercent = totalMissingPercent + missingPct
+            end
+            heroCount = heroCount + 1
+        end
+    end
+    if heroCount < 1 then heroCount = 1 end
+    local avgMissingPercent = totalMissingPercent / heroCount
+    local healAmount = avgMissingPercent * amountPerMissingPercent
+    if healAmount < 50.0 then healAmount = 50.0 end
+    SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + healAmount)
+    DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Undead\\VampiricAura\\VampiricAuraTarget.mdl", caster, "origin"))
+end
+
+function Arena_ShieldOfTorment(caster, shieldHp, armorBonus, duration)
+    -- Временное увеличение макс. HP (для эффекта сильного щита) и брони
+    UnitAddAbility(caster, FourCC('Adev')) -- Devotion Aura / Броня
+    SetUnitAbilityLevel(caster, FourCC('Adev'), math.min(10, math.max(1, math.floor(armorBonus / 5))))
+    UnitAddAbility(caster, FourCC('AImx')) -- Item Life Bonus / Запас HP
+    SetUnitAbilityLevel(caster, FourCC('AImx'), 1)
+    local curHp = GetUnitState(caster, UNIT_STATE_LIFE)
+    SetUnitState(caster, UNIT_STATE_LIFE, curHp + shieldHp)
+    DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdl", caster, "origin"))
+    local t = CreateTimer()
+    TimerStart(t, duration, false, function()
+        UnitRemoveAbility(caster, FourCC('Adev'))
+        UnitRemoveAbility(caster, FourCC('AImx'))
+        DestroyTimer(t)
+    end)
+end
 
 function Arena_TauntArea(caster, radius)
     local g = CreateGroup()
