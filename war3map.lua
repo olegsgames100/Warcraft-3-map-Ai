@@ -18,6 +18,9 @@ function InitGlobals()
     PriestessSunState = {}
     DruidSummons = {}
     DruidDeepwoodColossus = {}
+    LichSkeletons = {}
+    LichRevenant = {}
+    LichWyrm = {}
     
     -- Глобальные переменные волн
     udg_Wave = 0
@@ -44,8 +47,8 @@ function InitGlobals()
         { id = FourCC('Hamg'), name = "Элементалист Бури (Интеллект / Маг)", role = "mage",     spells = {FourCC('A105'), FourCC('A106'), FourCC('A10H'), FourCC('A10I')} },
         -- 4. Хранитель Древней / Друид Первобытного Леса (Сила / Саммонер & Биомасса)
         { id = FourCC('Udea'), name = "Хранитель Древней (Сила / Саммонер)", role = "summoner", spells = {FourCC('A107'), FourCC('A108'), FourCC('A10J'), FourCC('A10K')} },
-        -- 5. Токсиколог (Интеллект / ДоТ & Контроль)
-        { id = FourCC('Edem'), name = "Токсиколог (Интеллект / ДоТ)",    role = "dot_control", spells = {FourCC('A109'), FourCC('A10A'), FourCC('A10L'), FourCC('A10M')} },
+        -- 5. Архилич Чумы / Повелитель Мёртвых (Интеллект / Некромант-Призыватель)
+        { id = FourCC('Edem'), name = "Архилич Чумы (Интеллект / Некромант)", role = "dot_control", spells = {FourCC('A109'), FourCC('A10A'), FourCC('A10L'), FourCC('A10M')} },
         -- 6. Мастер Клинка / Ронин (Ловкость / Керри Ближнего Боя)
         { id = FourCC('Hmkg'), name = "Мастер Клинка-Ронин (Ловкость / Керри)", role = "carry", spells = {FourCC('A115'), FourCC('A116'), FourCC('A117'), FourCC('A118')} },
         -- 7. Жрица Рассвета (Интеллект / Боевой Саппорт, Защитник и Баффер)
@@ -222,17 +225,16 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
             Arena_ApplyStaticCharges(caster, rank, 650.0, amount * 0.8)
         end
 
-    -- 5. Токсиколог / Чумной Доктор (Интеллект / Контроль и ДоТ)
+    -- 5. Архилич Чумы / Повелитель Мёртвых (Интеллект / Некромант-Призыватель)
     elseif role == 5 then
-        if spellId == FourCC('A109') then -- Q: Склянка с Ядом (Ядовитый газ)
-            Arena_PoisonGas(caster, 400.0, amount * 1.5, 5.0)
-        elseif spellId == FourCC('A10A') then -- W: Едкая Инъекция (-броня)
-            Arena_ArmorSunder(caster, 350.0, 6.0)
-            Arena_CustomFinisher(caster, amount * 2.0)
-        elseif spellId == FourCC('A10L') then -- E: Эпидемия (Заражение окружающих)
-            Arena_PoisonGas(caster, 450.0, amount * 1.2, 6.0)
-        elseif spellId == FourCC('A10M') then -- R: Биологический Коллапс (Мгновенный взрыв ядов)
-            Arena_CustomArea(caster, 600.0, amount * 5.0, false)
+        if spellId == FourCC('A109') then -- Q: Восстание Могил: Скелеты-Осквернители (Grave Awakening)
+            Arena_Lich_Q(caster, rank)
+        elseif spellId == FourCC('A10A') then -- W: Ледяной Конструкт: Костяной Голем (Frostbone Revenant)
+            Arena_Lich_W(caster, rank)
+        elseif spellId == FourCC('A10L') then -- E: Взрыв Трупов: Чумная Детонация (Corpse Explosion)
+            Arena_Lich_E(caster, rank)
+        elseif spellId == FourCC('A10M') then -- R: Чёрные Врата: Призыв Дракона Нежити (Frost Wyrm Avatar)
+            Arena_Lich_R(caster, rank)
         end
 
     -- 7. Жрица Рассвета (Интеллект / Боевой Саппорт, Защитник и Баффер)
@@ -2434,7 +2436,7 @@ function Arena_Druid_Q(caster, rank)
     if rank == 3 then treantHp = 2200.0 + maxHpCaster * 1.5 end
     if rank >= 4 then treantHp = 3200.0 + maxHpCaster * 1.5 end
 
-    SetUnitState(treant, UNIT_STATE_MAX_LIFE, treantHp)
+    if BlzSetUnitMaxHP then BlzSetUnitMaxHP(treant, treantHp) end SetUnitState(treant, UNIT_STATE_MAX_LIFE, treantHp)
     SetUnitState(treant, UNIT_STATE_LIFE, treantHp)
 
     DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/NightElf/EntanglingRoots/EntanglingRootsTarget.mdl", treant, "origin"))
@@ -2605,7 +2607,7 @@ function Arena_Druid_R(caster, rank)
         local colHp = 4000.0 + 3000.0 * (rank - 1) + str * 2.5
         if rank == 3 then colHp = 11000.0 + str * 2.5 end
 
-        SetUnitState(colossus, UNIT_STATE_MAX_LIFE, colHp)
+        if BlzSetUnitMaxHP then BlzSetUnitMaxHP(colossus, colHp) end SetUnitState(colossus, UNIT_STATE_MAX_LIFE, colHp)
         SetUnitState(colossus, UNIT_STATE_LIFE, colHp)
 
         UnitApplyTimedLife(colossus, FourCC('BTLF'), 25.0)
@@ -2637,6 +2639,287 @@ function Arena_Druid_R(caster, rank)
             DestroyGroup(sg)
         end)
     end
+end
+
+function Arena_Lich_ExplodeSkeleton(skel, caster, rank)
+    if skel == nil or GetWidgetLife(skel) <= 0.405 then return end
+
+    local sx, sy = GetUnitX(skel), GetUnitY(skel)
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Undead/CorpseExplode/CorpseExplodeTarget.mdl", sx, sy))
+
+    local pInt = GetHeroInt(caster, true)
+    local expDmg = 100.0 + 70.0 * (rank - 1) + pInt * 0.5
+    if rank == 3 then expDmg = 240.0 + pInt * 0.5 end
+    if rank >= 4 then expDmg = 310.0 + pInt * 0.5 end
+
+    local p = GetOwningPlayer(caster)
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, sx, sy, 250.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, p) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(caster, u, expDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/PlagueCloud/PlagueCloudCaster.mdl", u, "chest"))
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+
+    SetWidgetLife(skel, 0.0)
+end
+
+function Arena_Lich_Q(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local tx = GetSpellTargetX()
+    local ty = GetSpellTargetY()
+    if tx == 0.0 and ty == 0.0 then
+        tx = GetUnitX(caster)
+        ty = GetUnitY(caster)
+    end
+
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Undead/AnimateDead/AnimateDeadTarget.mdl", tx, ty))
+
+    local pInt = GetHeroInt(caster, true)
+    local qDmg = 120.0 + 80.0 * (rank - 1) + pInt * 0.9
+    if rank == 3 then qDmg = 280.0 + pInt * 0.9 end
+    if rank >= 4 then qDmg = 360.0 + pInt * 0.9 end
+
+    local p = GetOwningPlayer(caster)
+    local cid = GetHandleId(caster)
+    if not LichSkeletons[cid] then LichSkeletons[cid] = {} end
+
+    local killedCount = 0
+    local hitBossOrElite = false
+
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, tx, ty, 350.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, p) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(caster, u, qDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/DarkRitual/DarkRitualCaster.mdl", u, "origin"))
+
+            if GetWidgetLife(u) <= 0.405 then
+                killedCount = killedCount + 1
+            end
+            if udg_Boss ~= nil and u == udg_Boss then
+                hitBossOrElite = true
+            end
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+
+    local skelHp = 350.0 + 250.0 * (rank - 1) + pInt * 0.6
+    if rank == 3 then skelHp = 950.0 + pInt * 0.6 end
+    if rank >= 4 then skelHp = 1400.0 + pInt * 0.6 end
+
+    local skelSpawnCount = killedCount
+    if hitBossOrElite or skelSpawnCount == 0 then
+        skelSpawnCount = 1 + rank -- 2, 3, 4, 5 skeletons
+    end
+
+    for i = 1, skelSpawnCount do
+        local rx = tx + GetRandomReal(-100.0, 100.0)
+        local ry = ty + GetRandomReal(-100.0, 100.0)
+        local skel = CreateUnit(p, FourCC('uske'), rx, ry, GetRandomReal(0, 360))
+        if skel == nil then skel = CreateUnit(p, FourCC('uskr'), rx, ry, GetRandomReal(0, 360)) end
+
+        if BlzSetUnitMaxHP then BlzSetUnitMaxHP(skel, skelHp) end SetUnitState(skel, UNIT_STATE_MAX_LIFE, skelHp)
+        SetUnitState(skel, UNIT_STATE_LIFE, skelHp)
+
+        UnitApplyTimedLife(skel, FourCC('BTLF'), 25.0)
+        table.insert(LichSkeletons[cid], skel)
+        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/RaiseDead/RaiseDeadTarget.mdl", skel, "origin"))
+    end
+end
+
+function Arena_Lich_W(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cid = GetHandleId(caster)
+    if LichRevenant[cid] ~= nil and GetWidgetLife(LichRevenant[cid]) > 0.405 then
+        SetWidgetLife(LichRevenant[cid], 0.0)
+    end
+
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    local facing = GetUnitFacing(caster) * (math.pi / 180.0)
+    local spawnX = cx + math.cos(facing) * 150.0
+    local spawnY = cy + math.sin(facing) * 150.0
+
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Undead/FrostArmor/FrostArmorTarget.mdl", spawnX, spawnY))
+
+    local p = GetOwningPlayer(caster)
+    local rev = CreateUnit(p, FourCC('ukob'), spawnX, spawnY, GetUnitFacing(caster)) -- Frostbone Revenant / Golem
+    if rev == nil then rev = CreateUnit(p, FourCC('ugol'), spawnX, spawnY, GetUnitFacing(caster)) end
+
+    local pInt = GetHeroInt(caster, true)
+    local revHp = 1200.0 + 1000.0 * (rank - 1) + pInt * 1.5
+    if rank == 3 then revHp = 3500.0 + pInt * 1.5 end
+    if rank >= 4 then revHp = 5000.0 + pInt * 1.5 end
+
+    if BlzSetUnitMaxHP then BlzSetUnitMaxHP(rev, revHp) end SetUnitState(rev, UNIT_STATE_MAX_LIFE, revHp)
+    SetUnitState(rev, UNIT_STATE_LIFE, revHp)
+
+    UnitApplyTimedLife(rev, FourCC('BTLF'), 35.0)
+    LichRevenant[cid] = rev
+
+    local auraTimer = CreateTimer()
+    TimerStart(auraTimer, 2.0, true, function()
+        if rev == nil or GetWidgetLife(rev) <= 0.405 then
+            DestroyTimer(auraTimer)
+            return
+        end
+        local rx, ry = GetUnitX(rev), GetUnitY(rev)
+        DestroyEffect(AddSpecialEffect("Abilities/Spells/Undead/FreezingBreath/FreezingBreathTarget.mdl", rx, ry))
+
+        local g = CreateGroup()
+        GroupEnumUnitsInRange(g, rx, ry, 350.0, nil)
+        local u = FirstOfGroup(g)
+        while u ~= nil do
+            GroupRemoveUnit(g, u)
+            if IsUnitEnemy(u, p) and GetWidgetLife(u) > 0.405 then
+                UnitDamageTarget(rev, u, 50.0 + pInt * 0.2, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_COLD, WEAPON_TYPE_WHOKNOWS)
+                UnitAddAbility(u, FourCC('Aslow'))
+            end
+            u = FirstOfGroup(g)
+        end
+        DestroyGroup(g)
+    end)
+
+    local shardTimer = CreateTimer()
+    TimerStart(shardTimer, 6.0, true, function()
+        if rev == nil or GetWidgetLife(rev) <= 0.405 then
+            DestroyTimer(shardTimer)
+            return
+        end
+        local rx, ry = GetUnitX(rev), GetUnitY(rev)
+        local g = CreateGroup()
+        GroupEnumUnitsInRange(g, rx, ry, 500.0, nil)
+        local u = FirstOfGroup(g)
+        while u ~= nil do
+            GroupRemoveUnit(g, u)
+            if IsUnitEnemy(u, p) and GetWidgetLife(u) > 0.405 then
+                UnitDamageTarget(rev, u, 150.0 + pInt * 0.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_COLD, WEAPON_TYPE_WHOKNOWS)
+                PauseUnit(u, true)
+                UnitAddAbility(u, FourCC('ACrf'))
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/FrostNova/FrostNovaTarget.mdl", u, "overhead"))
+
+                local tu = u
+                local stTimer = CreateTimer()
+                TimerStart(stTimer, 1.5, false, function()
+                    if GetWidgetLife(tu) > 0.405 then PauseUnit(tu, false) end
+                    DestroyTimer(stTimer)
+                end)
+                break
+            end
+            tu = FirstOfGroup(g)
+        end
+        DestroyGroup(g)
+    end)
+end
+
+function Arena_Lich_E(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cid = GetHandleId(caster)
+    local skels = LichSkeletons[cid] or {}
+
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    local explodedCount = 0
+
+    for i = #skels, 1, -1 do
+        local skel = skels[i]
+        if skel ~= nil and GetWidgetLife(skel) > 0.405 then
+            local sx, sy = GetUnitX(skel), GetUnitY(skel)
+            local dist = math.sqrt((sx - cx)^2 + (sy - cy)^2)
+            if dist <= 700.0 then
+                Arena_Lich_ExplodeSkeleton(skel, caster, rank)
+                explodedCount = explodedCount + 1
+                table.remove(skels, i)
+            end
+        end
+    end
+
+    if explodedCount > 0 then
+        local maxMp = GetUnitState(caster, UNIT_STATE_MAX_MANA)
+        local curMp = GetUnitState(caster, UNIT_STATE_MANA)
+        SetUnitState(caster, UNIT_STATE_MANA, math.min(maxMp, curMp + maxMp * 0.05 * explodedCount))
+
+        local maxHp = GetUnitState(caster, UNIT_STATE_MAX_LIFE)
+        local curHp = GetUnitState(caster, UNIT_STATE_LIFE)
+        SetUnitState(caster, UNIT_STATE_LIFE, math.min(maxHp, curHp + maxHp * 0.04 * explodedCount))
+
+        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/DarkRitual/DarkRitualCaster.mdl", caster, "origin"))
+        DisplayTimedTextToPlayer(GetOwningPlayer(caster), 0, 0, 4.0, "|cff00ff00[ЧУМНАЯ ДЕТОНАЦИЯ]:|r Взорвано " .. explodedCount .. " скелетов! Восполнено MP и HP.")
+    end
+end
+
+function Arena_Lich_R(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cid = GetHandleId(caster)
+    if LichWyrm[cid] ~= nil and GetWidgetLife(LichWyrm[cid]) > 0.405 then
+        SetWidgetLife(LichWyrm[cid], 0.0)
+    end
+
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Undead/FreezingBreath/FreezingBreathTarget.mdl", cx, cy))
+
+    local p = GetOwningPlayer(caster)
+    local wyrm = CreateUnit(p, FourCC('ufro'), cx, cy, GetUnitFacing(caster)) -- Frost Wyrm
+    if wyrm == nil then wyrm = CreateUnit(p, FourCC('udread'), cx, cy, GetUnitFacing(caster)) end
+
+    local pInt = GetHeroInt(caster, true)
+    local wyrmHp = 5000.0 + 3000.0 * (rank - 1) + pInt * 3.0
+    if rank == 3 then wyrmHp = 11000.0 + pInt * 3.0 end
+
+    if BlzSetUnitMaxHP then BlzSetUnitMaxHP(wyrm, wyrmHp) end SetUnitState(wyrm, UNIT_STATE_MAX_LIFE, wyrmHp)
+    SetUnitState(wyrm, UNIT_STATE_LIFE, wyrmHp)
+
+    UnitApplyTimedLife(wyrm, FourCC('BTLF'), 25.0)
+    LichWyrm[cid] = wyrm
+
+    local breathTimer = CreateTimer()
+    TimerStart(breathTimer, 4.0, true, function()
+        if wyrm == nil or GetWidgetLife(wyrm) <= 0.405 then
+            DestroyTimer(breathTimer)
+            return
+        end
+        local wx, wy = GetUnitX(wyrm), GetUnitY(wyrm)
+        DestroyEffect(AddSpecialEffect("Abilities/Spells/Undead/FreezingBreath/FreezingBreathTarget.mdl", wx, wy))
+
+        local breathDmg = 600.0 + 400.0 * (rank - 1) + pInt * 2.0
+        if rank == 3 then breathDmg = 1500.0 + pInt * 2.0 end
+
+        local g = CreateGroup()
+        GroupEnumUnitsInRange(g, wx, wy, 550.0, nil)
+        local u = FirstOfGroup(g)
+        while u ~= nil do
+            GroupRemoveUnit(g, u)
+            if IsUnitEnemy(u, p) and GetWidgetLife(u) > 0.405 then
+                if udg_Boss ~= nil and u == udg_Boss then
+                    UnitDamageTarget(wyrm, u, breathDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_UNIVERSAL, WEAPON_TYPE_WHOKNOWS)
+                    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/FrostNova/FrostNovaTarget.mdl", u, "chest"))
+                else
+                    PauseUnit(u, true)
+                    UnitDamageTarget(wyrm, u, breathDmg * 0.6, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_COLD, WEAPON_TYPE_WHOKNOWS)
+                    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/FreezingBreath/FreezingBreathTarget.mdl", u, "origin"))
+                    local tu = u
+                    local fTimer = CreateTimer()
+                    TimerStart(fTimer, 2.5, false, function()
+                        if GetWidgetLife(tu) > 0.405 then PauseUnit(tu, false) end
+                        DestroyTimer(fTimer)
+                    end)
+                end
+            end
+            u = FirstOfGroup(g)
+        end
+        DestroyGroup(g)
+    end)
 end
 
 function Arena_InitBombardierSystem()
