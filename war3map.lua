@@ -792,16 +792,14 @@ function Arena_TryStartWaves()
     if udg_WavesStarted then
         return
     end
-    udg_HumanCount = Arena_CountHumans()
     local pickedCount = Arena_CountPickedHumans()
-    if pickedCount < udg_HumanCount or pickedCount == 0 then
-        return
+    if pickedCount > 0 then
+        udg_WavesStarted = true
+        TimerStart(udg_WaveTimer, 15.00, false, Trig_Wave_Actions)
+        TimerDialogSetTitle(udg_WaveTD, "Волна 1")
+        TimerDialogDisplay(udg_WaveTD, true)
+        Arena_Msg("Герой выбран! Первая волна через 15 секунд. Покупайте предметы в лавках!")
     end
-    udg_WavesStarted = true
-    TimerStart(udg_WaveTimer, 15.00, false, Trig_Wave_Actions)
-    TimerDialogSetTitle(udg_WaveTD, "Волна 1")
-    TimerDialogDisplay(udg_WaveTD, true)
-    Arena_Msg("Все герои выбраны. Первая волна через 15 сек. Магазины по углам центра.")
 end
 
 function Arena_SpawnBoss()
