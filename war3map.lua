@@ -14,6 +14,8 @@ function InitGlobals()
     RoninParryState = {}
     RoninCleaveTimer = {}
     ColossusDamageTaken = {}
+    PriestessCoronaShield = {}
+    PriestessSunState = {}
     
     -- Глобальные переменные волн
     udg_Wave = 0
@@ -44,8 +46,8 @@ function InitGlobals()
         { id = FourCC('Edem'), name = "Токсиколог (Интеллект / ДоТ)",    role = "dot_control", spells = {FourCC('A109'), FourCC('A10A'), FourCC('A10L'), FourCC('A10M')} },
         -- 6. Мастер Клинка / Ронин (Ловкость / Керри Ближнего Боя)
         { id = FourCC('Hmkg'), name = "Мастер Клинка-Ронин (Ловкость / Керри)", role = "carry", spells = {FourCC('A115'), FourCC('A116'), FourCC('A117'), FourCC('A118')} },
-        -- 7. Жрица Солнца (Интеллект / Саппорт-Хилер)
-        { id = FourCC('Emoo'), name = "Жрица Солнца (Интеллект / Хилер)", role = "healer",   spells = {FourCC('A10B'), FourCC('A10C'), FourCC('A10N'), FourCC('A10O')} },
+        -- 7. Жрица Рассвета (Интеллект / Боевой Саппорт, Защитник и Баффер)
+        { id = FourCC('Emoo'), name = "Жрица Рассвета (Интеллект / Боевой Саппорт)", role = "healer", spells = {FourCC('A10B'), FourCC('A10C'), FourCC('A10N'), FourCC('A10O')} },
         -- 8. Инженер-Бомбардир (Ловкость / Осада и Зонинг)
         { id = FourCC('Nalc'), name = "Инженер-Бомбардир (Ловкость / Осада)", role = "siege",  spells = {FourCC('A111'), FourCC('A112'), FourCC('A113'), FourCC('A114')} },
         -- 9. Железный Исполин (Сила / Главный Танк, Инициатор и Стяжка)
@@ -232,16 +234,16 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
             Arena_CustomArea(caster, 600.0, amount * 5.0, false)
         end
 
-    -- 7. Жрица Солнца (Интеллект / Саппорт-Хилер)
+    -- 7. Жрица Рассвета (Интеллект / Боевой Саппорт, Защитник и Баффер)
     elseif role == 7 then
-        if spellId == FourCC('A10B') then -- Q: Благодать Света (Лечение/урон)
-            Arena_CustomArea(caster, 400.0, amount * 1.8, true)
-        elseif spellId == FourCC('A10C') then -- W: Очищающее Сияние (Снятие негатива + ускорение)
-            Arena_ItemPulses(caster, amount * 1.5, amount * 1.0)
-        elseif spellId == FourCC('A10N') then -- E: Солнечная Аура (Регенерация маны/броня)
-            Arena_ItemPulses(caster, amount * 1.0, amount * 2.0)
-        elseif spellId == FourCC('A10O') then -- R: Восход (Солнечный свет + ослепление + хил)
-            Arena_CustomArea(caster, 800.0, amount * 3.5, true)
+        if spellId == FourCC('A10B') then -- Q: Луч Рассвета (Dawn Beam)
+            Arena_Priestess_Q(caster, rank)
+        elseif spellId == FourCC('A10C') then -- W: Очищающий Ореол / Сфера Света (Cleansing Corona)
+            Arena_Priestess_W(caster, rank)
+        elseif spellId == FourCC('A10N') then -- E: Солнечный Источник (Solar Font)
+            Arena_Priestess_E(caster, rank)
+        elseif spellId == FourCC('A10O') then -- R: Триумф Солнца: Новая Заря (Dawn Awakening)
+            Arena_Priestess_R(caster, rank)
         end
 
     -- 8. Инженер-Бомбардир (Ловкость / Осада и Зонинг)
@@ -1297,6 +1299,26 @@ function Arena_OnUnitAttack(attacker, target)
     if Heroes[pid] and Heroes[pid] == attacker then
         local kind = HeroKind[pid]
 
+        -- Priestess Sacred Flame Aura Bonus (role == 7)
+        local priestessAuraDmg = 0.0
+        for ppid = 0, 3 do
+            if Heroes[ppid] and GetWidgetLife(Heroes[ppid]) > 0.405 and HeroKind[ppid] == 7 then
+                local prHero = Heroes[ppid]
+                local rankE = GetUnitAbilityLevel(prHero, FourCC('A10N'))
+                if rankE > 0 then
+                    local distP = math.sqrt((GetUnitX(attacker) - GetUnitX(prHero))^2 + (GetUnitY(attacker) - GetUnitY(prHero))^2)
+                    if distP <= 900.0 then
+                        local prInt = GetHeroInt(prHero, true)
+                        priestessAuraDmg = priestessAuraDmg + (prInt * 0.10)
+                    end
+                end
+            end
+        end
+        if priestessAuraDmg > 0.0 then
+            UnitDamageTarget(attacker, target, priestessAuraDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_UNIVERSAL, WEAPON_TYPE_WHOKNOWS)
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/Resurrection/ResurrectionTarget.mdl", target, "origin"))
+        end
+
         -- Ronin Attack Handlers (role == 6)
         if kind == 6 then
             local rankE = GetUnitAbilityLevel(attacker, FourCC('A117'))
@@ -1734,7 +1756,7 @@ function Arena_Ronin_Q(caster, rank)
     elseif hitBoss then
         local t = CreateTimer()
         TimerStart(t, 0.1, false, function()
-            UnitStartCooldown(caster, FourCC('A115'), 4.0)
+            if BlzStartUnitAbilityCooldown then BlzStartUnitAbilityCooldown(caster, FourCC('A115'), 4.0) end
             DestroyTimer(t)
         end)
         DisplayTimedTextToPlayer(GetOwningPlayer(caster), 0, 0, 3.0, "|cffffcc00[ПОТОК КЛИНКА]:|r Кулдаун сокращен на 50%!")
@@ -2190,6 +2212,203 @@ function Arena_Colossus_R(caster, rank)
                 end
             end
         end
+    end)
+end
+
+function Arena_Priestess_Q(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    local tx, ty = GetSpellTargetX(), GetSpellTargetY()
+
+    local dx = tx - cx
+    local dy = ty - cy
+    local dist = math.sqrt(dx * dx + dy * dy)
+    local angle = GetUnitFacing(caster) * (math.pi / 180.0)
+    if dist > 10.0 then
+        angle = math.atan2(dy, dx)
+    end
+
+    local beamLen = 800.0
+    local endX = cx + math.cos(angle) * beamLen
+    local endY = cy + math.sin(angle) * beamLen
+
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/Resurrection/ResurrectionTarget.mdl", (cx + endX) * 0.5, (cy + endY) * 0.5))
+
+    local pInt = GetHeroInt(caster, true)
+    local baseAmount = 140.0 + 100.0 * (rank - 1) + pInt * 1.2
+    if rank == 3 then baseAmount = 360.0 + pInt * 1.2 end
+    if rank >= 4 then baseAmount = 500.0 + pInt * 1.2 end
+
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, (cx + endX) * 0.5, (cy + endY) * 0.5, 450.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if GetWidgetLife(u) > 0.405 then
+            if IsUnitAlly(u, GetOwningPlayer(caster)) then
+                local maxHp = GetUnitState(u, UNIT_STATE_MAX_LIFE)
+                local curHp = GetUnitState(u, UNIT_STATE_LIFE)
+                local missingHp = maxHp - curHp
+                local healVal = baseAmount + (missingHp * 0.04)
+                SetUnitState(u, UNIT_STATE_LIFE, math.min(maxHp, curHp + healVal))
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/Heal/HealTarget.mdl", u, "origin"))
+            elseif IsUnitEnemy(u, GetOwningPlayer(caster)) then
+                UnitDamageTarget(caster, u, baseAmount, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                UnitAddAbility(u, FourCC('Aslow'))
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/HolyBolt/HolyBoltSpecialArt.mdl", u, "origin"))
+            end
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+end
+
+function Arena_Priestess_W(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local target = GetSpellTargetUnit()
+    if target == nil then target = caster end
+
+    UnitRemoveAbility(target, FourCC('Ashs'))
+    UnitRemoveAbility(target, FourCC('ACrf'))
+    UnitRemoveAbility(target, FourCC('Aslow'))
+
+    local pInt = GetHeroInt(caster, true)
+    local shieldAmount = 300.0 + 250.0 * (rank - 1) + pInt * 1.5
+    if rank == 3 then shieldAmount = 800.0 + pInt * 1.5 end
+    if rank >= 4 then shieldAmount = 1100.0 + pInt * 1.5 end
+
+    local tid = GetHandleId(target)
+    PriestessCoronaShield[tid] = {
+        amount = shieldAmount,
+        target = target,
+        caster = caster,
+        rank = rank,
+        duration = 5.0
+    }
+
+    SetUnitMoveSpeed(target, GetUnitDefaultMoveSpeed(target) * 1.35)
+    local eff = AddSpecialEffectTarget("Abilities/Spells/Human/DivineShield/DivineShieldTarget.mdl", target, "origin")
+
+    local t = CreateTimer()
+    TimerStart(t, 5.0, false, function()
+        DestroyEffect(eff)
+        SetUnitMoveSpeed(target, GetUnitDefaultMoveSpeed(target))
+        local st = PriestessCoronaShield[tid]
+        if st ~= nil then
+            PriestessCoronaShield[tid] = nil
+            local tx, ty = GetUnitX(target), GetUnitY(target)
+            DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/ThunderClap/ThunderClapCaster.mdl", tx, ty))
+
+            local g = CreateGroup()
+            GroupEnumUnitsInRange(g, tx, ty, 300.0, nil)
+            local u = FirstOfGroup(g)
+            while u ~= nil do
+                GroupRemoveUnit(g, u)
+                if IsUnitEnemy(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+                    PauseUnit(u, true)
+                    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/Thunderclap/ThunderclapTarget.mdl", u, "overhead"))
+                    local tu = u
+                    local stt = CreateTimer()
+                    TimerStart(stt, 1.2, false, function()
+                        if GetWidgetLife(tu) > 0.405 then PauseUnit(tu, false) end
+                        DestroyTimer(stt)
+                    end)
+                end
+                u = FirstOfGroup(g)
+            end
+            DestroyGroup(g)
+        end
+        DestroyTimer(t)
+    end)
+end
+
+function Arena_Priestess_E(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local pInt = GetHeroInt(caster, true)
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/Resurrection/ResurrectionTarget.mdl", cx, cy))
+
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, cx, cy, 900.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitAlly(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            local curMp = GetUnitState(u, UNIT_STATE_MANA)
+            local maxMp = GetUnitState(u, UNIT_STATE_MAX_MANA)
+            SetUnitState(u, UNIT_STATE_MANA, math.min(maxMp, curMp + 50.0 + rank * 20.0))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Items/AIam/AIamTarget.mdl", u, "origin"))
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+end
+
+function Arena_Priestess_R(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    local sunEff = AddSpecialEffect("Abilities/Spells/Human/Avatar/AvatarCaster.mdl", cx, cy)
+
+    PriestessSunState = {
+        x = cx,
+        y = cy,
+        caster = caster,
+        rank = rank,
+        duration = 8.0,
+        cheatDeathUsed = false
+    }
+
+    local t = CreateTimer()
+    TimerStart(t, 1.0, true, function()
+        if PriestessSunState == nil or PriestessSunState.duration <= 0 then
+            DestroyEffect(sunEff)
+            PriestessSunState = nil
+            DestroyTimer(t)
+            return
+        end
+
+        PriestessSunState.duration = PriestessSunState.duration - 1.0
+        local pInt = GetHeroInt(caster, true)
+        local baseHeal = 150.0 + 100.0 * (rank - 1) + pInt * 0.5
+        if rank == 3 then baseHeal = 400.0 + pInt * 0.5 end
+
+        local g = CreateGroup()
+        GroupEnumUnitsInRange(g, cx, cy, 700.0, nil)
+        local u = FirstOfGroup(g)
+        while u ~= nil do
+            GroupRemoveUnit(g, u)
+            if GetWidgetLife(u) > 0.405 then
+                if IsUnitAlly(u, GetOwningPlayer(caster)) then
+                    local maxHp = GetUnitState(u, UNIT_STATE_MAX_LIFE)
+                    local curHp = GetUnitState(u, UNIT_STATE_LIFE)
+                    SetUnitState(u, UNIT_STATE_LIFE, math.min(maxHp, curHp + baseHeal + maxHp * 0.03))
+                    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/Heal/HealTarget.mdl", u, "origin"))
+
+                    if not PriestessSunState.cheatDeathUsed and curHp < maxHp * 0.15 then
+                        PriestessSunState.cheatDeathUsed = true
+                        SetUnitState(u, UNIT_STATE_LIFE, maxHp * 0.30)
+                        SetUnitInvulnerable(u, true)
+                        DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/DivineShield/DivineShieldTarget.mdl", u, "origin"))
+                        local tu = u
+                        local cdTimer = CreateTimer()
+                        TimerStart(cdTimer, 1.5, false, function()
+                            SetUnitInvulnerable(tu, false)
+                            DestroyTimer(cdTimer)
+                        end)
+                        DisplayTimedTextToPlayer(GetOwningPlayer(caster), 0, 0, 4.0, "|cff00ff00[СПАСЕНИЕ СОЛНЦА]:|r Союзник спасен от гибели!")
+                    end
+                elseif IsUnitEnemy(u, GetOwningPlayer(caster)) then
+                    UnitDamageTarget(caster, u, baseHeal * 0.75, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/HolyBolt/HolyBoltSpecialArt.mdl", u, "chest"))
+                end
+            end
+            u = FirstOfGroup(g)
+        end
+        DestroyGroup(g)
     end)
 end
 
