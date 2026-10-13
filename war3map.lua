@@ -475,8 +475,7 @@ function InitCustomTriggers()
         -- Показываем диалог игрокам
         for pid = 0, 3 do
             local p = Player(pid)
-            -- Проверяем: если игрок управляется человеком
-            if GetPlayerController(p) == MAP_CONTROL_USER then
+            if GetPlayerSlotState(p) == PLAYER_SLOT_STATE_PLAYING then
                 DialogDisplay(p, HeroDialog, true)
             end
         end
