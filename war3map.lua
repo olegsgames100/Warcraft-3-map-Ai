@@ -16,6 +16,8 @@ function InitGlobals()
     ColossusDamageTaken = {}
     PriestessCoronaShield = {}
     PriestessSunState = {}
+    DruidSummons = {}
+    DruidDeepwoodColossus = {}
     
     -- Глобальные переменные волн
     udg_Wave = 0
@@ -40,8 +42,8 @@ function InitGlobals()
         { id = FourCC('Obla'), name = "Призрачный Ловчий (Ловкость / Ассасин)", role = "assassin", spells = {FourCC('A103'), FourCC('A104'), FourCC('A10F'), FourCC('A10G')} },
         -- 3. Элементалист Бури (Интеллект / Маг)
         { id = FourCC('Hamg'), name = "Элементалист Бури (Интеллект / Маг)", role = "mage",     spells = {FourCC('A105'), FourCC('A106'), FourCC('A10H'), FourCC('A10I')} },
-        -- 4. Хозяин Стаи (Сила / Саммонер)
-        { id = FourCC('Udea'), name = "Хозяин Стаи (Сила / Саммонер)",   role = "summoner", spells = {FourCC('A107'), FourCC('A108'), FourCC('A10J'), FourCC('A10K')} },
+        -- 4. Хранитель Древней / Друид Первобытного Леса (Сила / Саммонер & Биомасса)
+        { id = FourCC('Udea'), name = "Хранитель Древней (Сила / Саммонер)", role = "summoner", spells = {FourCC('A107'), FourCC('A108'), FourCC('A10J'), FourCC('A10K')} },
         -- 5. Токсиколог (Интеллект / ДоТ & Контроль)
         { id = FourCC('Edem'), name = "Токсиколог (Интеллект / ДоТ)",    role = "dot_control", spells = {FourCC('A109'), FourCC('A10A'), FourCC('A10L'), FourCC('A10M')} },
         -- 6. Мастер Клинка / Ронин (Ловкость / Керри Ближнего Боя)
@@ -120,17 +122,16 @@ function Arena_CustomCast_Lua(caster, pid, spellId)
             Arena_CustomFinisher(caster, amount * 5.0)
         end
 
-    -- 4. Хозяин Стаи (Сила / Призыватель)
+    -- 4. Хранитель Древней / Друид Первобытного Леса (Сила / Саммонер & Биомасса)
     elseif role == 4 then
-        if spellId == FourCC('A107') then -- Q: Призыв Волков-Фантомов
-            Arena_CustomSummon(caster, FourCC('nska'), 2, 25.0)
-        elseif spellId == FourCC('A108') then -- W: Охотничий Клич (Усиление отряда)
-            Arena_ItemPulses(caster, amount * 1.2, 0)
-        elseif spellId == FourCC('A10J') then -- E: Дух Вожака (Аура восстановления HP)
-            Arena_ItemPulses(caster, amount * 1.8, 0)
-        elseif spellId == FourCC('A10K') then -- R: Гнев Природы (Форма Древнего Медведя + сплеш)
-            SetUnitState(caster, UNIT_STATE_LIFE, GetUnitState(caster, UNIT_STATE_LIFE) + amount * 4.0)
-            Arena_CustomArea(caster, 450.0, amount * 3.0, false)
+        if spellId == FourCC('A107') then -- Q: Пробуждение Древня-Защитника (Awaken Ironwood Treant)
+            Arena_Druid_Q(caster, rank)
+        elseif spellId == FourCC('A108') then -- W: Паразитические Споры / Рой Светляков (Spore Infestation)
+            Arena_Druid_W(caster, rank)
+        elseif spellId == FourCC('A10J') then -- E: Командный Симбиоз / Древесная Связь (Symbiotic Bond)
+            Arena_Druid_E(caster, rank)
+        elseif spellId == FourCC('A10K') then -- R: Первобытный Колосс: Аватар Леса (Colossus of the Deepwood)
+            Arena_Druid_R(caster, rank)
         end
 
     -- 6. Мастер Клинка / Ронин (Ловкость / Керри Ближнего Боя)
@@ -2410,6 +2411,232 @@ function Arena_Priestess_R(caster, rank)
         end
         DestroyGroup(g)
     end)
+end
+
+function Arena_Druid_Q(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    local facing = GetUnitFacing(caster) * (math.pi / 180.0)
+    local spawnX = cx + math.cos(facing) * 150.0
+    local spawnY = cy + math.sin(facing) * 150.0
+
+    local p = GetOwningPlayer(caster)
+    local treant = CreateUnit(p, FourCC('entc'), spawnX, spawnY, GetUnitFacing(caster)) -- Ironwood Treant
+    if treant == nil then
+        treant = CreateUnit(p, FourCC('eent'), spawnX, spawnY, GetUnitFacing(caster))
+    end
+
+    local maxHpCaster = GetUnitState(caster, UNIT_STATE_MAX_LIFE)
+    local str = GetHeroStr(caster, true)
+
+    local treantHp = 800.0 + 600.0 * (rank - 1) + maxHpCaster * 1.5
+    if rank == 3 then treantHp = 2200.0 + maxHpCaster * 1.5 end
+    if rank >= 4 then treantHp = 3200.0 + maxHpCaster * 1.5 end
+
+    SetUnitState(treant, UNIT_STATE_MAX_LIFE, treantHp)
+    SetUnitState(treant, UNIT_STATE_LIFE, treantHp)
+
+    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/NightElf/EntanglingRoots/EntanglingRootsTarget.mdl", treant, "origin"))
+
+    local cid = GetHandleId(caster)
+    if not DruidSummons[cid] then DruidSummons[cid] = {} end
+    table.insert(DruidSummons[cid], treant)
+
+    local autoTimer = CreateTimer()
+    TimerStart(autoTimer, 8.0, true, function()
+        if treant == nil or GetWidgetLife(treant) <= 0.405 then
+            DestroyTimer(autoTimer)
+            return
+        end
+
+        local tg = CreateGroup()
+        GroupEnumUnitsInRange(tg, GetUnitX(treant), GetUnitY(treant), 300.0, nil)
+        local tu = FirstOfGroup(tg)
+        while tu ~= nil do
+            GroupRemoveUnit(tg, tu)
+            if IsUnitEnemy(tu, p) and GetWidgetLife(tu) > 0.405 then
+                PauseUnit(tu, true)
+                DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/NightElf/EntanglingRoots/EntanglingRootsTarget.mdl", tu, "origin"))
+                local rootu = tu
+                local rtimer = CreateTimer()
+                TimerStart(rtimer, 2.5, false, function()
+                    if GetWidgetLife(rootu) > 0.405 then PauseUnit(rootu, false) end
+                    DestroyTimer(rtimer)
+                end)
+                break
+            end
+            tu = FirstOfGroup(tg)
+        end
+        DestroyGroup(tg)
+    end)
+end
+
+function Arena_Druid_W(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    local facing = GetUnitFacing(caster) * (math.pi / 180.0)
+
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/Other/HowlOfTerror/HowlTarget.mdl", cx, cy))
+
+    local str = GetHeroStr(caster, true)
+    local sporeDmg = 120.0 + 80.0 * (rank - 1) + str * 0.8
+    if rank == 3 then sporeDmg = 280.0 + str * 0.8 end
+    if rank >= 4 then sporeDmg = 360.0 + str * 0.8 end
+
+    local p = GetOwningPlayer(caster)
+    local cid = GetHandleId(caster)
+
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, cx + math.cos(facing) * 200.0, cy + math.sin(facing) * 200.0, 400.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitEnemy(u, p) and GetWidgetLife(u) > 0.405 then
+            UnitDamageTarget(caster, u, sporeDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Undead/PlagueCloud/PlagueCloudCaster.mdl", u, "overhead"))
+
+            if udg_Boss ~= nil and u == udg_Boss then
+                local bTimer = CreateTimer()
+                local bTicks = 0
+                TimerStart(bTimer, 2.0, true, function()
+                    bTicks = bTicks + 1
+                    if bTicks > 3 or GetWidgetLife(u) <= 0.405 then
+                        DestroyTimer(bTimer)
+                        return
+                    end
+                    local sapling = CreateUnit(p, FourCC('espv'), GetUnitX(u), GetUnitY(u), 0.0)
+                    if sapling == nil then sapling = CreateUnit(p, FourCC('ewsp'), GetUnitX(u), GetUnitY(u), 0.0) end
+                    UnitApplyTimedLife(sapling, FourCC('BTLF'), 12.0)
+                    if not DruidSummons[cid] then DruidSummons[cid] = {} end
+                    table.insert(DruidSummons[cid], sapling)
+                end)
+            else
+                local tu = u
+                local dTimer = CreateTimer()
+                TimerStart(dTimer, 0.5, true, function()
+                    if GetWidgetLife(tu) <= 0.405 then
+                        DestroyTimer(dTimer)
+                        local sapling = CreateUnit(p, FourCC('espv'), GetUnitX(tu), GetUnitY(tu), 0.0)
+                        if sapling == nil then sapling = CreateUnit(p, FourCC('ewsp'), GetUnitX(tu), GetUnitY(tu), 0.0) end
+                        UnitApplyTimedLife(sapling, FourCC('BTLF'), 12.0)
+                        if not DruidSummons[cid] then DruidSummons[cid] = {} end
+                        table.insert(DruidSummons[cid], sapling)
+                    end
+                end)
+            end
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+end
+
+function Arena_Druid_E(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cx, cy = GetUnitX(caster), GetUnitY(caster)
+    DestroyEffect(AddSpecialEffect("Abilities/Spells/NightElf/Tranquility/TranquilityTarget.mdl", cx, cy))
+
+    local hpPct = 0.10 + 0.05 * (rank - 1)
+    local maxHp = GetUnitState(caster, UNIT_STATE_MAX_LIFE)
+    SetUnitState(caster, UNIT_STATE_LIFE, math.min(maxHp, GetUnitState(caster, UNIT_STATE_LIFE) + maxHp * hpPct))
+
+    local g = CreateGroup()
+    GroupEnumUnitsInRange(g, cx, cy, 900.0, nil)
+    local u = FirstOfGroup(g)
+    while u ~= nil do
+        GroupRemoveUnit(g, u)
+        if IsUnitAlly(u, GetOwningPlayer(caster)) and GetWidgetLife(u) > 0.405 then
+            local uMaxHp = GetUnitState(u, UNIT_STATE_MAX_LIFE)
+            SetUnitState(u, UNIT_STATE_LIFE, math.min(uMaxHp, GetUnitState(u, UNIT_STATE_LIFE) + uMaxHp * 0.10))
+            DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/Heal/HealTarget.mdl", u, "origin"))
+        end
+        u = FirstOfGroup(g)
+    end
+    DestroyGroup(g)
+end
+
+function Arena_Druid_R(caster, rank)
+    if caster == nil or GetWidgetLife(caster) <= 0.405 then return end
+
+    local cid = GetHandleId(caster)
+    local activeCol = DruidDeepwoodColossus[cid]
+
+    if activeCol ~= nil and GetWidgetLife(activeCol) > 0.405 then
+        local bx, by = GetUnitX(activeCol), GetUnitY(activeCol)
+        DestroyEffect(AddSpecialEffect("Abilities/Spells/Other/NeutralExplode/NeutralExplode.mdl", bx, by))
+
+        local colMaxHp = GetUnitState(activeCol, UNIT_STATE_MAX_LIFE)
+        local explDmg = colMaxHp * 0.15
+
+        local g = CreateGroup()
+        GroupEnumUnitsInRange(g, bx, by, 550.0, nil)
+        local u = FirstOfGroup(g)
+        while u ~= nil do
+            GroupRemoveUnit(g, u)
+            if GetWidgetLife(u) > 0.405 then
+                if IsUnitEnemy(u, GetOwningPlayer(caster)) then
+                    UnitDamageTarget(caster, u, explDmg, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_UNIVERSAL, WEAPON_TYPE_WHOKNOWS)
+                elseif IsUnitAlly(u, GetOwningPlayer(caster)) then
+                    SetUnitState(u, UNIT_STATE_LIFE, GetUnitState(u, UNIT_STATE_MAX_LIFE))
+                    DestroyEffect(AddSpecialEffectTarget("Abilities/Spells/Human/Heal/HealTarget.mdl", u, "origin"))
+                end
+            end
+            u = FirstOfGroup(g)
+        end
+        DestroyGroup(g)
+
+        SetWidgetLife(activeCol, 0.0)
+        DruidDeepwoodColossus[cid] = nil
+        DisplayTimedTextToPlayer(GetOwningPlayer(caster), 0, 0, 4.0, "|cff00ff00[ЖАТВА]:|r Колосс взорван! Союзники полностью исцелены!")
+    else
+        local facing = GetUnitFacing(caster) * (math.pi / 180.0)
+        local cx = GetUnitX(caster) + math.cos(facing) * 250.0
+        local cy = GetUnitY(caster) + math.sin(facing) * 250.0
+
+        DestroyEffect(AddSpecialEffect("Abilities/Spells/Demon/Inferno/InfernoTarget.mdl", cx, cy))
+
+        local p = GetOwningPlayer(caster)
+        local colossus = CreateUnit(p, FourCC('etop'), cx, cy, GetUnitFacing(caster)) -- Deepwood Colossus / Ancient Protector
+        if colossus == nil then colossus = CreateUnit(p, FourCC('eanc'), cx, cy, GetUnitFacing(caster)) end
+
+        local str = GetHeroStr(caster, true)
+        local colHp = 4000.0 + 3000.0 * (rank - 1) + str * 2.5
+        if rank == 3 then colHp = 11000.0 + str * 2.5 end
+
+        SetUnitState(colossus, UNIT_STATE_MAX_LIFE, colHp)
+        SetUnitState(colossus, UNIT_STATE_LIFE, colHp)
+
+        UnitApplyTimedLife(colossus, FourCC('BTLF'), 25.0)
+        DruidDeepwoodColossus[cid] = colossus
+
+        if not DruidSummons[cid] then DruidSummons[cid] = {} end
+        table.insert(DruidSummons[cid], colossus)
+
+        local stompTimer = CreateTimer()
+        TimerStart(stompTimer, 6.0, true, function()
+            if colossus == nil or GetWidgetLife(colossus) <= 0.405 then
+                DestroyTimer(stompTimer)
+                return
+            end
+            local bx, by = GetUnitX(colossus), GetUnitY(colossus)
+            DestroyEffect(AddSpecialEffect("Abilities/Spells/Human/WarStomp/WarStompCaster.mdl", bx, by))
+
+            local sg = CreateGroup()
+            GroupEnumUnitsInRange(sg, bx, by, 500.0, nil)
+            local su = FirstOfGroup(sg)
+            while su ~= nil do
+                GroupRemoveUnit(sg, su)
+                if IsUnitEnemy(su, p) and GetWidgetLife(su) > 0.405 then
+                    UnitDamageTarget(colossus, su, 300.0 + str * 1.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                    UnitAddAbility(su, FourCC('Aslow'))
+                end
+                su = FirstOfGroup(sg)
+            end
+            DestroyGroup(sg)
+        end)
+    end
 end
 
 function Arena_InitBombardierSystem()
