@@ -22,3 +22,2063 @@ STRING 5
 {
 Игрок 4
 }
+
+STRING 6
+{
+Hero Arena
+}
+
+STRING 7
+{
+1-4
+}
+
+STRING 8
+{
+Coop hero arena: pick a hero, shops, 10 waves, boss. Fewer players = stronger map-wide auras.
+}
+
+STRING 9
+{
+Arena
+}
+
+STRING 10
+// Abilities: A101 (), Tip (Tooltip - Normal)
+{
+Клеймо света [Q]
+}
+
+STRING 11
+// Abilities: A101 (), Ubertip (Tooltip - Normal - Extended)
+{
+Луч по направлению взгляда отмечает врагов; попадания накапливают доблесть. |cff7acfffПерезарядка: 6.7 с|r. Мана: 26. Ранг 2/5.
+}
+
+STRING 12
+// Abilities: A101 (), Tip (Tooltip - Normal)
+{
+Клеймо света [Q]
+}
+
+STRING 13
+// Abilities: A101 (), Ubertip (Tooltip - Normal - Extended)
+{
+Луч по направлению взгляда отмечает врагов; попадания накапливают доблесть. |cff7acfffПерезарядка: 6.3 с|r. Мана: 29. Ранг 3/5.
+}
+
+STRING 14
+// Abilities: A101 (), Tip (Tooltip - Normal)
+{
+Клеймо света [Q]
+}
+
+STRING 15
+// Abilities: A101 (), Ubertip (Tooltip - Normal - Extended)
+{
+Луч по направлению взгляда отмечает врагов; попадания накапливают доблесть. |cff7acfffПерезарядка: 6.0 с|r. Мана: 32. Ранг 4/5.
+}
+
+STRING 16
+// Abilities: A101 (), Tip (Tooltip - Normal)
+{
+Клеймо света [Q]
+}
+
+STRING 17
+// Abilities: A101 (), Ubertip (Tooltip - Normal - Extended)
+{
+Луч по направлению взгляда отмечает врагов; попадания накапливают доблесть. |cff7acfffПерезарядка: 5.6 с|r. Мана: 35. Ранг 5/5.
+}
+
+STRING 18
+// Abilities: A102 (), Tip (Tooltip - Normal)
+{
+Купол клятвы [W]
+}
+
+STRING 19
+// Abilities: A102 (), Ubertip (Tooltip - Normal - Extended)
+{
+Создаёт святилище на 7 секунд: каждые полсекунды лечит союзников и помогает удерживать позицию. |cff7acfffПерезарядка: 13.7 с|r. Мана: 43. Ранг 2/5.
+}
+
+STRING 20
+// Abilities: A102 (), Tip (Tooltip - Normal)
+{
+Купол клятвы [W]
+}
+
+STRING 21
+// Abilities: A102 (), Ubertip (Tooltip - Normal - Extended)
+{
+Создаёт святилище на 7 секунд: каждые полсекунды лечит союзников и помогает удерживать позицию. |cff7acfffПерезарядка: 13.3 с|r. Мана: 46. Ранг 3/5.
+}
+
+STRING 22
+// Abilities: A102 (), Tip (Tooltip - Normal)
+{
+Купол клятвы [W]
+}
+
+STRING 23
+// Abilities: A102 (), Ubertip (Tooltip - Normal - Extended)
+{
+Создаёт святилище на 7 секунд: каждые полсекунды лечит союзников и помогает удерживать позицию. |cff7acfffПерезарядка: 12.9 с|r. Мана: 49. Ранг 4/5.
+}
+
+STRING 24
+// Abilities: A102 (), Tip (Tooltip - Normal)
+{
+Купол клятвы [W]
+}
+
+STRING 25
+// Abilities: A102 (), Ubertip (Tooltip - Normal - Extended)
+{
+Создаёт святилище на 7 секунд: каждые полсекунды лечит союзников и помогает удерживать позицию. |cff7acfffПерезарядка: 12.6 с|r. Мана: 52. Ранг 5/5.
+}
+
+STRING 26
+// Abilities: A103 (), Tip (Tooltip - Normal)
+{
+Песчаный рывок [Q]
+}
+
+STRING 27
+// Abilities: A103 (), Ubertip (Tooltip - Normal - Extended)
+{
+Пронзает врагов серией ударов при стремительном рывке. |cff7acfffПерезарядка: 6.7 с|r. Мана: 26. Ранг 2/5.
+}
+
+STRING 28
+// Abilities: A103 (), Tip (Tooltip - Normal)
+{
+Песчаный рывок [Q]
+}
+
+STRING 29
+// Abilities: A103 (), Ubertip (Tooltip - Normal - Extended)
+{
+Пронзает врагов серией ударов при стремительном рывке. |cff7acfffПерезарядка: 6.3 с|r. Мана: 29. Ранг 3/5.
+}
+
+STRING 30
+// Abilities: A103 (), Tip (Tooltip - Normal)
+{
+Песчаный рывок [Q]
+}
+
+STRING 31
+// Abilities: A103 (), Ubertip (Tooltip - Normal - Extended)
+{
+Пронзает врагов серией ударов при стремительном рывке. |cff7acfffПерезарядка: 6.0 с|r. Мана: 32. Ранг 4/5.
+}
+
+STRING 32
+// Abilities: A103 (), Tip (Tooltip - Normal)
+{
+Песчаный рывок [Q]
+}
+
+STRING 33
+// Abilities: A103 (), Ubertip (Tooltip - Normal - Extended)
+{
+Пронзает врагов серией ударов при стремительном рывке. |cff7acfffПерезарядка: 5.6 с|r. Мана: 35. Ранг 5/5.
+}
+
+STRING 34
+// Abilities: A104 (), Tip (Tooltip - Normal)
+{
+Рваные клинки [W]
+}
+
+STRING 35
+// Abilities: A104 (), Ubertip (Tooltip - Normal - Extended)
+{
+Оставляет смертоносные следы: враги в вихре получают периодический урон. |cff7acfffПерезарядка: 13.7 с|r. Мана: 43. Ранг 2/5.
+}
+
+STRING 36
+// Abilities: A104 (), Tip (Tooltip - Normal)
+{
+Рваные клинки [W]
+}
+
+STRING 37
+// Abilities: A104 (), Ubertip (Tooltip - Normal - Extended)
+{
+Оставляет смертоносные следы: враги в вихре получают периодический урон. |cff7acfffПерезарядка: 13.3 с|r. Мана: 46. Ранг 3/5.
+}
+
+STRING 38
+// Abilities: A104 (), Tip (Tooltip - Normal)
+{
+Рваные клинки [W]
+}
+
+STRING 39
+// Abilities: A104 (), Ubertip (Tooltip - Normal - Extended)
+{
+Оставляет смертоносные следы: враги в вихре получают периодический урон. |cff7acfffПерезарядка: 12.9 с|r. Мана: 49. Ранг 4/5.
+}
+
+STRING 40
+// Abilities: A104 (), Tip (Tooltip - Normal)
+{
+Рваные клинки [W]
+}
+
+STRING 41
+// Abilities: A104 (), Ubertip (Tooltip - Normal - Extended)
+{
+Оставляет смертоносные следы: враги в вихре получают периодический урон. |cff7acfffПерезарядка: 12.6 с|r. Мана: 52. Ранг 5/5.
+}
+
+STRING 42
+// Abilities: A105 (), Tip (Tooltip - Normal)
+{
+Цепной разряд [Q]
+}
+
+STRING 43
+// Abilities: A105 (), Ubertip (Tooltip - Normal - Extended)
+{
+Молния перепрыгивает между группами врагов и накапливает заряды шторма. |cff7acfffПерезарядка: 6.7 с|r. Мана: 31. Ранг 2/5.
+}
+
+STRING 44
+// Abilities: A105 (), Tip (Tooltip - Normal)
+{
+Цепной разряд [Q]
+}
+
+STRING 45
+// Abilities: A105 (), Ubertip (Tooltip - Normal - Extended)
+{
+Молния перепрыгивает между группами врагов и накапливает заряды шторма. |cff7acfffПерезарядка: 6.3 с|r. Мана: 34. Ранг 3/5.
+}
+
+STRING 46
+// Abilities: A105 (), Tip (Tooltip - Normal)
+{
+Цепной разряд [Q]
+}
+
+STRING 47
+// Abilities: A105 (), Ubertip (Tooltip - Normal - Extended)
+{
+Молния перепрыгивает между группами врагов и накапливает заряды шторма. |cff7acfffПерезарядка: 6.0 с|r. Мана: 37. Ранг 4/5.
+}
+
+STRING 48
+// Abilities: A105 (), Tip (Tooltip - Normal)
+{
+Цепной разряд [Q]
+}
+
+STRING 49
+// Abilities: A105 (), Ubertip (Tooltip - Normal - Extended)
+{
+Молния перепрыгивает между группами врагов и накапливает заряды шторма. |cff7acfffПерезарядка: 5.6 с|r. Мана: 40. Ранг 5/5.
+}
+
+STRING 50
+// Abilities: A106 (), Tip (Tooltip - Normal)
+{
+Грозовой столб [W]
+}
+
+STRING 51
+// Abilities: A106 (), Ubertip (Tooltip - Normal - Extended)
+{
+Длительное электрическое поле наносит урон стоящим в нём врагам. |cff7acfffПерезарядка: 15.7 с|r. Мана: 48. Ранг 2/5.
+}
+
+STRING 52
+// Abilities: A106 (), Tip (Tooltip - Normal)
+{
+Грозовой столб [W]
+}
+
+STRING 53
+// Abilities: A106 (), Ubertip (Tooltip - Normal - Extended)
+{
+Длительное электрическое поле наносит урон стоящим в нём врагам. |cff7acfffПерезарядка: 15.3 с|r. Мана: 51. Ранг 3/5.
+}
+
+STRING 54
+// Abilities: A106 (), Tip (Tooltip - Normal)
+{
+Грозовой столб [W]
+}
+
+STRING 55
+// Abilities: A106 (), Ubertip (Tooltip - Normal - Extended)
+{
+Длительное электрическое поле наносит урон стоящим в нём врагам. |cff7acfffПерезарядка: 14.9 с|r. Мана: 54. Ранг 4/5.
+}
+
+STRING 56
+// Abilities: A106 (), Tip (Tooltip - Normal)
+{
+Грозовой столб [W]
+}
+
+STRING 57
+// Abilities: A106 (), Ubertip (Tooltip - Normal - Extended)
+{
+Длительное электрическое поле наносит урон стоящим в нём врагам. |cff7acfffПерезарядка: 14.6 с|r. Мана: 57. Ранг 5/5.
+}
+
+STRING 58
+// Abilities: A107 (), Tip (Tooltip - Normal)
+{
+Печать погибели [Q]
+}
+
+STRING 59
+// Abilities: A107 (), Ubertip (Tooltip - Normal - Extended)
+{
+Помечает ближайшего врага проклятием. Добивание метки приносит душу. |cff7acfffПерезарядка: 6.7 с|r. Мана: 26. Ранг 2/5.
+}
+
+STRING 60
+// Abilities: A107 (), Tip (Tooltip - Normal)
+{
+Печать погибели [Q]
+}
+
+STRING 61
+// Abilities: A107 (), Ubertip (Tooltip - Normal - Extended)
+{
+Помечает ближайшего врага проклятием. Добивание метки приносит душу. |cff7acfffПерезарядка: 6.3 с|r. Мана: 29. Ранг 3/5.
+}
+
+STRING 62
+// Abilities: A107 (), Tip (Tooltip - Normal)
+{
+Печать погибели [Q]
+}
+
+STRING 63
+// Abilities: A107 (), Ubertip (Tooltip - Normal - Extended)
+{
+Помечает ближайшего врага проклятием. Добивание метки приносит душу. |cff7acfffПерезарядка: 6.0 с|r. Мана: 32. Ранг 4/5.
+}
+
+STRING 64
+// Abilities: A107 (), Tip (Tooltip - Normal)
+{
+Печать погибели [Q]
+}
+
+STRING 65
+// Abilities: A107 (), Ubertip (Tooltip - Normal - Extended)
+{
+Помечает ближайшего врага проклятием. Добивание метки приносит душу. |cff7acfffПерезарядка: 5.6 с|r. Мана: 35. Ранг 5/5.
+}
+
+STRING 66
+// Abilities: A108 (), Tip (Tooltip - Normal)
+{
+Костяной дозор [W]
+}
+
+STRING 67
+// Abilities: A108 (), Ubertip (Tooltip - Normal - Extended)
+{
+Призывает скелетов, временно защищающих своего господина. |cff7acfffПерезарядка: 13.7 с|r. Мана: 43. Ранг 2/5.
+}
+
+STRING 68
+// Abilities: A108 (), Tip (Tooltip - Normal)
+{
+Костяной дозор [W]
+}
+
+STRING 69
+// Abilities: A108 (), Ubertip (Tooltip - Normal - Extended)
+{
+Призывает скелетов, временно защищающих своего господина. |cff7acfffПерезарядка: 13.3 с|r. Мана: 46. Ранг 3/5.
+}
+
+STRING 70
+// Abilities: A108 (), Tip (Tooltip - Normal)
+{
+Костяной дозор [W]
+}
+
+STRING 71
+// Abilities: A108 (), Ubertip (Tooltip - Normal - Extended)
+{
+Призывает скелетов, временно защищающих своего господина. |cff7acfffПерезарядка: 12.9 с|r. Мана: 49. Ранг 4/5.
+}
+
+STRING 72
+// Abilities: A108 (), Tip (Tooltip - Normal)
+{
+Костяной дозор [W]
+}
+
+STRING 73
+// Abilities: A108 (), Ubertip (Tooltip - Normal - Extended)
+{
+Призывает скелетов, временно защищающих своего господина. |cff7acfffПерезарядка: 12.6 с|r. Мана: 52. Ранг 5/5.
+}
+
+STRING 74
+// Abilities: A109 (), Tip (Tooltip - Normal)
+{
+Разрез реальности [Q]
+}
+
+STRING 75
+// Abilities: A109 (), Ubertip (Tooltip - Normal - Extended)
+{
+Телепортационный рывок оставляет позади огненную полосу. |cff7acfffПерезарядка: 6.7 с|r. Мана: 26. Ранг 2/5.
+}
+
+STRING 76
+// Abilities: A109 (), Tip (Tooltip - Normal)
+{
+Разрез реальности [Q]
+}
+
+STRING 77
+// Abilities: A109 (), Ubertip (Tooltip - Normal - Extended)
+{
+Телепортационный рывок оставляет позади огненную полосу. |cff7acfffПерезарядка: 6.3 с|r. Мана: 29. Ранг 3/5.
+}
+
+STRING 78
+// Abilities: A109 (), Tip (Tooltip - Normal)
+{
+Разрез реальности [Q]
+}
+
+STRING 79
+// Abilities: A109 (), Ubertip (Tooltip - Normal - Extended)
+{
+Телепортационный рывок оставляет позади огненную полосу. |cff7acfffПерезарядка: 6.0 с|r. Мана: 32. Ранг 4/5.
+}
+
+STRING 80
+// Abilities: A109 (), Tip (Tooltip - Normal)
+{
+Разрез реальности [Q]
+}
+
+STRING 81
+// Abilities: A109 (), Ubertip (Tooltip - Normal - Extended)
+{
+Телепортационный рывок оставляет позади огненную полосу. |cff7acfffПерезарядка: 5.6 с|r. Мана: 35. Ранг 5/5.
+}
+
+STRING 82
+// Abilities: A10A (), Tip (Tooltip - Normal)
+{
+Выжечь разум [W]
+}
+
+STRING 83
+// Abilities: A10A (), Ubertip (Tooltip - Normal - Extended)
+{
+Сжигает ману врагов и восстанавливает здоровье и ярость героя. |cff7acfffПерезарядка: 13.7 с|r. Мана: 43. Ранг 2/5.
+}
+
+STRING 84
+// Abilities: A10A (), Tip (Tooltip - Normal)
+{
+Выжечь разум [W]
+}
+
+STRING 85
+// Abilities: A10A (), Ubertip (Tooltip - Normal - Extended)
+{
+Сжигает ману врагов и восстанавливает здоровье и ярость героя. |cff7acfffПерезарядка: 13.3 с|r. Мана: 46. Ранг 3/5.
+}
+
+STRING 86
+// Abilities: A10A (), Tip (Tooltip - Normal)
+{
+Выжечь разум [W]
+}
+
+STRING 87
+// Abilities: A10A (), Ubertip (Tooltip - Normal - Extended)
+{
+Сжигает ману врагов и восстанавливает здоровье и ярость героя. |cff7acfffПерезарядка: 12.9 с|r. Мана: 49. Ранг 4/5.
+}
+
+STRING 88
+// Abilities: A10A (), Tip (Tooltip - Normal)
+{
+Выжечь разум [W]
+}
+
+STRING 89
+// Abilities: A10A (), Ubertip (Tooltip - Normal - Extended)
+{
+Сжигает ману врагов и восстанавливает здоровье и ярость героя. |cff7acfffПерезарядка: 12.6 с|r. Мана: 52. Ранг 5/5.
+}
+
+STRING 90
+// Abilities: A10B (), Tip (Tooltip - Normal)
+{
+Серебряная стрела [Q]
+}
+
+STRING 91
+// Abilities: A10B (), Ubertip (Tooltip - Normal - Extended)
+{
+Пронзающая стрела поражает врагов на линии и лечит ближайшего союзника. |cff7acfffПерезарядка: 6.7 с|r. Мана: 26. Ранг 2/5.
+}
+
+STRING 92
+// Abilities: A10B (), Tip (Tooltip - Normal)
+{
+Серебряная стрела [Q]
+}
+
+STRING 93
+// Abilities: A10B (), Ubertip (Tooltip - Normal - Extended)
+{
+Пронзающая стрела поражает врагов на линии и лечит ближайшего союзника. |cff7acfffПерезарядка: 6.3 с|r. Мана: 29. Ранг 3/5.
+}
+
+STRING 94
+// Abilities: A10B (), Tip (Tooltip - Normal)
+{
+Серебряная стрела [Q]
+}
+
+STRING 95
+// Abilities: A10B (), Ubertip (Tooltip - Normal - Extended)
+{
+Пронзающая стрела поражает врагов на линии и лечит ближайшего союзника. |cff7acfffПерезарядка: 6.0 с|r. Мана: 32. Ранг 4/5.
+}
+
+STRING 96
+// Abilities: A10B (), Tip (Tooltip - Normal)
+{
+Серебряная стрела [Q]
+}
+
+STRING 97
+// Abilities: A10B (), Ubertip (Tooltip - Normal - Extended)
+{
+Пронзающая стрела поражает врагов на линии и лечит ближайшего союзника. |cff7acfffПерезарядка: 5.6 с|r. Мана: 35. Ранг 5/5.
+}
+
+STRING 98
+// Abilities: A10C (), Tip (Tooltip - Normal)
+{
+Священная роща [W]
+}
+
+STRING 99
+// Abilities: A10C (), Ubertip (Tooltip - Normal - Extended)
+{
+Разворачивает зону постоянного лечения и восстановления маны. |cff7acfffПерезарядка: 13.7 с|r. Мана: 43. Ранг 2/5.
+}
+
+STRING 100
+// Abilities: A10C (), Tip (Tooltip - Normal)
+{
+Священная роща [W]
+}
+
+STRING 101
+// Abilities: A10C (), Ubertip (Tooltip - Normal - Extended)
+{
+Разворачивает зону постоянного лечения и восстановления маны. |cff7acfffПерезарядка: 13.3 с|r. Мана: 46. Ранг 3/5.
+}
+
+STRING 102
+// Abilities: A10C (), Tip (Tooltip - Normal)
+{
+Священная роща [W]
+}
+
+STRING 103
+// Abilities: A10C (), Ubertip (Tooltip - Normal - Extended)
+{
+Разворачивает зону постоянного лечения и восстановления маны. |cff7acfffПерезарядка: 12.9 с|r. Мана: 49. Ранг 4/5.
+}
+
+STRING 104
+// Abilities: A10C (), Tip (Tooltip - Normal)
+{
+Священная роща [W]
+}
+
+STRING 105
+// Abilities: A10C (), Ubertip (Tooltip - Normal - Extended)
+{
+Разворачивает зону постоянного лечения и восстановления маны. |cff7acfffПерезарядка: 12.6 с|r. Мана: 52. Ранг 5/5.
+}
+
+STRING 106
+// Abilities: A201 (Покров движения), Name (Name)
+{
+Покров движения
+}
+
+STRING 107
+// Abilities: A201 (Покров движения), Tip (Tooltip - Normal)
+{
+Покров движения
+}
+
+STRING 108
+// Abilities: A201 (Покров движения), Tip (Tooltip - Normal)
+{
+Покров движения
+}
+
+STRING 109
+// Abilities: A201 (Покров движения), Tip (Tooltip - Normal)
+{
+Покров движения
+}
+
+STRING 110
+// Abilities: A201 (Покров движения), Ubertip (Tooltip - Normal - Extended)
+{
+Глобальная скорость атаки и бега (1–3 игрока).
+}
+
+STRING 111
+// Abilities: A201 (Покров движения), Ubertip (Tooltip - Normal - Extended)
+{
+Глобальная скорость атаки и бега (1–3 игрока).
+}
+
+STRING 112
+// Abilities: A201 (Покров движения), Ubertip (Tooltip - Normal - Extended)
+{
+Глобальная скорость атаки и бега (1–3 игрока).
+}
+
+STRING 113
+// Abilities: A202 (), Tip (Tooltip - Normal)
+{
+Покров возрождения
+}
+
+STRING 114
+// Abilities: A202 (), Tip (Tooltip - Normal)
+{
+Покров возрождения
+}
+
+STRING 115
+// Abilities: A202 (), Ubertip (Tooltip - Normal - Extended)
+{
+Глобальное восстановление здоровья (1–2 игрока).
+}
+
+STRING 116
+// Abilities: A202 (), Ubertip (Tooltip - Normal - Extended)
+{
+Глобальное восстановление здоровья (1–2 игрока).
+}
+
+STRING 117
+// Abilities: A203 (), Tip (Tooltip - Normal)
+{
+Покров непокорности
+}
+
+STRING 118
+// Abilities: A203 (), Tip (Tooltip - Normal)
+{
+Покров непокорности
+}
+
+STRING 119
+// Abilities: A203 (), Ubertip (Tooltip - Normal - Extended)
+{
+Глобальная дополнительная броня (только 1 игрок).
+}
+
+STRING 120
+// Abilities: A203 (), Ubertip (Tooltip - Normal - Extended)
+{
+Глобальная дополнительная броня (только 1 игрок).
+}
+
+STRING 121
+// Abilities: A204 (), Tip (Tooltip - Normal)
+{
+Покров ярости
+}
+
+STRING 122
+// Abilities: A204 (), Tip (Tooltip - Normal)
+{
+Покров ярости
+}
+
+STRING 123
+// Abilities: A204 (), Ubertip (Tooltip - Normal - Extended)
+{
+Глобальная дополнительная сила атаки (только 1 игрок).
+}
+
+STRING 124
+// Abilities: A204 (), Ubertip (Tooltip - Normal - Extended)
+{
+Глобальная дополнительная сила атаки (только 1 игрок).
+}
+
+STRING 125
+// Abilities: A10D (), Tip (Tooltip - Normal)
+{
+Перехват [E]
+}
+
+STRING 126
+// Abilities: A10D (), Ubertip (Tooltip - Normal - Extended)
+{
+Рывок к противникам, стягивание врагов и кратковременный личный щит. |cff7acfffПерезарядка: 16.6 с|r. Мана: 49. Ранг 2/5.
+}
+
+STRING 127
+// Abilities: A10D (), Tip (Tooltip - Normal)
+{
+Перехват [E]
+}
+
+STRING 128
+// Abilities: A10D (), Ubertip (Tooltip - Normal - Extended)
+{
+Рывок к противникам, стягивание врагов и кратковременный личный щит. |cff7acfffПерезарядка: 16.3 с|r. Мана: 52. Ранг 3/5.
+}
+
+STRING 129
+// Abilities: A10D (), Tip (Tooltip - Normal)
+{
+Перехват [E]
+}
+
+STRING 130
+// Abilities: A10D (), Ubertip (Tooltip - Normal - Extended)
+{
+Рывок к противникам, стягивание врагов и кратковременный личный щит. |cff7acfffПерезарядка: 15.9 с|r. Мана: 55. Ранг 4/5.
+}
+
+STRING 131
+// Abilities: A10D (), Tip (Tooltip - Normal)
+{
+Перехват [E]
+}
+
+STRING 132
+// Abilities: A10D (), Ubertip (Tooltip - Normal - Extended)
+{
+Рывок к противникам, стягивание врагов и кратковременный личный щит. |cff7acfffПерезарядка: 15.6 с|r. Мана: 58. Ранг 5/5.
+}
+
+STRING 133
+// Abilities: A10E (), Tip (Tooltip - Normal)
+{
+Последний рассвет [R]
+}
+
+STRING 134
+// Abilities: A10E (), Ubertip (Tooltip - Normal - Extended)
+{
+Массовое исцеление, воскрешение погибших союзников и мощная волна святого урона. |cff7acfffПерезарядка: 63.3 с|r. Мана: 116. Ранг 2/5.
+}
+
+STRING 135
+// Abilities: A10E (), Tip (Tooltip - Normal)
+{
+Последний рассвет [R]
+}
+
+STRING 136
+// Abilities: A10E (), Ubertip (Tooltip - Normal - Extended)
+{
+Массовое исцеление, воскрешение погибших союзников и мощная волна святого урона. |cff7acfffПерезарядка: 62.6 с|r. Мана: 119. Ранг 3/5.
+}
+
+STRING 137
+// Abilities: A10E (), Tip (Tooltip - Normal)
+{
+Последний рассвет [R]
+}
+
+STRING 138
+// Abilities: A10E (), Ubertip (Tooltip - Normal - Extended)
+{
+Массовое исцеление, воскрешение погибших союзников и мощная волна святого урона. |cff7acfffПерезарядка: 61.9 с|r. Мана: 122. Ранг 4/5.
+}
+
+STRING 139
+// Abilities: A10E (), Tip (Tooltip - Normal)
+{
+Последний рассвет [R]
+}
+
+STRING 140
+// Abilities: A10E (), Ubertip (Tooltip - Normal - Extended)
+{
+Массовое исцеление, воскрешение погибших союзников и мощная волна святого урона. |cff7acfffПерезарядка: 61.2 с|r. Мана: 125. Ранг 5/5.
+}
+
+STRING 141
+// Abilities: A10F (), Tip (Tooltip - Normal)
+{
+Миражи барханов [E]
+}
+
+STRING 142
+// Abilities: A10F (), Ubertip (Tooltip - Normal - Extended)
+{
+Призывает двух временных теневых бойцов, атакующих вместе с героем. |cff7acfffПерезарядка: 16.6 с|r. Мана: 49. Ранг 2/5.
+}
+
+STRING 143
+// Abilities: A10F (), Tip (Tooltip - Normal)
+{
+Миражи барханов [E]
+}
+
+STRING 144
+// Abilities: A10F (), Ubertip (Tooltip - Normal - Extended)
+{
+Призывает двух временных теневых бойцов, атакующих вместе с героем. |cff7acfffПерезарядка: 16.3 с|r. Мана: 52. Ранг 3/5.
+}
+
+STRING 145
+// Abilities: A10F (), Tip (Tooltip - Normal)
+{
+Миражи барханов [E]
+}
+
+STRING 146
+// Abilities: A10F (), Ubertip (Tooltip - Normal - Extended)
+{
+Призывает двух временных теневых бойцов, атакующих вместе с героем. |cff7acfffПерезарядка: 15.9 с|r. Мана: 55. Ранг 4/5.
+}
+
+STRING 147
+// Abilities: A10F (), Tip (Tooltip - Normal)
+{
+Миражи барханов [E]
+}
+
+STRING 148
+// Abilities: A10F (), Ubertip (Tooltip - Normal - Extended)
+{
+Призывает двух временных теневых бойцов, атакующих вместе с героем. |cff7acfffПерезарядка: 15.6 с|r. Мана: 58. Ранг 5/5.
+}
+
+STRING 149
+// Abilities: A10G (), Tip (Tooltip - Normal)
+{
+Буря тысячи лезвий [R]
+}
+
+STRING 150
+// Abilities: A10G (), Ubertip (Tooltip - Normal - Extended)
+{
+Запускает многократный вихрь вокруг героя; накопленные комбо усиливают урон. |cff7acfffПерезарядка: 51.3 с|r. Мана: 108. Ранг 2/5.
+}
+
+STRING 151
+// Abilities: A10G (), Tip (Tooltip - Normal)
+{
+Буря тысячи лезвий [R]
+}
+
+STRING 152
+// Abilities: A10G (), Ubertip (Tooltip - Normal - Extended)
+{
+Запускает многократный вихрь вокруг героя; накопленные комбо усиливают урон. |cff7acfffПерезарядка: 50.6 с|r. Мана: 111. Ранг 3/5.
+}
+
+STRING 153
+// Abilities: A10G (), Tip (Tooltip - Normal)
+{
+Буря тысячи лезвий [R]
+}
+
+STRING 154
+// Abilities: A10G (), Ubertip (Tooltip - Normal - Extended)
+{
+Запускает многократный вихрь вокруг героя; накопленные комбо усиливают урон. |cff7acfffПерезарядка: 49.9 с|r. Мана: 114. Ранг 4/5.
+}
+
+STRING 155
+// Abilities: A10G (), Tip (Tooltip - Normal)
+{
+Буря тысячи лезвий [R]
+}
+
+STRING 156
+// Abilities: A10G (), Ubertip (Tooltip - Normal - Extended)
+{
+Запускает многократный вихрь вокруг героя; накопленные комбо усиливают урон. |cff7acfffПерезарядка: 49.2 с|r. Мана: 117. Ранг 5/5.
+}
+
+STRING 157
+// Abilities: A10H (), Tip (Tooltip - Normal)
+{
+Магический контур [E]
+}
+
+STRING 158
+// Abilities: A10H (), Ubertip (Tooltip - Normal - Extended)
+{
+Превращает накопленные заряды в ману союзникам и локальный разряд. |cff7acfffПерезарядка: 16.6 с|r. Мана: 54. Ранг 2/5.
+}
+
+STRING 159
+// Abilities: A10H (), Tip (Tooltip - Normal)
+{
+Магический контур [E]
+}
+
+STRING 160
+// Abilities: A10H (), Ubertip (Tooltip - Normal - Extended)
+{
+Превращает накопленные заряды в ману союзникам и локальный разряд. |cff7acfffПерезарядка: 16.3 с|r. Мана: 57. Ранг 3/5.
+}
+
+STRING 161
+// Abilities: A10H (), Tip (Tooltip - Normal)
+{
+Магический контур [E]
+}
+
+STRING 162
+// Abilities: A10H (), Ubertip (Tooltip - Normal - Extended)
+{
+Превращает накопленные заряды в ману союзникам и локальный разряд. |cff7acfffПерезарядка: 15.9 с|r. Мана: 60. Ранг 4/5.
+}
+
+STRING 163
+// Abilities: A10H (), Tip (Tooltip - Normal)
+{
+Магический контур [E]
+}
+
+STRING 164
+// Abilities: A10H (), Ubertip (Tooltip - Normal - Extended)
+{
+Превращает накопленные заряды в ману союзникам и локальный разряд. |cff7acfffПерезарядка: 15.6 с|r. Мана: 63. Ранг 5/5.
+}
+
+STRING 165
+// Abilities: A10I (), Tip (Tooltip - Normal)
+{
+Штормовой катаклизм [R]
+}
+
+STRING 166
+// Abilities: A10I (), Ubertip (Tooltip - Normal - Extended)
+{
+Вызывает три последовательных грозовых удара по всей арене вокруг героя. |cff7acfffПерезарядка: 51.3 с|r. Мана: 113. Ранг 2/5.
+}
+
+STRING 167
+// Abilities: A10I (), Tip (Tooltip - Normal)
+{
+Штормовой катаклизм [R]
+}
+
+STRING 168
+// Abilities: A10I (), Ubertip (Tooltip - Normal - Extended)
+{
+Вызывает три последовательных грозовых удара по всей арене вокруг героя. |cff7acfffПерезарядка: 50.6 с|r. Мана: 116. Ранг 3/5.
+}
+
+STRING 169
+// Abilities: A10I (), Tip (Tooltip - Normal)
+{
+Штормовой катаклизм [R]
+}
+
+STRING 170
+// Abilities: A10I (), Ubertip (Tooltip - Normal - Extended)
+{
+Вызывает три последовательных грозовых удара по всей арене вокруг героя. |cff7acfffПерезарядка: 49.9 с|r. Мана: 119. Ранг 4/5.
+}
+
+STRING 171
+// Abilities: A10I (), Tip (Tooltip - Normal)
+{
+Штормовой катаклизм [R]
+}
+
+STRING 172
+// Abilities: A10I (), Ubertip (Tooltip - Normal - Extended)
+{
+Вызывает три последовательных грозовых удара по всей арене вокруг героя. |cff7acfffПерезарядка: 49.2 с|r. Мана: 122. Ранг 5/5.
+}
+
+STRING 173
+// Abilities: A10J (), Tip (Tooltip - Normal)
+{
+Жатва эссенции [E]
+}
+
+STRING 174
+// Abilities: A10J (), Ubertip (Tooltip - Normal - Extended)
+{
+Высасывает здоровье у окружающих врагов и накапливает души. |cff7acfffПерезарядка: 16.6 с|r. Мана: 49. Ранг 2/5.
+}
+
+STRING 175
+// Abilities: A10J (), Tip (Tooltip - Normal)
+{
+Жатва эссенции [E]
+}
+
+STRING 176
+// Abilities: A10J (), Ubertip (Tooltip - Normal - Extended)
+{
+Высасывает здоровье у окружающих врагов и накапливает души. |cff7acfffПерезарядка: 16.3 с|r. Мана: 52. Ранг 3/5.
+}
+
+STRING 177
+// Abilities: A10J (), Tip (Tooltip - Normal)
+{
+Жатва эссенции [E]
+}
+
+STRING 178
+// Abilities: A10J (), Ubertip (Tooltip - Normal - Extended)
+{
+Высасывает здоровье у окружающих врагов и накапливает души. |cff7acfffПерезарядка: 15.9 с|r. Мана: 55. Ранг 4/5.
+}
+
+STRING 179
+// Abilities: A10J (), Tip (Tooltip - Normal)
+{
+Жатва эссенции [E]
+}
+
+STRING 180
+// Abilities: A10J (), Ubertip (Tooltip - Normal - Extended)
+{
+Высасывает здоровье у окружающих врагов и накапливает души. |cff7acfffПерезарядка: 15.6 с|r. Мана: 58. Ранг 5/5.
+}
+
+STRING 181
+// Abilities: A10K (), Tip (Tooltip - Normal)
+{
+Чёрный легион [R]
+}
+
+STRING 182
+// Abilities: A10K (), Ubertip (Tooltip - Normal - Extended)
+{
+Тратит накопленные души, поднимая армию нежити с боевыми усилениями. |cff7acfffПерезарядка: 51.3 с|r. Мана: 108. Ранг 2/5.
+}
+
+STRING 183
+// Abilities: A10K (), Tip (Tooltip - Normal)
+{
+Чёрный легион [R]
+}
+
+STRING 184
+// Abilities: A10K (), Ubertip (Tooltip - Normal - Extended)
+{
+Тратит накопленные души, поднимая армию нежити с боевыми усилениями. |cff7acfffПерезарядка: 50.6 с|r. Мана: 111. Ранг 3/5.
+}
+
+STRING 185
+// Abilities: A10K (), Tip (Tooltip - Normal)
+{
+Чёрный легион [R]
+}
+
+STRING 186
+// Abilities: A10K (), Ubertip (Tooltip - Normal - Extended)
+{
+Тратит накопленные души, поднимая армию нежити с боевыми усилениями. |cff7acfffПерезарядка: 49.9 с|r. Мана: 114. Ранг 4/5.
+}
+
+STRING 187
+// Abilities: A10K (), Tip (Tooltip - Normal)
+{
+Чёрный легион [R]
+}
+
+STRING 188
+// Abilities: A10K (), Ubertip (Tooltip - Normal - Extended)
+{
+Тратит накопленные души, поднимая армию нежити с боевыми усилениями. |cff7acfffПерезарядка: 49.2 с|r. Мана: 117. Ранг 5/5.
+}
+
+STRING 189
+// Abilities: A10L (), Tip (Tooltip - Normal)
+{
+Фел-ловушка [E]
+}
+
+STRING 190
+// Abilities: A10L (), Ubertip (Tooltip - Normal - Extended)
+{
+Размещает руну, которая взрывается через несколько секунд. |cff7acfffПерезарядка: 16.6 с|r. Мана: 49. Ранг 2/5.
+}
+
+STRING 191
+// Abilities: A10L (), Tip (Tooltip - Normal)
+{
+Фел-ловушка [E]
+}
+
+STRING 192
+// Abilities: A10L (), Ubertip (Tooltip - Normal - Extended)
+{
+Размещает руну, которая взрывается через несколько секунд. |cff7acfffПерезарядка: 16.3 с|r. Мана: 52. Ранг 3/5.
+}
+
+STRING 193
+// Abilities: A10L (), Tip (Tooltip - Normal)
+{
+Фел-ловушка [E]
+}
+
+STRING 194
+// Abilities: A10L (), Ubertip (Tooltip - Normal - Extended)
+{
+Размещает руну, которая взрывается через несколько секунд. |cff7acfffПерезарядка: 15.9 с|r. Мана: 55. Ранг 4/5.
+}
+
+STRING 195
+// Abilities: A10L (), Tip (Tooltip - Normal)
+{
+Фел-ловушка [E]
+}
+
+STRING 196
+// Abilities: A10L (), Ubertip (Tooltip - Normal - Extended)
+{
+Размещает руну, которая взрывается через несколько секунд. |cff7acfffПерезарядка: 15.6 с|r. Мана: 58. Ранг 5/5.
+}
+
+STRING 197
+// Abilities: A10M (), Tip (Tooltip - Normal)
+{
+Владыка бездны [R]
+}
+
+STRING 198
+// Abilities: A10M (), Ubertip (Tooltip - Normal - Extended)
+{
+На 10 секунд превращает героя в живой источник периодических огненных взрывов. |cff7acfffПерезарядка: 51.3 с|r. Мана: 108. Ранг 2/5.
+}
+
+STRING 199
+// Abilities: A10M (), Tip (Tooltip - Normal)
+{
+Владыка бездны [R]
+}
+
+STRING 200
+// Abilities: A10M (), Ubertip (Tooltip - Normal - Extended)
+{
+На 10 секунд превращает героя в живой источник периодических огненных взрывов. |cff7acfffПерезарядка: 50.6 с|r. Мана: 111. Ранг 3/5.
+}
+
+STRING 201
+// Abilities: A10M (), Tip (Tooltip - Normal)
+{
+Владыка бездны [R]
+}
+
+STRING 202
+// Abilities: A10M (), Ubertip (Tooltip - Normal - Extended)
+{
+На 10 секунд превращает героя в живой источник периодических огненных взрывов. |cff7acfffПерезарядка: 49.9 с|r. Мана: 114. Ранг 4/5.
+}
+
+STRING 203
+// Abilities: A10M (), Tip (Tooltip - Normal)
+{
+Владыка бездны [R]
+}
+
+STRING 204
+// Abilities: A10M (), Ubertip (Tooltip - Normal - Extended)
+{
+На 10 секунд превращает героя в живой источник периодических огненных взрывов. |cff7acfffПерезарядка: 49.2 с|r. Мана: 117. Ранг 5/5.
+}
+
+STRING 205
+// Abilities: A10N (), Tip (Tooltip - Normal)
+{
+Плащ затмения [E]
+}
+
+STRING 206
+// Abilities: A10N (), Ubertip (Tooltip - Normal - Extended)
+{
+Краткая неуязвимость и скрытный уход из-под удара с поддержкой союзников. |cff7acfffПерезарядка: 16.6 с|r. Мана: 49. Ранг 2/5.
+}
+
+STRING 207
+// Abilities: A10N (), Tip (Tooltip - Normal)
+{
+Плащ затмения [E]
+}
+
+STRING 208
+// Abilities: A10N (), Ubertip (Tooltip - Normal - Extended)
+{
+Краткая неуязвимость и скрытный уход из-под удара с поддержкой союзников. |cff7acfffПерезарядка: 16.3 с|r. Мана: 52. Ранг 3/5.
+}
+
+STRING 209
+// Abilities: A10N (), Tip (Tooltip - Normal)
+{
+Плащ затмения [E]
+}
+
+STRING 210
+// Abilities: A10N (), Ubertip (Tooltip - Normal - Extended)
+{
+Краткая неуязвимость и скрытный уход из-под удара с поддержкой союзников. |cff7acfffПерезарядка: 15.9 с|r. Мана: 55. Ранг 4/5.
+}
+
+STRING 211
+// Abilities: A10N (), Tip (Tooltip - Normal)
+{
+Плащ затмения [E]
+}
+
+STRING 212
+// Abilities: A10N (), Ubertip (Tooltip - Normal - Extended)
+{
+Краткая неуязвимость и скрытный уход из-под удара с поддержкой союзников. |cff7acfffПерезарядка: 15.6 с|r. Мана: 58. Ранг 5/5.
+}
+
+STRING 213
+// Abilities: A10O (), Tip (Tooltip - Normal)
+{
+Падение созвездий [R]
+}
+
+STRING 214
+// Abilities: A10O (), Ubertip (Tooltip - Normal - Extended)
+{
+Многократный звёздный дождь обрушивается на врагов вокруг жрицы. |cff7acfffПерезарядка: 51.3 с|r. Мана: 108. Ранг 2/5.
+}
+
+STRING 215
+// Abilities: A10O (), Tip (Tooltip - Normal)
+{
+Падение созвездий [R]
+}
+
+STRING 216
+// Abilities: A10O (), Ubertip (Tooltip - Normal - Extended)
+{
+Многократный звёздный дождь обрушивается на врагов вокруг жрицы. |cff7acfffПерезарядка: 50.6 с|r. Мана: 111. Ранг 3/5.
+}
+
+STRING 217
+// Abilities: A10O (), Tip (Tooltip - Normal)
+{
+Падение созвездий [R]
+}
+
+STRING 218
+// Abilities: A10O (), Ubertip (Tooltip - Normal - Extended)
+{
+Многократный звёздный дождь обрушивается на врагов вокруг жрицы. |cff7acfffПерезарядка: 49.9 с|r. Мана: 114. Ранг 4/5.
+}
+
+STRING 219
+// Abilities: A10O (), Tip (Tooltip - Normal)
+{
+Падение созвездий [R]
+}
+
+STRING 220
+// Abilities: A10O (), Ubertip (Tooltip - Normal - Extended)
+{
+Многократный звёздный дождь обрушивается на врагов вокруг жрицы. |cff7acfffПерезарядка: 49.2 с|r. Мана: 117. Ранг 5/5.
+}
+
+STRING 221
+// Abilities: A111 (), Tip (Tooltip - Normal)
+{
+Гремучий флакон [Q]
+}
+
+STRING 222
+// Abilities: A111 (), Ubertip (Tooltip - Normal - Extended)
+{
+Бросает нестабильную смесь: через 2 секунды она взрывается. |cff7acfffПерезарядка: 6.7 с|r. Мана: 26. Ранг 2/5.
+}
+
+STRING 223
+// Abilities: A111 (), Tip (Tooltip - Normal)
+{
+Гремучий флакон [Q]
+}
+
+STRING 224
+// Abilities: A111 (), Ubertip (Tooltip - Normal - Extended)
+{
+Бросает нестабильную смесь: через 2 секунды она взрывается. |cff7acfffПерезарядка: 6.3 с|r. Мана: 29. Ранг 3/5.
+}
+
+STRING 225
+// Abilities: A111 (), Tip (Tooltip - Normal)
+{
+Гремучий флакон [Q]
+}
+
+STRING 226
+// Abilities: A111 (), Ubertip (Tooltip - Normal - Extended)
+{
+Бросает нестабильную смесь: через 2 секунды она взрывается. |cff7acfffПерезарядка: 6.0 с|r. Мана: 32. Ранг 4/5.
+}
+
+STRING 227
+// Abilities: A111 (), Tip (Tooltip - Normal)
+{
+Гремучий флакон [Q]
+}
+
+STRING 228
+// Abilities: A111 (), Ubertip (Tooltip - Normal - Extended)
+{
+Бросает нестабильную смесь: через 2 секунды она взрывается. |cff7acfffПерезарядка: 5.6 с|r. Мана: 35. Ранг 5/5.
+}
+
+STRING 229
+// Abilities: A112 (), Tip (Tooltip - Normal)
+{
+Кислотная воронка [W]
+}
+
+STRING 230
+// Abilities: A112 (), Ubertip (Tooltip - Normal - Extended)
+{
+Заливает землю кислотой и постоянно повреждает врагов. |cff7acfffПерезарядка: 15.7 с|r. Мана: 43. Ранг 2/5.
+}
+
+STRING 231
+// Abilities: A112 (), Tip (Tooltip - Normal)
+{
+Кислотная воронка [W]
+}
+
+STRING 232
+// Abilities: A112 (), Ubertip (Tooltip - Normal - Extended)
+{
+Заливает землю кислотой и постоянно повреждает врагов. |cff7acfffПерезарядка: 15.3 с|r. Мана: 46. Ранг 3/5.
+}
+
+STRING 233
+// Abilities: A112 (), Tip (Tooltip - Normal)
+{
+Кислотная воронка [W]
+}
+
+STRING 234
+// Abilities: A112 (), Ubertip (Tooltip - Normal - Extended)
+{
+Заливает землю кислотой и постоянно повреждает врагов. |cff7acfffПерезарядка: 14.9 с|r. Мана: 49. Ранг 4/5.
+}
+
+STRING 235
+// Abilities: A112 (), Tip (Tooltip - Normal)
+{
+Кислотная воронка [W]
+}
+
+STRING 236
+// Abilities: A112 (), Ubertip (Tooltip - Normal - Extended)
+{
+Заливает землю кислотой и постоянно повреждает врагов. |cff7acfffПерезарядка: 14.6 с|r. Мана: 52. Ранг 5/5.
+}
+
+STRING 237
+// Abilities: A113 (), Tip (Tooltip - Normal)
+{
+Жадная трансмутация [E]
+}
+
+STRING 238
+// Abilities: A113 (), Ubertip (Tooltip - Normal - Extended)
+{
+Перерабатывает жизненную силу противника в золото и лечение. |cff7acfffПерезарядка: 16.6 с|r. Мана: 49. Ранг 2/5.
+}
+
+STRING 239
+// Abilities: A113 (), Tip (Tooltip - Normal)
+{
+Жадная трансмутация [E]
+}
+
+STRING 240
+// Abilities: A113 (), Ubertip (Tooltip - Normal - Extended)
+{
+Перерабатывает жизненную силу противника в золото и лечение. |cff7acfffПерезарядка: 16.3 с|r. Мана: 52. Ранг 3/5.
+}
+
+STRING 241
+// Abilities: A113 (), Tip (Tooltip - Normal)
+{
+Жадная трансмутация [E]
+}
+
+STRING 242
+// Abilities: A113 (), Ubertip (Tooltip - Normal - Extended)
+{
+Перерабатывает жизненную силу противника в золото и лечение. |cff7acfffПерезарядка: 15.9 с|r. Мана: 55. Ранг 4/5.
+}
+
+STRING 243
+// Abilities: A113 (), Tip (Tooltip - Normal)
+{
+Жадная трансмутация [E]
+}
+
+STRING 244
+// Abilities: A113 (), Ubertip (Tooltip - Normal - Extended)
+{
+Перерабатывает жизненную силу противника в золото и лечение. |cff7acfffПерезарядка: 15.6 с|r. Мана: 58. Ранг 5/5.
+}
+
+STRING 245
+// Abilities: A114 (), Tip (Tooltip - Normal)
+{
+Философский эликсир [R]
+}
+
+STRING 246
+// Abilities: A114 (), Ubertip (Tooltip - Normal - Extended)
+{
+Активирует алхимический реактор, периодически лечащий союзников и поджигающий врагов. |cff7acfffПерезарядка: 51.3 с|r. Мана: 108. Ранг 2/5.
+}
+
+STRING 247
+// Abilities: A114 (), Tip (Tooltip - Normal)
+{
+Философский эликсир [R]
+}
+
+STRING 248
+// Abilities: A114 (), Ubertip (Tooltip - Normal - Extended)
+{
+Активирует алхимический реактор, периодически лечащий союзников и поджигающий врагов. |cff7acfffПерезарядка: 50.6 с|r. Мана: 111. Ранг 3/5.
+}
+
+STRING 249
+// Abilities: A114 (), Tip (Tooltip - Normal)
+{
+Философский эликсир [R]
+}
+
+STRING 250
+// Abilities: A114 (), Ubertip (Tooltip - Normal - Extended)
+{
+Активирует алхимический реактор, периодически лечащий союзников и поджигающий врагов. |cff7acfffПерезарядка: 49.9 с|r. Мана: 114. Ранг 4/5.
+}
+
+STRING 251
+// Abilities: A114 (), Tip (Tooltip - Normal)
+{
+Философский эликсир [R]
+}
+
+STRING 252
+// Abilities: A114 (), Ubertip (Tooltip - Normal - Extended)
+{
+Активирует алхимический реактор, периодически лечащий союзников и поджигающий врагов. |cff7acfffПерезарядка: 49.2 с|r. Мана: 117. Ранг 5/5.
+}
+
+STRING 253
+// Abilities: A115 (), Tip (Tooltip - Normal)
+{
+Раскол земной коры [Q]
+}
+
+STRING 254
+// Abilities: A115 (), Ubertip (Tooltip - Normal - Extended)
+{
+Продольная ударная волна пробивает строй врагов. |cff7acfffПерезарядка: 6.7 с|r. Мана: 26. Ранг 2/5.
+}
+
+STRING 255
+// Abilities: A115 (), Tip (Tooltip - Normal)
+{
+Раскол земной коры [Q]
+}
+
+STRING 256
+// Abilities: A115 (), Ubertip (Tooltip - Normal - Extended)
+{
+Продольная ударная волна пробивает строй врагов. |cff7acfffПерезарядка: 6.3 с|r. Мана: 29. Ранг 3/5.
+}
+
+STRING 257
+// Abilities: A115 (), Tip (Tooltip - Normal)
+{
+Раскол земной коры [Q]
+}
+
+STRING 258
+// Abilities: A115 (), Ubertip (Tooltip - Normal - Extended)
+{
+Продольная ударная волна пробивает строй врагов. |cff7acfffПерезарядка: 6.0 с|r. Мана: 32. Ранг 4/5.
+}
+
+STRING 259
+// Abilities: A115 (), Tip (Tooltip - Normal)
+{
+Раскол земной коры [Q]
+}
+
+STRING 260
+// Abilities: A115 (), Ubertip (Tooltip - Normal - Extended)
+{
+Продольная ударная волна пробивает строй врагов. |cff7acfffПерезарядка: 5.6 с|r. Мана: 35. Ранг 5/5.
+}
+
+STRING 261
+// Abilities: A116 (), Tip (Tooltip - Normal)
+{
+Магнитный кулак [W]
+}
+
+STRING 262
+// Abilities: A116 (), Ubertip (Tooltip - Normal - Extended)
+{
+Притягивает врагов с большого радиуса к своей позиции. |cff7acfffПерезарядка: 13.7 с|r. Мана: 43. Ранг 2/5.
+}
+
+STRING 263
+// Abilities: A116 (), Tip (Tooltip - Normal)
+{
+Магнитный кулак [W]
+}
+
+STRING 264
+// Abilities: A116 (), Ubertip (Tooltip - Normal - Extended)
+{
+Притягивает врагов с большого радиуса к своей позиции. |cff7acfffПерезарядка: 13.3 с|r. Мана: 46. Ранг 3/5.
+}
+
+STRING 265
+// Abilities: A116 (), Tip (Tooltip - Normal)
+{
+Магнитный кулак [W]
+}
+
+STRING 266
+// Abilities: A116 (), Ubertip (Tooltip - Normal - Extended)
+{
+Притягивает врагов с большого радиуса к своей позиции. |cff7acfffПерезарядка: 12.9 с|r. Мана: 49. Ранг 4/5.
+}
+
+STRING 267
+// Abilities: A116 (), Tip (Tooltip - Normal)
+{
+Магнитный кулак [W]
+}
+
+STRING 268
+// Abilities: A116 (), Ubertip (Tooltip - Normal - Extended)
+{
+Притягивает врагов с большого радиуса к своей позиции. |cff7acfffПерезарядка: 12.6 с|r. Мана: 52. Ранг 5/5.
+}
+
+STRING 269
+// Abilities: A117 (), Tip (Tooltip - Normal)
+{
+Гранитная твердыня [E]
+}
+
+STRING 270
+// Abilities: A117 (), Ubertip (Tooltip - Normal - Extended)
+{
+Краткая каменная неуязвимость и ответный урон в ближнем бою. |cff7acfffПерезарядка: 16.6 с|r. Мана: 49. Ранг 2/5.
+}
+
+STRING 271
+// Abilities: A117 (), Tip (Tooltip - Normal)
+{
+Гранитная твердыня [E]
+}
+
+STRING 272
+// Abilities: A117 (), Ubertip (Tooltip - Normal - Extended)
+{
+Краткая каменная неуязвимость и ответный урон в ближнем бою. |cff7acfffПерезарядка: 16.3 с|r. Мана: 52. Ранг 3/5.
+}
+
+STRING 273
+// Abilities: A117 (), Tip (Tooltip - Normal)
+{
+Гранитная твердыня [E]
+}
+
+STRING 274
+// Abilities: A117 (), Ubertip (Tooltip - Normal - Extended)
+{
+Краткая каменная неуязвимость и ответный урон в ближнем бою. |cff7acfffПерезарядка: 15.9 с|r. Мана: 55. Ранг 4/5.
+}
+
+STRING 275
+// Abilities: A117 (), Tip (Tooltip - Normal)
+{
+Гранитная твердыня [E]
+}
+
+STRING 276
+// Abilities: A117 (), Ubertip (Tooltip - Normal - Extended)
+{
+Краткая каменная неуязвимость и ответный урон в ближнем бою. |cff7acfffПерезарядка: 15.6 с|r. Мана: 58. Ранг 5/5.
+}
+
+STRING 277
+// Abilities: A118 (), Tip (Tooltip - Normal)
+{
+Гнев исполина [R]
+}
+
+STRING 278
+// Abilities: A118 (), Ubertip (Tooltip - Normal - Extended)
+{
+Серия разрушительных землетрясений с призывом горных стражей. |cff7acfffПерезарядка: 51.3 с|r. Мана: 108. Ранг 2/5.
+}
+
+STRING 279
+// Abilities: A118 (), Tip (Tooltip - Normal)
+{
+Гнев исполина [R]
+}
+
+STRING 280
+// Abilities: A118 (), Ubertip (Tooltip - Normal - Extended)
+{
+Серия разрушительных землетрясений с призывом горных стражей. |cff7acfffПерезарядка: 50.6 с|r. Мана: 111. Ранг 3/5.
+}
+
+STRING 281
+// Abilities: A118 (), Tip (Tooltip - Normal)
+{
+Гнев исполина [R]
+}
+
+STRING 282
+// Abilities: A118 (), Ubertip (Tooltip - Normal - Extended)
+{
+Серия разрушительных землетрясений с призывом горных стражей. |cff7acfffПерезарядка: 49.9 с|r. Мана: 114. Ранг 4/5.
+}
+
+STRING 283
+// Abilities: A118 (), Tip (Tooltip - Normal)
+{
+Гнев исполина [R]
+}
+
+STRING 284
+// Abilities: A118 (), Ubertip (Tooltip - Normal - Extended)
+{
+Серия разрушительных землетрясений с призывом горных стражей. |cff7acfffПерезарядка: 49.2 с|r. Мана: 117. Ранг 5/5.
+}
+
+STRING 285
+// Abilities: A119 (), Tip (Tooltip - Normal)
+{
+Шаг за грань [Q]
+}
+
+STRING 286
+// Abilities: A119 (), Ubertip (Tooltip - Normal - Extended)
+{
+Скачок к ближайшему противнику с мощным ударом из тени. |cff7acfffПерезарядка: 6.7 с|r. Мана: 26. Ранг 2/5.
+}
+
+STRING 287
+// Abilities: A119 (), Tip (Tooltip - Normal)
+{
+Шаг за грань [Q]
+}
+
+STRING 288
+// Abilities: A119 (), Ubertip (Tooltip - Normal - Extended)
+{
+Скачок к ближайшему противнику с мощным ударом из тени. |cff7acfffПерезарядка: 6.3 с|r. Мана: 29. Ранг 3/5.
+}
+
+STRING 289
+// Abilities: A119 (), Tip (Tooltip - Normal)
+{
+Шаг за грань [Q]
+}
+
+STRING 290
+// Abilities: A119 (), Ubertip (Tooltip - Normal - Extended)
+{
+Скачок к ближайшему противнику с мощным ударом из тени. |cff7acfffПерезарядка: 6.0 с|r. Мана: 32. Ранг 4/5.
+}
+
+STRING 291
+// Abilities: A119 (), Tip (Tooltip - Normal)
+{
+Шаг за грань [Q]
+}
+
+STRING 292
+// Abilities: A119 (), Ubertip (Tooltip - Normal - Extended)
+{
+Скачок к ближайшему противнику с мощным ударом из тени. |cff7acfffПерезарядка: 5.6 с|r. Мана: 35. Ранг 5/5.
+}
+
+STRING 293
+// Abilities: A11A (), Tip (Tooltip - Normal)
+{
+Клеймо охотницы [W]
+}
+
+STRING 294
+// Abilities: A11A (), Ubertip (Tooltip - Normal - Extended)
+{
+Накладывает метку приоритета; повторное применение усиливает урон по цели. |cff7acfffПерезарядка: 13.7 с|r. Мана: 43. Ранг 2/5.
+}
+
+STRING 295
+// Abilities: A11A (), Tip (Tooltip - Normal)
+{
+Клеймо охотницы [W]
+}
+
+STRING 296
+// Abilities: A11A (), Ubertip (Tooltip - Normal - Extended)
+{
+Накладывает метку приоритета; повторное применение усиливает урон по цели. |cff7acfffПерезарядка: 13.3 с|r. Мана: 46. Ранг 3/5.
+}
+
+STRING 297
+// Abilities: A11A (), Tip (Tooltip - Normal)
+{
+Клеймо охотницы [W]
+}
+
+STRING 298
+// Abilities: A11A (), Ubertip (Tooltip - Normal - Extended)
+{
+Накладывает метку приоритета; повторное применение усиливает урон по цели. |cff7acfffПерезарядка: 12.9 с|r. Мана: 49. Ранг 4/5.
+}
+
+STRING 299
+// Abilities: A11A (), Tip (Tooltip - Normal)
+{
+Клеймо охотницы [W]
+}
+
+STRING 300
+// Abilities: A11A (), Ubertip (Tooltip - Normal - Extended)
+{
+Накладывает метку приоритета; повторное применение усиливает урон по цели. |cff7acfffПерезарядка: 12.6 с|r. Мана: 52. Ранг 5/5.
+}
+
+STRING 301
+// Abilities: A11B (), Tip (Tooltip - Normal)
+{
+Дымовая завеса [E]
+}
+
+STRING 302
+// Abilities: A11B (), Ubertip (Tooltip - Normal - Extended)
+{
+На мгновение делает героя неуязвимым и создаёт повреждающий дым. |cff7acfffПерезарядка: 16.6 с|r. Мана: 49. Ранг 2/5.
+}
+
+STRING 303
+// Abilities: A11B (), Tip (Tooltip - Normal)
+{
+Дымовая завеса [E]
+}
+
+STRING 304
+// Abilities: A11B (), Ubertip (Tooltip - Normal - Extended)
+{
+На мгновение делает героя неуязвимым и создаёт повреждающий дым. |cff7acfffПерезарядка: 16.3 с|r. Мана: 52. Ранг 3/5.
+}
+
+STRING 305
+// Abilities: A11B (), Tip (Tooltip - Normal)
+{
+Дымовая завеса [E]
+}
+
+STRING 306
+// Abilities: A11B (), Ubertip (Tooltip - Normal - Extended)
+{
+На мгновение делает героя неуязвимым и создаёт повреждающий дым. |cff7acfffПерезарядка: 15.9 с|r. Мана: 55. Ранг 4/5.
+}
+
+STRING 307
+// Abilities: A11B (), Tip (Tooltip - Normal)
+{
+Дымовая завеса [E]
+}
+
+STRING 308
+// Abilities: A11B (), Ubertip (Tooltip - Normal - Extended)
+{
+На мгновение делает героя неуязвимым и создаёт повреждающий дым. |cff7acfffПерезарядка: 15.6 с|r. Мана: 58. Ранг 5/5.
+}
+
+STRING 309
+// Abilities: A11C (), Tip (Tooltip - Normal)
+{
+Приговор ночи [R]
+}
+
+STRING 310
+// Abilities: A11C (), Ubertip (Tooltip - Normal - Extended)
+{
+Казнит раненую цель; если цель выживает, получает крупный урон и взрыв вокруг. |cff7acfffПерезарядка: 55.3 с|r. Мана: 108. Ранг 2/5.
+}
+
+STRING 311
+// Abilities: A11C (), Tip (Tooltip - Normal)
+{
+Приговор ночи [R]
+}
+
+STRING 312
+// Abilities: A11C (), Ubertip (Tooltip - Normal - Extended)
+{
+Казнит раненую цель; если цель выживает, получает крупный урон и взрыв вокруг. |cff7acfffПерезарядка: 54.6 с|r. Мана: 111. Ранг 3/5.
+}
+
+STRING 313
+// Abilities: A11C (), Tip (Tooltip - Normal)
+{
+Приговор ночи [R]
+}
+
+STRING 314
+// Abilities: A11C (), Ubertip (Tooltip - Normal - Extended)
+{
+Казнит раненую цель; если цель выживает, получает крупный урон и взрыв вокруг. |cff7acfffПерезарядка: 53.9 с|r. Мана: 114. Ранг 4/5.
+}
+
+STRING 315
+// Abilities: A11C (), Tip (Tooltip - Normal)
+{
+Приговор ночи [R]
+}
+
+STRING 316
+// Abilities: A11C (), Ubertip (Tooltip - Normal - Extended)
+{
+Казнит раненую цель; если цель выживает, получает крупный урон и взрыв вокруг. |cff7acfffПерезарядка: 53.2 с|r. Мана: 117. Ранг 5/5.
+}
+
+STRING 317
+// Abilities: A11D (), Tip (Tooltip - Normal)
+{
+Копьё вечного льда [Q]
+}
+
+STRING 318
+// Abilities: A11D (), Ubertip (Tooltip - Normal - Extended)
+{
+Ледяной снаряд режет врагов по прямой линии. |cff7acfffПерезарядка: 6.7 с|r. Мана: 26. Ранг 2/5.
+}
+
+STRING 319
+// Abilities: A11D (), Tip (Tooltip - Normal)
+{
+Копьё вечного льда [Q]
+}
+
+STRING 320
+// Abilities: A11D (), Ubertip (Tooltip - Normal - Extended)
+{
+Ледяной снаряд режет врагов по прямой линии. |cff7acfffПерезарядка: 6.3 с|r. Мана: 29. Ранг 3/5.
+}
+
+STRING 321
+// Abilities: A11D (), Tip (Tooltip - Normal)
+{
+Копьё вечного льда [Q]
+}
+
+STRING 322
+// Abilities: A11D (), Ubertip (Tooltip - Normal - Extended)
+{
+Ледяной снаряд режет врагов по прямой линии. |cff7acfffПерезарядка: 6.0 с|r. Мана: 32. Ранг 4/5.
+}
+
+STRING 323
+// Abilities: A11D (), Tip (Tooltip - Normal)
+{
+Копьё вечного льда [Q]
+}
+
+STRING 324
+// Abilities: A11D (), Ubertip (Tooltip - Normal - Extended)
+{
+Ледяной снаряд режет врагов по прямой линии. |cff7acfffПерезарядка: 5.6 с|r. Мана: 35. Ранг 5/5.
+}
+
+STRING 325
+// Abilities: A11E (), Tip (Tooltip - Normal)
+{
+Ледяные цепи [W]
+}
+
+STRING 326
+// Abilities: A11E (), Ubertip (Tooltip - Normal - Extended)
+{
+Ненадолго сковывает ближайших врагов и замедляет их. |cff7acfffПерезарядка: 15.7 с|r. Мана: 43. Ранг 2/5.
+}
+
+STRING 327
+// Abilities: A11E (), Tip (Tooltip - Normal)
+{
+Ледяные цепи [W]
+}
+
+STRING 328
+// Abilities: A11E (), Ubertip (Tooltip - Normal - Extended)
+{
+Ненадолго сковывает ближайших врагов и замедляет их. |cff7acfffПерезарядка: 15.3 с|r. Мана: 46. Ранг 3/5.
+}
+
+STRING 329
+// Abilities: A11E (), Tip (Tooltip - Normal)
+{
+Ледяные цепи [W]
+}
+
+STRING 330
+// Abilities: A11E (), Ubertip (Tooltip - Normal - Extended)
+{
+Ненадолго сковывает ближайших врагов и замедляет их. |cff7acfffПерезарядка: 14.9 с|r. Мана: 49. Ранг 4/5.
+}
+
+STRING 331
+// Abilities: A11E (), Tip (Tooltip - Normal)
+{
+Ледяные цепи [W]
+}
+
+STRING 332
+// Abilities: A11E (), Ubertip (Tooltip - Normal - Extended)
+{
+Ненадолго сковывает ближайших врагов и замедляет их. |cff7acfffПерезарядка: 14.6 с|r. Мана: 52. Ранг 5/5.
+}
+
+STRING 333
+// Abilities: A11F (), Tip (Tooltip - Normal)
+{
+Орбита холода [E]
+}
+
+STRING 334
+// Abilities: A11F (), Ubertip (Tooltip - Normal - Extended)
+{
+Создаёт постоянную морозную область, которая движется вместе с целью только при активации. |cff7acfffПерезарядка: 16.6 с|r. Мана: 49. Ранг 2/5.
+}
+
+STRING 335
+// Abilities: A11F (), Tip (Tooltip - Normal)
+{
+Орбита холода [E]
+}
+
+STRING 336
+// Abilities: A11F (), Ubertip (Tooltip - Normal - Extended)
+{
+Создаёт постоянную морозную область, которая движется вместе с целью только при активации. |cff7acfffПерезарядка: 16.3 с|r. Мана: 52. Ранг 3/5.
+}
+
+STRING 337
+// Abilities: A11F (), Tip (Tooltip - Normal)
+{
+Орбита холода [E]
+}
+
+STRING 338
+// Abilities: A11F (), Ubertip (Tooltip - Normal - Extended)
+{
+Создаёт постоянную морозную область, которая движется вместе с целью только при активации. |cff7acfffПерезарядка: 15.9 с|r. Мана: 55. Ранг 4/5.
+}
+
+STRING 339
+// Abilities: A11F (), Tip (Tooltip - Normal)
+{
+Орбита холода [E]
+}
+
+STRING 340
+// Abilities: A11F (), Ubertip (Tooltip - Normal - Extended)
+{
+Создаёт постоянную морозную область, которая движется вместе с целью только при активации. |cff7acfffПерезарядка: 15.6 с|r. Мана: 58. Ранг 5/5.
+}
+
+STRING 341
+// Abilities: A11G (), Tip (Tooltip - Normal)
+{
+Вечная зима [R]
+}
+
+STRING 342
+// Abilities: A11G (), Ubertip (Tooltip - Normal - Extended)
+{
+Большая снежная буря замедляет врагов и подпитывает жизнью героя. |cff7acfffПерезарядка: 51.3 с|r. Мана: 108. Ранг 2/5.
+}
+
+STRING 343
+// Abilities: A11G (), Tip (Tooltip - Normal)
+{
+Вечная зима [R]
+}
+
+STRING 344
+// Abilities: A11G (), Ubertip (Tooltip - Normal - Extended)
+{
+Большая снежная буря замедляет врагов и подпитывает жизнью героя. |cff7acfffПерезарядка: 50.6 с|r. Мана: 111. Ранг 3/5.
+}
+
+STRING 345
+// Abilities: A11G (), Tip (Tooltip - Normal)
+{
+Вечная зима [R]
+}
+
+STRING 346
+// Abilities: A11G (), Ubertip (Tooltip - Normal - Extended)
+{
+Большая снежная буря замедляет врагов и подпитывает жизнью героя. |cff7acfffПерезарядка: 49.9 с|r. Мана: 114. Ранг 4/5.
+}
+
+STRING 347
+// Abilities: A11G (), Tip (Tooltip - Normal)
+{
+Вечная зима [R]
+}
+
+STRING 348
+// Abilities: A11G (), Ubertip (Tooltip - Normal - Extended)
+{
+Большая снежная буря замедляет врагов и подпитывает жизнью героя. |cff7acfffПерезарядка: 49.2 с|r. Мана: 117. Ранг 5/5.
+}
+
+STRING 349
+{
+|cffffff00Инициализация карты...|r
+}
+
