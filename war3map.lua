@@ -1,5 +1,6 @@
 -- ===========================================================================
--- Map Script: Warcraft III (Lua Mode)
+-- Map Script: Warcraft III Reforged (Lua Mode)
+-- Full 50-Wave Arena, 10 Custom Hero Skillsets, 3-Tier Item Crafting
 -- ===========================================================================
 
 function InitGlobals()
