@@ -1,0 +1,3 @@
+.map-check-deps/
+__pycache__/
+*.w3x.tmp

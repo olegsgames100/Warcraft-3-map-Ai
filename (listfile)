@@ -1,5 +1,5 @@
 war3map.doo
-war3map.j
+war3map.lua
 war3map.mmp
 war3map.shd
 war3map.w3c
@@ -12,3 +12,8 @@ war3map.wtg
 war3map.wts
 war3mapMap.blp
 war3mapUnits.doo
+war3map.w3u
+war3map.w3a
+war3map.w3h
+war3map.w3t
+(listfile)
