@@ -15,32 +15,10 @@ assert(not Arena_UnitInLine({x=300,y=250},0,0,700,0,100))
 assert(not Arena_UnitInLine({x=-1,y=0},0,0,700,0,100))
 assert(not Arena_UnitInLine({x=701,y=0},0,0,700,0,100))
 
-local timers, invulnerabilityCalls, damage = {},0,0
+local timers={}
 function CreateTimer() local t={};table.insert(timers,t);return t end
 function TimerStart(t,delay,periodic,callback) t.delay=delay;t.callback=callback end
-function SetUnitInvulnerable() invulnerabilityCalls=invulnerabilityCalls+1 end
-function BlzSetEventDamage(v) damage=v end
-Arena_Ronin_W(hero,1)
-local stanceTimer=timers[#timers]
-local counterCount=0
-local originalCounter=Arena_Ronin_CounterAttack
-function Arena_Ronin_CounterAttack(caster,absorbed)
-    counterCount=counterCount+1
-    assert(absorbed==83)
-end
-Arena_ParryDamage(hero,83)
-assert(damage==0 and invulnerabilityCalls==0)
-local queued=timers[#timers]
-damage=50
-Arena_ParryDamage(hero,50)
-assert(damage==0 and timers[#timers]==queued)
-queued.callback()
-assert(counterCount==1)
-stanceTimer.callback()
-damage=50
-Arena_ParryDamage(hero,50)
-assert(damage==50, 'block expires after the stance')
-Arena_Ronin_CounterAttack=originalCounter
+function IsTerrainPathable() return false end
 
 local created={}
 function GetUnitFacing() return 0 end
@@ -52,8 +30,12 @@ function CreateUnit(owner,raw,x,y)
     table.insert(created,u)
     return u
 end
+UnitAddAbility(hero,FourCC('A107'))
 Arena_Druid_Q(hero,1)
-assert(#created==1 and created[1].id==FourCC('eD01') and created[1].maxHp==2300)
+assert(#created==1 and created[1].id==FourCC('eD01') and created[1].maxHp==900)
+assert(created[1].baseDamage==59)
+Arena_Druid_Q(hero,1)
+assert(#created==1, 'a second living guardian cannot be summoned')
 Arena_Druid_R(hero,1)
 assert(#created==2 and created[2].id==FourCC('eD02') and DruidDeepwoodColossus[hero]==created[2])
 

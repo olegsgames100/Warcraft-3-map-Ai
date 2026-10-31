@@ -64,9 +64,9 @@ local target=unit(Player(1),400)
 local outside=unit(Player(1),451)
 Arena_Storm_W(hero,1)
 local fieldTimer=timers[#timers]
-assert(fieldTimer.interval==1)
-for i=1,6 do fieldTimer.callback() end
-assert(target.life==760 and outside.life==1000 and fieldTimer.destroyed)
+assert(fieldTimer.interval==1.5)
+for i=1,4 do fieldTimer.callback() end
+assert(target.life==920 and outside.life==1000 and fieldTimer.destroyed)
 
 world={hero}
 hero.life=500; hero.mana=0
@@ -77,8 +77,8 @@ local heroCorpse=unit(Player(1),200,0);heroCorpse.hero=true
 LichSkeletons[hero]={skeleton}
 Arena_Lich_E(hero,1)
 assert(corpse.id==0 and skeleton.life==0 and heroCorpse.id~=0)
-assert(enemy.life==700 and hero.life==580 and hero.mana==100)
+assert(enemy.life==700 and hero.life==580 and hero.mana==20)
 assert(#LichSkeletons[hero]==0)
 -- No second damage/healing from already consumed corpses or dead tracked summons.
 Arena_Lich_E(hero,1)
-assert(enemy.life==700 and hero.life==580 and hero.mana==100)
+assert(enemy.life==700 and hero.life==580 and hero.mana==20)

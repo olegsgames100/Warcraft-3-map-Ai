@@ -28,10 +28,12 @@ creep.life=0
 Arena_UpdateEnemyOrders()
 assert(ArenaEnemies[creep]==nil)
 
-Arena_ResetRoninDash(hero)
-assert(#resets==0)
+local started={}
+function BlzStartUnitAbilityCooldown(u,ability,duration) started[#started+1]={ability,duration} end
+Arena_StartRoninDashCooldown(hero)
+assert(#started==0)
 timers[#timers].callback()
-assert(#resets==1 and resets[1]==FourCC('A115'), 'only the dash may reset')
+assert(#resets==0 and #started==1 and started[1][1]==FourCC('A115') and started[1][2]==8)
 
 function GetSpellTargetUnit() return hero end
 Arena_Priestess_W(hero,1)

@@ -36,7 +36,7 @@ Arena_ApplyBleedStack(enemy,hero,3,8)
 Arena_ApplyBleedStack(enemy,hero,2,8)
 assert(#tags==1 and tags[1].text=='Кровотечение: 5' and not tags[1].destroyed)
 Arena_ApplyInductionStack(enemy,hero,2)
-assert(#tags==2 and tags[2].text=='Проводимость: 2/5')
+assert(#tags==2 and tags[2].text=='Сверхпроводимость: 2/5')
 local inductionEffect=StackIndicators[enemy].induction.effect
 assert(inductionEffect and not inductionEffect.destroyed)
 Arena_ClearStackIndicator(enemy,'induction')
@@ -55,11 +55,13 @@ assert(damageLog[#damageLog].kind==DAMAGE_TYPE_COLD)
 MoveSlows[enemy].timer.callback()
 assert(enemy.speed==300)
 
--- Living skeletons at long range must be consumed, not silently skipped.
+-- Point selection can consume a distant living skeleton, but only inside the selected area.
 local skeleton=CreateUnit(Player(0),FourCC('uske'),4000,0)
 LichSkeletons[hero]={skeleton}
+function GetSpellTargetX() return 4000 end
 Arena_Lich_E(hero,1)
 assert(skeleton.id==0 and #LichSkeletons[hero]==0)
+function GetSpellTargetX() return 700 end
 
 -- W creates a damage-dealing visible unit, with replacement of the oldest at cap.
 for i=1,4 do Arena_Bombardier_W(hero,1) end

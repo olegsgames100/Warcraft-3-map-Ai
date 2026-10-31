@@ -1,0 +1,12 @@
+[Misc]
+// Arena heroes keep gaining neutral-creep XP at every level.
+MaxHeroLevel=30
+HeroFactorXP=100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100
+HeroExpRange=5000.0
+GlobalExperience=1
+MaxLevelHeroesDrainExp=0
+BuildingKillsGiveExp=1
+NeedHeroXP=200
+NeedHeroXPFormulaA=1
+NeedHeroXPFormulaB=100
+NeedHeroXPFormulaC=0

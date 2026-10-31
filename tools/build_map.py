@@ -1,7 +1,7 @@
 """Build the Lua map from the unpacked sources, using only Python's stdlib.
 
-MPQ v1 hash/block tables follow StormLib's format. Files use zlib-compressed
-sectors without single-unit flags for Warcraft III map compatibility.
+MPQ v1 hash/block tables follow StormLib's format. W3X resources always use
+sector storage; MPQ_FILE_SINGLE_UNIT is outside MPQ_FILE_VALID_FLAGS_W3X.
 """
 
 from pathlib import Path
@@ -110,8 +110,9 @@ def build():
     payload = bytearray()
     for index, (name, content) in enumerate(files):
         offset = 32 + len(payload)
+        flags = 0x80000200
         packed = pack_sectors(content)
-        blocks.extend(struct.pack("<4I", offset, len(packed), len(content), 0x80000200))
+        blocks.extend(struct.pack("<4I", offset, len(packed), len(content), flags))
         payload.extend(packed)
         slot = hash_name(name, 0) % count
         while hashes[slot] != b"\xff" * 16:

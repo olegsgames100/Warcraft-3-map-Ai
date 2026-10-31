@@ -79,6 +79,10 @@ def apply():
         changes = {}
         for field, value in [('usnd', sound), ('unam', name), ('utip', name), ('upro', name), ('uhab', '')]:
             changes[field.encode()] = (3, value.encode('utf-8') + b'\0')
+        if rawcode == 'U001':
+            changes[b'upra'] = (3,b'STR\0')
+            changes[b'ustp'] = (2,struct.pack('<f',3.0))
+            changes[b'uinp'] = (2,struct.pack('<f',1.0))
         if rawcode == 'E003':
             changes[b'umdl'] = (3, model.encode('ascii') + b'\0')
         changes[b'uico'] = (3, ('ReplaceableTextures\\CommandButtons\\' + icon + '.blp').encode('ascii') + b'\0')

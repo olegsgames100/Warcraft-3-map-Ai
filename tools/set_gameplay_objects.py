@@ -96,12 +96,12 @@ def apply():
         tables[1] = [entry for entry in tables[1] if entry[1] != raw.encode()]
         tables[1].append((b'efon',raw.encode(),fields_of([
             ('unam',name),('utip',name),('uabi',''),('usca',scale),('umvs',280)
-        ])))
+        ] + ([('ua1d',1),('ua1s',1),('ua1b',40),('uaen',1)] if raw=='eD01' else []))))
     for base,raw,changes in [
         (b'hfoo',b'eC01',[('unam','Хроно-Эхо'),('utip','Хроно-Эхо'),('uabi',''),('uaen',0),('umvs',0),
                          ('umdl',r'units\human\HeroBloodElf\HeroBloodElf.mdl'),('usca',1.5),
                          ('uclr',100),('uclg',170),('uclb',255)]),
-        (b'efon',b'eD03',[('unam','Молодой Древень'),('utip','Молодой Древень'),('uabi',''),('usca',0.8),('umvs',300)]),
+        (b'efon',b'eD03',[('unam','Молодой Древень'),('utip','Молодой Древень'),('uabi',''),('usca',0.8),('umvs',300),('uhpr',0.0)]),
         (b'hctw',b'hT01',[('unam','Орудийная Турель'),('utip','Орудийная Турель'),('uabi',''),
                          ('uhpm',650),('uaen',0),('ufoo',0)])
     ]:
